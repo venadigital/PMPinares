@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --color-dark: #0b0f1a;
+  --color-dark-2: #141827;
+  --color-dark-3: #1e2438;
+  --color-light: #f4f6fb;
+  --color-light-2: #eaecf4;
+  --color-white: #ffffff;
+  --color-accent-1: #f5c518;
+  --color-accent-2: #4f8ef7;
+  --color-accent-3: #ff5c5c;
+  --color-accent-soft: #e8f0ff;
+  --text-primary-dark: #ffffff;
+  --text-secondary-dark: #a8b2d8;
+  --text-primary-light: #0b0f1a;
+  --text-secondary-light: #5a6380;
+  --text-muted: #8892aa;
+  --radius-xl: 28px;
+}
+
+@theme inline {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", "Avenir Next", ui-sans-serif, system-ui, sans-serif;
+  --color-ink: var(--color-dark);
+  --color-ink-2: var(--color-dark-2);
+  --color-ink-3: var(--color-dark-3);
+  --color-paper: var(--color-light);
+  --color-paper-2: var(--color-light-2);
+  --color-sun: var(--color-accent-1);
+  --color-blueprint: var(--color-accent-2);
+  --color-coral: var(--color-accent-3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  color: var(--text-primary-light);
+  background:
+    radial-gradient(circle at 8% 8%, rgba(79, 142, 247, 0.1), transparent 30rem),
+    radial-gradient(circle at 92% 5%, rgba(245, 197, 24, 0.12), transparent 26rem),
+    linear-gradient(145deg, #fbfcff 0%, #f1f4fa 48%, #f7f8fc 100%);
+}
+
+::selection {
+  color: var(--color-dark);
+  background: var(--color-accent-1);
+}
+
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.62));
+  box-shadow: 0 18px 44px rgba(11, 15, 26, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.dark-glass {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(145deg, rgba(11, 15, 26, 0.95), rgba(20, 24, 39, 0.88));
+  box-shadow: 0 18px 48px rgba(11, 15, 26, 0.2);
+  backdrop-filter: blur(18px);
+}
+
+.apple-card {
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 30px rgba(11, 15, 26, 0.07);
+  backdrop-filter: blur(14px);
+}
+
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus-ring:focus-visible {
+  outline-color: var(--color-accent-2);
+}
