@@ -10,6 +10,7 @@ import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/
 import type { ModuleKey, Role } from "@/lib/types";
 
 const adminRoles: Role[] = ["Administrador Vena Digital", "Administrador Pinares"];
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://pinarespm.venadigital.com.co/";
 
 export async function createUserAction(formData: FormData) {
   if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
@@ -73,7 +74,21 @@ export async function createUserAction(formData: FormData) {
   await sendProjectEmail({
     to: email,
     subject: "Invitacion a Pinares Project Control",
-    html: `<p>Hola ${fullName},</p><p>Vena Digital creo tu acceso a Pinares Project Control.</p><p><strong>Usuario:</strong> ${email}<br/><strong>Contrasena temporal:</strong> ${password}</p><p>Puedes cambiar tu contrasena despues de ingresar si lo deseas.</p>`
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6;">
+        <p>Hola ${fullName},</p>
+        <p>Vena Digital creo tu acceso a <strong>Pinares Project Control</strong>.</p>
+        <p>
+          <strong>Link de acceso:</strong>
+          <a href="${appUrl}" style="color: #2563eb;">${appUrl}</a>
+        </p>
+        <p>
+          <strong>Usuario:</strong> ${email}<br/>
+          <strong>Contrasena temporal:</strong> ${password}
+        </p>
+        <p>Puedes cambiar tu contrasena despues de ingresar si lo deseas.</p>
+      </div>
+    `
   });
 
   revalidatePath("/stakeholders");
