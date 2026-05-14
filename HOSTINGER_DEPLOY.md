@@ -46,13 +46,13 @@ El build ejecuta automaticamente `postbuild`, que copia `public` y `.next/static
 Si el panel pide un **startup file**, usa:
 
 ```bash
-.next/standalone/server.js
+server.js
 ```
 
 Si el panel pide un **start command**, usa:
 
 ```bash
-npm run start:hostinger
+npm start
 ```
 
 ## Archivos Que Deben Subirse

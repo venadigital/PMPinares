@@ -5,11 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node .next/standalone/server.js",
+    "start": "node server.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "bootstrap:admin": "node --env-file=.env.local scripts/bootstrap-admin.mjs",
-    "start:hostinger": "node .next/standalone/server.js",
+    "start:hostinger": "node server.js",
     "check:prod": "npm run typecheck && npm run lint && npm run build",
     "postbuild": "node scripts/prepare-standalone.mjs"
   },
