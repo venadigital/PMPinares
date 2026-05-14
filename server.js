@@ -1,23 +1,21 @@
-const { existsSync } = require("node:fs");
-const { join } = require("node:path");
-const { spawn } = require("node:child_process");
+const { createServer } = require("node:http");
+const next = require("next");
 
-const standaloneServer = join(__dirname, ".next", "standalone", "server.js");
+const port = Number.parseInt(process.env.PORT || "3000", 10);
+const hostname = process.env.HOSTNAME || "0.0.0.0";
+const app = next({ dev: false, hostname, port });
+const handle = app.getRequestHandler();
 
-if (existsSync(standaloneServer)) {
-  require(standaloneServer);
-} else {
-  console.warn("Standalone server not found. Falling back to `next start`.");
-
-  const nextBin = require.resolve("next/dist/bin/next");
-  const child = spawn(process.execPath, [nextBin, "start", "-H", "0.0.0.0", "-p", process.env.PORT || "3000"], {
-    cwd: __dirname,
-    env: { ...process.env, NODE_ENV: "production" },
-    stdio: "inherit"
+app
+  .prepare()
+  .then(() => {
+    createServer((request, response) => {
+      handle(request, response);
+    }).listen(port, hostname, () => {
+      console.log(`Pinares Project Control ready on http://${hostname}:${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to start Pinares Project Control", error);
+    process.exit(1);
   });
-
-  child.on("exit", (code, signal) => {
-    if (signal) process.kill(process.pid, signal);
-    process.exit(code ?? 1);
-  });
-}

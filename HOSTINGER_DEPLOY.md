@@ -38,10 +38,10 @@ En Hostinger configura:
 ```bash
 npm ci
 npm run build
-npm run start:hostinger
+npm start
 ```
 
-El build ejecuta automaticamente `postbuild`, que copia `public` y `.next/static` dentro de `.next/standalone` para que Hostinger sirva imagenes, CSS y assets correctamente.
+El arranque se hace desde `server.js`, un servidor Node compatible con Hostinger que usa el puerto `PORT` asignado por la plataforma.
 
 Si el panel pide un **startup file**, usa:
 
