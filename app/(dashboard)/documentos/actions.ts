@@ -111,6 +111,54 @@ export async function deleteDocumentAction(formData: FormData) {
   redirect("/documentos?deleted=1");
 }
 
+export async function deleteFolderAction(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (profile.role !== "Administrador Vena Digital") redirect("/documentos?error=Solo Administrador Vena Digital puede eliminar carpetas");
+  if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) redirect("/documentos?error=Supabase no esta configurado");
+
+  const folderId = String(formData.get("folderId") ?? "").trim();
+  if (!folderId) redirect("/documentos?error=Carpeta no valida");
+
+  const admin = createAdminClient();
+  const { data: folder, error: folderError } = await admin.from("folders").select("id").eq("id", folderId).single();
+  if (folderError || !folder) redirect("/documentos?error=La carpeta no existe");
+
+  const folderIds = await collectFolderTreeIds(folderId);
+  const { data: files, error: filesError } = await admin.from("files").select("storage_path").in("folder_id", folderIds);
+  if (filesError) redirect("/documentos?error=No se pudieron consultar los archivos de la carpeta");
+
+  const storagePaths = (files ?? []).map((file) => file.storage_path).filter(Boolean);
+  if (storagePaths.length > 0) {
+    const { error: removeError } = await admin.storage.from(BUCKET).remove(storagePaths);
+    if (removeError) redirect("/documentos?error=No se pudieron eliminar los archivos del almacenamiento");
+  }
+
+  const { error: deleteError } = await admin.from("folders").delete().eq("id", folderId);
+  if (deleteError) redirect("/documentos?error=No se pudo eliminar la carpeta");
+
+  revalidatePath("/documentos");
+  revalidatePath("/dashboard");
+  redirect("/documentos?folderDeleted=1");
+}
+
+async function collectFolderTreeIds(rootFolderId: string) {
+  const admin = createAdminClient();
+  const collected = new Set([rootFolderId]);
+  let frontier = [rootFolderId];
+
+  while (frontier.length > 0) {
+    const { data, error } = await admin.from("folders").select("id").in("parent_id", frontier);
+    if (error) break;
+
+    frontier = (data ?? [])
+      .map((folder) => folder.id)
+      .filter((id) => !collected.has(id));
+    frontier.forEach((id) => collected.add(id));
+  }
+
+  return [...collected];
+}
+
 function isDocumentAdmin(role: string) {
   return role === "Administrador Vena Digital" || role === "Administrador Pinares";
 }

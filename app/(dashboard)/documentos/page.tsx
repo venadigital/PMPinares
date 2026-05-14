@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/modules/page-header";
-import { createFolderAction, deleteDocumentAction, uploadDocumentAction } from "@/app/(dashboard)/documentos/actions";
+import { createFolderAction, deleteDocumentAction, deleteFolderAction, uploadDocumentAction } from "@/app/(dashboard)/documentos/actions";
 import { getCurrentProfile, hasPermission } from "@/lib/auth";
 import { formatFileSize, getDocumentData } from "@/lib/documents";
 import type { DocumentFile, DocumentFolder } from "@/lib/documents";
@@ -19,10 +19,12 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
   const [{ phases, folders, files }, profile] = await Promise.all([getDocumentData(), getCurrentProfile()]);
   const canView = hasPermission(profile, "documentos", "view");
   const canManage = profile.role === "Administrador Vena Digital" || profile.role === "Administrador Pinares";
+  const canDeleteFolders = profile.role === "Administrador Vena Digital";
   const error = typeof params.error === "string" ? params.error : null;
   const uploaded = params.uploaded === "1";
   const deleted = params.deleted === "1";
   const folderCreated = params.folderCreated === "1";
+  const folderDeleted = params.folderDeleted === "1";
   const activeFolderId = normalizeFolderFilter(params.folderId, folders);
   const visibleFiles = activeFolderId ? files.filter((file) => file.folderId === activeFolderId) : files;
 
@@ -45,7 +47,7 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
         description="Repositorio por fases con archivos finales, vista previa, descarga y eliminacion definitiva segun permisos."
       />
 
-      <StatusMessages error={error} uploaded={uploaded} deleted={deleted} folderCreated={folderCreated} />
+      <StatusMessages error={error} uploaded={uploaded} deleted={deleted} folderCreated={folderCreated} folderDeleted={folderDeleted} />
 
       <section className="mb-5 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
         <UploadPanel folders={folders} canManage={canManage} />
@@ -57,22 +59,32 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
           const label = getFolderDisplayLabel(folder);
           const isActive = activeFolderId === folder.id;
           return (
-            <Link
+            <article
               key={folder.id}
-              href={`/documentos?folderId=${folder.id}`}
-              className={`apple-card focus-ring block p-3.5 transition hover:-translate-y-0.5 hover:bg-white/85 ${
+              className={`apple-card group relative block p-3.5 transition hover:-translate-y-0.5 hover:bg-white/85 ${
                 isActive ? "ring-2 ring-blueprint/35 shadow-md shadow-blueprint/10" : ""
               }`}
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <Link href={`/documentos?folderId=${folder.id}`} className="focus-ring absolute inset-0 rounded-[inherit]" aria-label={`Filtrar por ${label.title} ${label.subtitle}`} />
+                <div className="relative min-w-0">
                   <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Carpeta</p>
                   <p className="mt-1.5 font-semibold leading-tight text-ink">{label.title}</p>
                   <p className="mt-1 text-sm text-slate-500">{label.subtitle}</p>
                 </div>
-                <Badge tone={folder.fileCount > 0 ? "blue" : "neutral"}>{folder.fileCount}</Badge>
+                <div className="relative z-10 flex items-center gap-2">
+                  <Badge tone={folder.fileCount > 0 ? "blue" : "neutral"}>{folder.fileCount}</Badge>
+                  {canDeleteFolders ? (
+                    <form action={deleteFolderAction}>
+                      <input type="hidden" name="folderId" value={folder.id} />
+                      <button className="focus-ring grid h-8 w-8 place-items-center rounded-full bg-coral/10 text-coral opacity-80 ring-1 ring-coral/20 transition hover:bg-coral hover:text-white group-hover:opacity-100" aria-label={`Eliminar carpeta ${folder.name}`}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
               </div>
-            </Link>
+            </article>
           );
         })}
       </section>
@@ -111,13 +123,14 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function StatusMessages({ error, uploaded, deleted, folderCreated }: { error: string | null; uploaded: boolean; deleted: boolean; folderCreated: boolean }) {
+function StatusMessages({ error, uploaded, deleted, folderCreated, folderDeleted }: { error: string | null; uploaded: boolean; deleted: boolean; folderCreated: boolean; folderDeleted: boolean }) {
   return (
     <>
       {error ? <p className="mb-5 rounded-2xl bg-coral/10 p-4 text-sm font-bold text-coral">{error}</p> : null}
       {uploaded ? <p className="mb-5 rounded-2xl bg-emerald-500/10 p-4 text-sm font-bold text-emerald-700">Archivo subido correctamente.</p> : null}
       {deleted ? <p className="mb-5 rounded-2xl bg-blueprint/10 p-4 text-sm font-bold text-blueprint">Archivo eliminado definitivamente.</p> : null}
       {folderCreated ? <p className="mb-5 rounded-2xl bg-blueprint/10 p-4 text-sm font-bold text-blueprint">Carpeta creada correctamente.</p> : null}
+      {folderDeleted ? <p className="mb-5 rounded-2xl bg-blueprint/10 p-4 text-sm font-bold text-blueprint">Carpeta eliminada definitivamente.</p> : null}
     </>
   );
 }
