@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { modules } from "@/lib/data";
 import { sendProjectEmail } from "@/lib/email";
 import { getCurrentProfile } from "@/lib/auth";
@@ -13,6 +13,16 @@ const adminRoles: Role[] = ["Administrador Vena Digital", "Administrador Pinares
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://pinarespm.venadigital.com.co/";
 
 export async function createUserAction(formData: FormData) {
+  try {
+    await createUser(formData);
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("Error inesperado creando usuario:", error);
+    redirect(`/stakeholders?error=${encodeURIComponent(getSafeErrorMessage(error, "No se pudo crear el usuario"))}`);
+  }
+}
+
+async function createUser(formData: FormData) {
   if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
     redirect("/stakeholders?error=Configura Supabase y SUPABASE_SERVICE_ROLE_KEY para crear usuarios reales");
   }
@@ -97,6 +107,16 @@ export async function createUserAction(formData: FormData) {
 }
 
 export async function deleteUserAction(formData: FormData) {
+  try {
+    await deleteUser(formData);
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("Error inesperado eliminando usuario:", error);
+    redirect(`/stakeholders?error=${encodeURIComponent(getSafeErrorMessage(error, "No se pudo eliminar el usuario"))}`);
+  }
+}
+
+async function deleteUser(formData: FormData) {
   if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
     redirect("/stakeholders?error=Configura Supabase y SUPABASE_SERVICE_ROLE_KEY para eliminar usuarios reales");
   }
@@ -124,6 +144,14 @@ export async function deleteUserAction(formData: FormData) {
 
   revalidatePath("/stakeholders");
   redirect("/stakeholders?deleted=1");
+}
+
+function getSafeErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
 }
 
 function buildPermissionRow(formData: FormData, profileId: string, moduleKey: ModuleKey, role: Role) {
