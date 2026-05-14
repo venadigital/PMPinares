@@ -9,6 +9,25 @@ import type { ModuleKey, Role } from "@/lib/types";
 const adminRoles: Role[] = ["Administrador Vena Digital", "Administrador Pinares"];
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://pinarespm.venadigital.com.co/";
 
+interface PermissionInput {
+  moduleKey: ModuleKey;
+  canView?: boolean;
+  canCreate?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+}
+
+interface CreateUserPayload {
+  fullName?: string;
+  email?: string;
+  temporaryPassword?: string;
+  role?: Role;
+  organization?: "Vena Digital" | "Pinares";
+  position?: string;
+  area?: string;
+  permissions?: PermissionInput[];
+}
+
 export async function POST(request: Request) {
   try {
     if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
@@ -36,14 +55,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Solo Administrador Vena Digital puede crear usuarios" }, { status: 403 });
     }
 
-    const formData = await request.formData();
-    const fullName = String(formData.get("fullName") ?? "").trim();
-    const email = String(formData.get("email") ?? "").trim().toLowerCase();
-    const password = String(formData.get("temporaryPassword") ?? "");
-    const role = String(formData.get("role") ?? "Stakeholder Pinares") as Role;
-    const organization = String(formData.get("organization") ?? "Pinares") as "Vena Digital" | "Pinares";
-    const position = String(formData.get("position") ?? "").trim();
-    const area = String(formData.get("area") ?? "").trim();
+    const payload = await request.json() as CreateUserPayload;
+    const fullName = String(payload.fullName ?? "").trim();
+    const email = String(payload.email ?? "").trim().toLowerCase();
+    const password = String(payload.temporaryPassword ?? "");
+    const role = String(payload.role ?? "Stakeholder Pinares") as Role;
+    const organization = String(payload.organization ?? "Pinares") as "Vena Digital" | "Pinares";
+    const position = String(payload.position ?? "").trim();
+    const area = String(payload.area ?? "").trim();
 
     if (!fullName || !email || password.length < 8) {
       return NextResponse.json({ error: "Nombre, correo y contrasena temporal de minimo 8 caracteres son obligatorios" }, { status: 400 });
@@ -78,7 +97,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: profileCreationError.message }, { status: 400 });
     }
 
-    const permissions = modules.map((module) => buildPermissionRow(formData, userId, module.key, role));
+    const permissions = modules.map((module) => buildPermissionRow(payload.permissions ?? [], userId, module.key, role));
     const { error: permissionError } = await admin.from("module_permissions").insert(permissions);
 
     if (permissionError) {
@@ -114,10 +133,11 @@ export async function POST(request: Request) {
   }
 }
 
-function buildPermissionRow(formData: FormData, profileId: string, moduleKey: ModuleKey, role: Role) {
-  const canView = formData.get(`${moduleKey}:view`) === "on" || adminRoles.includes(role);
-  const canCreate = formData.get(`${moduleKey}:create`) === "on" || adminRoles.includes(role);
-  const canEdit = formData.get(`${moduleKey}:edit`) === "on" || adminRoles.includes(role);
+function buildPermissionRow(permissions: PermissionInput[], profileId: string, moduleKey: ModuleKey, role: Role) {
+  const modulePermission = permissions.find((permission) => permission.moduleKey === moduleKey);
+  const canView = Boolean(modulePermission?.canView) || adminRoles.includes(role);
+  const canCreate = Boolean(modulePermission?.canCreate) || adminRoles.includes(role);
+  const canEdit = Boolean(modulePermission?.canEdit) || adminRoles.includes(role);
   const canDelete = adminRoles.includes(role);
 
   return {

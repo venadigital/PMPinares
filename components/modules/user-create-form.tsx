@@ -18,13 +18,32 @@ export function UserCreateForm({ configured }: { configured: boolean }) {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const payload = {
+      fullName: String(formData.get("fullName") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      temporaryPassword: String(formData.get("temporaryPassword") ?? ""),
+      role: String(formData.get("role") ?? "Stakeholder Pinares"),
+      organization: String(formData.get("organization") ?? "Pinares"),
+      position: String(formData.get("position") ?? ""),
+      area: String(formData.get("area") ?? ""),
+      permissions: modules.map((module) => ({
+        moduleKey: module.key,
+        canView: formData.get(`${module.key}:view`) === "on",
+        canCreate: formData.get(`${module.key}:create`) === "on",
+        canEdit: formData.get(`${module.key}:edit`) === "on",
+        canDelete: formData.get(`${module.key}:delete`) === "on"
+      }))
+    };
 
     startTransition(async () => {
       try {
         const response = await fetch("/api/stakeholders/users", {
           method: "POST",
           credentials: "same-origin",
-          body: formData
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
         });
         const responseText = await response.text();
         const result = parseJsonResponse(responseText);
