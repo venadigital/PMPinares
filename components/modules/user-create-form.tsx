@@ -23,9 +23,16 @@ export function UserCreateForm({ configured }: { configured: boolean }) {
       try {
         const response = await fetch("/api/stakeholders/users", {
           method: "POST",
+          credentials: "same-origin",
           body: formData
         });
-        const result = await response.json();
+        const responseText = await response.text();
+        const result = parseJsonResponse(responseText);
+
+        if (!result) {
+          setError(`La plataforma recibio una respuesta inesperada (${response.status}). Intenta recargar la pagina e iniciar sesion nuevamente.`);
+          return;
+        }
 
         if (!response.ok || result.error) {
           setError(result.error ?? "No se pudo crear el usuario");
@@ -107,4 +114,12 @@ export function UserCreateForm({ configured }: { configured: boolean }) {
       </form>
     </Card>
   );
+}
+
+function parseJsonResponse(responseText: string) {
+  try {
+    return JSON.parse(responseText) as { ok?: boolean; error?: string; emailWarning?: boolean };
+  } catch {
+    return null;
+  }
 }

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { modules } from "@/lib/data";
 import { sendProjectEmail } from "@/lib/email";
-import { getCurrentProfile } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/config";
 import type { ModuleKey, Role } from "@/lib/types";
 
@@ -15,7 +15,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Configura Supabase y SUPABASE_SERVICE_ROLE_KEY para crear usuarios reales" }, { status: 500 });
     }
 
-    const currentProfile = await getCurrentProfile();
+    const supabase = await createClient();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json({ error: "Tu sesion expiro. Vuelve a iniciar sesion para crear usuarios." }, { status: 401 });
+    }
+
+    const { data: currentProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single<{ role: Role }>();
+
+    if (profileError || !currentProfile) {
+      return NextResponse.json({ error: "No se encontro el perfil administrador activo para esta sesion." }, { status: 403 });
+    }
+
     if (currentProfile.role !== "Administrador Vena Digital") {
       return NextResponse.json({ error: "Solo Administrador Vena Digital puede crear usuarios" }, { status: 403 });
     }
@@ -46,7 +62,7 @@ export async function POST(request: Request) {
     }
 
     const userId = createdUser.user.id;
-    const { error: profileError } = await admin.from("profiles").insert({
+    const { error: profileCreationError } = await admin.from("profiles").insert({
       id: userId,
       full_name: fullName,
       email,
@@ -57,9 +73,9 @@ export async function POST(request: Request) {
       status: "Activo"
     });
 
-    if (profileError) {
+    if (profileCreationError) {
       await admin.auth.admin.deleteUser(userId);
-      return NextResponse.json({ error: profileError.message }, { status: 400 });
+      return NextResponse.json({ error: profileCreationError.message }, { status: 400 });
     }
 
     const permissions = modules.map((module) => buildPermissionRow(formData, userId, module.key, role));
