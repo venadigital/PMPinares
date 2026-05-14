@@ -59,15 +59,7 @@ export const tasks: Task[] = [
   { id: "t-5", title: "Revisar hallazgos criticos", phaseId: "fase-2", status: "En revision", priority: "Alta", ownerId: "u-1", type: "Tarea" }
 ];
 
-export const deliverables: Deliverable[] = [
-  { id: "d-1", title: "Documento de kickoff", phaseId: "fase-0", status: "Aprobado" },
-  { id: "d-2", title: "Matriz de inventario tecnologico", phaseId: "fase-1", status: "En elaboracion" },
-  { id: "d-3", title: "Repositorio digital de procesos", phaseId: "fase-2", status: "Pendiente" },
-  { id: "d-4", title: "Documento de diagnostico consolidado", phaseId: "fase-3", status: "Pendiente" },
-  { id: "d-5", title: "Mapa del ecosistema tecnologico ideal", phaseId: "fase-4", status: "Pendiente" },
-  { id: "d-6", title: "Roadmap visual con tres horizontes", phaseId: "fase-5", status: "Pendiente" },
-  { id: "d-7", title: "Presentacion ejecutiva de resultados", phaseId: "fase-6", status: "Pendiente" }
-];
+export const deliverables: Deliverable[] = [];
 
 export const documents: DocumentItem[] = [
   { id: "doc-1", name: "Kickoff_Pinares.pdf", folder: "Fase 0", phaseId: "fase-0", type: "PDF", sizeMb: 3.8, uploadedAt: "2026-05-11", uploadedBy: "Laura Salazar" },
