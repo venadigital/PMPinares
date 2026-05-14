@@ -174,7 +174,7 @@ function EmptyState({ title, description, showAllLink = false }: { title: string
 
 function RiskCard({ risk, options, canEdit, canDelete }: { risk: RiskRecord; options: RiskOptions; canEdit: boolean; canDelete: boolean }) {
   return (
-    <details className="group rounded-[1.35rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5">
+    <details className="group rounded-[1.35rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5 open:bg-white/82 open:shadow-md open:shadow-blueprint/10">
       <summary className="flex cursor-pointer list-none flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -205,12 +205,22 @@ function RiskCard({ risk, options, canEdit, canDelete }: { risk: RiskRecord; opt
         </div>
       </summary>
 
-      <div className="mt-4 grid gap-4 border-t border-white/70 pt-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-4">
+      <div className="mt-5 border-t border-white/70 pt-5">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
           <RiskSnapshot risk={risk} />
-          <RiskForm action={updateRiskAction} risk={risk} options={options} canSubmit={canEdit} submitLabel="Guardar cambios" />
+          <AttachmentPanel attachments={risk.attachments} canDelete={canDelete} />
         </div>
-        <AttachmentPanel attachments={risk.attachments} canDelete={canDelete} />
+
+        <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/62 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/70 p-4">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Edicion</p>
+              <h4 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Actualizar riesgo</h4>
+            </div>
+            <Badge tone={canEdit ? "blue" : "neutral"}>{canEdit ? "Editable" : "Solo lectura"}</Badge>
+          </div>
+          <RiskForm action={updateRiskAction} risk={risk} options={options} canSubmit={canEdit} submitLabel="Guardar cambios" variant="compact" />
+        </div>
       </div>
     </details>
   );
@@ -218,15 +228,28 @@ function RiskCard({ risk, options, canEdit, canDelete }: { risk: RiskRecord; opt
 
 function RiskSnapshot({ risk }: { risk: RiskRecord }) {
   return (
-    <div className="grid gap-3 md:grid-cols-3">
-      <InfoBlock label="Normativa" value={risk.regulation} />
-      <InfoBlock label="Nivel" value={risk.level} />
-      <InfoBlock label="Estado" value={risk.status} />
-      <div className="rounded-2xl bg-white/62 p-3 ring-1 ring-white/80 md:col-span-3">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Descripcion</p>
-        <p className="mt-1 text-sm leading-6 text-slate-700">{risk.description || "Sin descripcion registrada."}</p>
+    <div className="rounded-[1.35rem] border border-white/80 bg-white/62 p-4 shadow-sm shadow-ink/5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Resumen del riesgo</p>
+          <h4 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Lectura rapida</h4>
+        </div>
+        <Badge tone={levelTone(risk.level)}>{risk.level}</Badge>
       </div>
-      <div className="rounded-2xl bg-white/62 p-3 ring-1 ring-white/80 md:col-span-3">
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <InfoBlock label="Normativa" value={risk.regulation} />
+        <InfoBlock label="Categoria" value={risk.category} />
+        <InfoBlock label="Estado" value={risk.status} />
+        <InfoBlock label="Creado por" value={risk.createdBy} />
+      </div>
+
+      <div className="mt-3 rounded-2xl bg-white/72 p-4 ring-1 ring-white/80">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Descripcion</p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{risk.description || "Sin descripcion registrada."}</p>
+      </div>
+
+      <div className="mt-3 rounded-2xl bg-white/72 p-4 ring-1 ring-white/80">
         <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Vinculos</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {risk.linkRecords.length > 0 ? risk.linkRecords.map((link) => <Badge key={link.id} tone="neutral">{linkTypeLabel(link.type)}: {link.label}</Badge>) : <span className="text-sm text-slate-500">Sin vinculos registrados.</span>}
@@ -238,15 +261,74 @@ function RiskSnapshot({ risk }: { risk: RiskRecord }) {
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white/62 p-3 ring-1 ring-white/80">
+    <div className="rounded-2xl bg-white/72 p-3 ring-1 ring-white/80">
       <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">{label}</p>
-      <p className="mt-1 text-sm leading-6 text-slate-700">{value}</p>
+      <p className="mt-1 line-clamp-2 text-sm font-medium leading-6 text-slate-700">{value}</p>
     </div>
   );
 }
 
-function RiskForm({ action, risk, options, canSubmit, submitLabel }: { action: (formData: FormData) => void | Promise<void>; risk?: RiskRecord; options: RiskOptions; canSubmit: boolean; submitLabel: string }) {
+function RiskForm({
+  action,
+  risk,
+  options,
+  canSubmit,
+  submitLabel,
+  variant = "full"
+}: {
+  action: (formData: FormData) => void | Promise<void>;
+  risk?: RiskRecord;
+  options: RiskOptions;
+  canSubmit: boolean;
+  submitLabel: string;
+  variant?: "full" | "compact";
+}) {
   const selectedLinks = new Set(risk?.linkRecords.map((link) => link.id) ?? []);
+
+  if (variant === "compact") {
+    return (
+      <form action={action}>
+        <fieldset disabled={!canSubmit} className="grid gap-4 p-4 disabled:opacity-55">
+          {risk ? <input type="hidden" name="riskId" value={risk.id} /> : null}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Field label="Titulo">
+              <Input name="title" defaultValue={risk?.title} placeholder="Ej. Acceso no autorizado a informacion clinica" required />
+            </Field>
+            <SelectField label="Nivel" name="level" defaultValue={risk?.level ?? "Medio"}>
+              {riskLevels.map((level) => <option key={level} value={level}>{level}</option>)}
+            </SelectField>
+            <SelectField label="Estado" name="status" defaultValue={risk?.status ?? "Abierto"}>
+              {riskStatuses.map((status) => <option key={status} value={status}>{status}</option>)}
+            </SelectField>
+            <SelectField label="Categoria" name="category" defaultValue={risk?.category ?? "Operativo"}>
+              {riskCategories.map((category) => <option key={category} value={category}>{category}</option>)}
+            </SelectField>
+            <SelectField label="Normativa" name="regulation" defaultValue={risk?.regulation ?? "No aplica / por definir"}>
+              {riskRegulations.map((regulation) => <option key={regulation} value={regulation}>{regulation}</option>)}
+            </SelectField>
+            <div className="rounded-2xl border border-dashed border-blueprint/20 bg-blueprint/10 p-3">
+              <p className="flex items-center gap-2 text-sm font-semibold text-ink">
+                <Paperclip className="h-4 w-4 text-blueprint" />
+                Agregar soportes
+              </p>
+              <Input name="attachments" type="file" multiple className="mt-3 cursor-pointer bg-white/90 text-xs file:mr-3 file:rounded-full file:border-0 file:bg-blueprint/10 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-blueprint" />
+            </div>
+          </div>
+
+          <Field label="Descripcion">
+            <Textarea name="description" defaultValue={risk?.description} placeholder="Describe el escenario, causa, impacto y contexto del riesgo." className="min-h-28" />
+          </Field>
+
+          <RiskLinks options={options} selectedLinks={selectedLinks} compact />
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/70 pt-4">
+            {!canSubmit ? <p className="text-sm font-medium leading-6 text-slate-600">Tu usuario puede consultar riesgos, pero no tiene permiso para modificarlos.</p> : <p className="text-sm font-medium leading-6 text-slate-500">Los cambios actualizaran la matriz de riesgos y el panel ejecutivo.</p>}
+            <Button type="submit" variant="accent" className="min-w-40 shadow-lg shadow-sun/25">{submitLabel}</Button>
+          </div>
+        </fieldset>
+      </form>
+    );
+  }
 
   return (
     <form action={action} className="grid gap-0">
@@ -331,7 +413,7 @@ function SectionTitle({ icon, eyebrow, title }: { icon: React.ReactNode; eyebrow
   );
 }
 
-function RiskLinks({ options, selectedLinks }: { options: RiskOptions; selectedLinks: Set<string> }) {
+function RiskLinks({ options, selectedLinks, compact = false }: { options: RiskOptions; selectedLinks: Set<string>; compact?: boolean }) {
   const groups = [
     { label: "Areas", options: options.areas },
     { label: "Herramientas", options: options.tools },
@@ -340,10 +422,10 @@ function RiskLinks({ options, selectedLinks }: { options: RiskOptions; selectedL
   ];
 
   return (
-    <div className="rounded-[1.4rem] bg-white/60 p-4 ring-1 ring-white/80">
+    <div className={`${compact ? "rounded-2xl bg-white/72 p-4" : "rounded-[1.4rem] bg-white/60 p-4"} ring-1 ring-white/80`}>
       <SectionTitle icon={<Link2 className="h-4 w-4" />} eyebrow="Trazabilidad" title="Vinculos del riesgo" />
       <p className="mt-3 text-xs leading-5 text-slate-500">Selecciona uno o varios vinculos. Este campo es obligatorio para mantener trazabilidad.</p>
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+      <div className={`mt-4 grid gap-3 ${compact ? "xl:grid-cols-4" : "lg:grid-cols-2"}`}>
         {groups.map((group) => (
           <div key={group.label} className="rounded-[1.2rem] border border-white/80 bg-white/72 p-3 shadow-sm shadow-ink/5">
             <div className="mb-3 flex items-center justify-between gap-3">
