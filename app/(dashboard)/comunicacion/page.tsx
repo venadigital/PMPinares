@@ -123,7 +123,7 @@ function ConversationPanel({ posts, canCreate, canDelete }: { posts: Communicati
 
 function PostCard({ post, canCreate, canDelete }: { post: CommunicationPost; canCreate: boolean; canDelete: boolean }) {
   return (
-    <article className="rounded-[1.4rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5">
+    <article id={`post-${post.id}`} className="scroll-mt-8 rounded-[1.4rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">

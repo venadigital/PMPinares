@@ -11,6 +11,7 @@ import type { UserProfile } from "@/lib/types";
 
 const BUCKET = "project-files";
 const MAX_ATTACHMENT_SIZE = 250 * 1024 * 1024;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://pinarespm.venadigital.com.co/";
 
 export async function createPostAction(formData: FormData) {
   const profile = await getCurrentProfile();
@@ -30,7 +31,7 @@ export async function createPostAction(formData: FormData) {
 
   await syncPostTags(formData, post.id);
   await uploadAttachments(formData.getAll("attachments"), { postId: post.id, uploadedBy: profile.id });
-  await notifyMentions(body, profile);
+  await notifyMentions({ body, author: profile, source: "post", postId: post.id });
 
   revalidatePath("/comunicacion");
   redirect("/comunicacion?posted=1");
@@ -56,7 +57,7 @@ export async function createCommentAction(formData: FormData) {
   if (error || !comment) redirect(`/comunicacion?error=${encodeURIComponent(error?.message ?? "No se pudo comentar")}`);
 
   await uploadAttachments(formData.getAll("attachments"), { commentId: comment.id, uploadedBy: profile.id });
-  await notifyMentions(body, profile);
+  await notifyMentions({ body, author: profile, source: "comment", postId });
 
   revalidatePath("/comunicacion");
   redirect("/comunicacion?commented=1");
@@ -164,7 +165,7 @@ async function uploadAttachments(files: FormDataEntryValue[], parent: { postId?:
   }
 }
 
-async function notifyMentions(body: string, author: UserProfile) {
+async function notifyMentions({ body, author, source, postId }: { body: string; author: UserProfile; source: "post" | "comment"; postId?: string }) {
   const admin = getAdminOrRedirect();
   const { data } = await admin.from("profiles").select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)").eq("status", "Activo");
   const users = (data ?? []).map((profile) => ({
@@ -180,14 +181,33 @@ async function notifyMentions(body: string, author: UserProfile) {
   })) as UserProfile[];
 
   const mentionedUsers = findMentionedUsers(body, users).filter((user) => user.id !== author.id);
+  const communicationUrl = buildCommunicationUrl(postId);
+  const sourceLabel = source === "comment" ? "un comentario" : "una nueva publicacion";
+  const subject = source === "comment"
+    ? "Te mencionaron en un comentario de Pinares Project Control"
+    : "Te mencionaron en Pinares Project Control";
+
   await Promise.all(mentionedUsers.map((user) => sendProjectEmail({
     to: user.email,
-    subject: "Te mencionaron en Pinares Project Control",
+    subject,
     html: `
-      <p>Hola ${escapeHtml(user.name)},</p>
-      <p>${escapeHtml(author.name)} te menciono en el muro de comunicacion del proyecto.</p>
-      <blockquote>${escapeHtml(body)}</blockquote>
-      <p>Ingresa a Pinares Project Control para responder o revisar el contexto.</p>
+      <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6; max-width: 640px;">
+        <p>Hola ${escapeHtml(user.name)},</p>
+        <p><strong>${escapeHtml(author.name)}</strong> te menciono en ${sourceLabel} dentro del muro de comunicacion de <strong>Pinares Project Control</strong>.</p>
+        <div style="margin: 20px 0; padding: 16px; border-left: 4px solid #3b82f6; background: #f8fbff; border-radius: 12px;">
+          <p style="margin: 0; color: #334155;">${escapeHtml(summarizeMessage(body))}</p>
+        </div>
+        <p>Puedes ingresar a la plataforma para revisar el contexto, responder o comentar el mensaje.</p>
+        <p style="margin: 24px 0;">
+          <a href="${escapeHtml(communicationUrl)}" style="display: inline-block; padding: 12px 18px; border-radius: 999px; background: #facc15; color: #0f172a; font-weight: 700; text-decoration: none;">
+            Ver mensaje en la plataforma
+          </a>
+        </p>
+        <p style="font-size: 13px; color: #64748b;">
+          Si el boton no abre correctamente, copia este enlace en tu navegador:<br/>
+          <a href="${escapeHtml(communicationUrl)}" style="color: #2563eb;">${escapeHtml(communicationUrl)}</a>
+        </p>
+      </div>
     `
   })));
 }
@@ -205,6 +225,19 @@ function findMentionedUsers(body: string, users: UserProfile[]) {
     ]);
     return [...options].some((handle) => handles.has(handle));
   });
+}
+
+function buildCommunicationUrl(postId?: string) {
+  const baseUrl = APP_URL.endsWith("/") ? APP_URL : `${APP_URL}/`;
+  const url = new URL("comunicacion", baseUrl);
+  if (postId) url.hash = `post-${postId}`;
+  return url.toString();
+}
+
+function summarizeMessage(value: string) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= 420) return normalized;
+  return `${normalized.slice(0, 417)}...`;
 }
 
 async function removeAttachmentsForPost(postId: string) {
