@@ -71,7 +71,7 @@ export async function createUserAction(formData: FormData) {
     redirect(`/stakeholders?error=${encodeURIComponent(permissionError.message)}`);
   }
 
-  await sendProjectEmail({
+  const emailResult = await sendProjectEmail({
     to: email,
     subject: "Invitacion a Pinares Project Control",
     html: `
@@ -90,9 +90,10 @@ export async function createUserAction(formData: FormData) {
       </div>
     `
   });
+  const emailWarning = "error" in emailResult && Boolean(emailResult.error);
 
   revalidatePath("/stakeholders");
-  redirect("/stakeholders?created=1");
+  redirect(emailWarning ? "/stakeholders?created=1&emailWarning=1" : "/stakeholders?created=1");
 }
 
 export async function deleteUserAction(formData: FormData) {

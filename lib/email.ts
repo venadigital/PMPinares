@@ -9,10 +9,21 @@ export async function sendProjectEmail({ to, subject, html }: { to: string; subj
     return { skipped: true };
   }
 
-  return resend.emails.send({
-    from: `Pinares Project Control <${fromEmail}>`,
-    to,
-    subject,
-    html
-  });
+  try {
+    const result = await resend.emails.send({
+      from: `Pinares Project Control <${fromEmail}>`,
+      to,
+      subject,
+      html
+    });
+
+    if (result.error) {
+      console.error("Resend no pudo enviar el correo:", { to, subject, error: result.error });
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error inesperado enviando correo con Resend:", { to, subject, error });
+    return { data: null, error };
+  }
 }

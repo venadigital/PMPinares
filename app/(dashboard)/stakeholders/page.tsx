@@ -13,13 +13,15 @@ export default async function StakeholdersPage({ searchParams }: StakeholdersPag
   const [users, currentProfile] = await Promise.all([getProfiles(), getCurrentProfile()]);
   const error = typeof params.error === "string" ? params.error : null;
   const created = params.created === "1";
+  const emailWarning = params.emailWarning === "1";
   const deleted = params.deleted === "1";
   const canDeleteUsers = currentProfile.role === "Administrador Vena Digital";
 
   return (
     <>
       <PageHeader eyebrow="Usuarios y permisos" title="Stakeholders" description="Gestion de usuarios, roles, contrasena temporal y acceso granular por modulo." />
-      {created ? <p className="mb-5 rounded-2xl bg-emerald-500/10 p-4 text-sm font-bold text-emerald-700">Usuario creado correctamente. Si Resend esta configurado, la invitacion fue enviada por correo.</p> : null}
+      {created ? <p className="mb-5 rounded-2xl bg-emerald-500/10 p-4 text-sm font-bold text-emerald-700">Usuario creado correctamente{emailWarning ? "." : " y la invitacion fue enviada por correo."}</p> : null}
+      {emailWarning ? <p className="mb-5 rounded-2xl bg-gold/15 p-4 text-sm font-bold text-amber-700">El usuario fue creado, pero no se pudo enviar la invitacion por correo. Revisa la configuracion de Resend o comparte el acceso manualmente.</p> : null}
       {deleted ? <p className="mb-5 rounded-2xl bg-blueprint/10 p-4 text-sm font-bold text-blueprint">Usuario eliminado correctamente.</p> : null}
       {error ? <p className="mb-5 rounded-2xl bg-coral/10 p-4 text-sm font-bold text-coral">{error}</p> : null}
       <UserCreateForm />
