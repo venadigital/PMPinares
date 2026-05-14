@@ -1,12 +1,46 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { modules, areas } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/input";
-import { createUserAction } from "@/app/(dashboard)/stakeholders/actions";
-import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/config";
 
-export function UserCreateForm() {
-  const configured = isSupabaseConfigured() && isSupabaseAdminConfigured();
+export function UserCreateForm({ configured }: { configured: boolean }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    startTransition(async () => {
+      try {
+        const response = await fetch("/api/stakeholders/users", {
+          method: "POST",
+          body: formData
+        });
+        const result = await response.json();
+
+        if (!response.ok || result.error) {
+          setError(result.error ?? "No se pudo crear el usuario");
+          return;
+        }
+
+        form.reset();
+        router.push(`/stakeholders?created=1${result.emailWarning ? "&emailWarning=1" : ""}`);
+        router.refresh();
+      } catch (requestError) {
+        console.error("No se pudo completar la creacion del usuario:", requestError);
+        setError("No se pudo crear el usuario. Intentalo nuevamente.");
+      }
+    });
+  }
 
   return (
     <Card className="mb-6">
@@ -14,7 +48,8 @@ export function UserCreateForm() {
       {!configured ? (
         <p className="mb-5 rounded-xl bg-sun/20 p-3.5 text-sm font-medium text-ink">Modo demo: para crear usuarios reales configura `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` en `.env.local`.</p>
       ) : null}
-      <form action={createUserAction} className="space-y-6">
+      {error ? <p className="mb-5 rounded-2xl bg-coral/10 p-4 text-sm font-bold text-coral">{error}</p> : null}
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <Field label="Nombre completo"><Input name="fullName" placeholder="Nombre del usuario" required /></Field>
           <Field label="Correo electronico"><Input name="email" type="email" placeholder="usuario@pinares.co" required /></Field>
@@ -68,7 +103,7 @@ export function UserCreateForm() {
             </table>
           </div>
         </div>
-        <Button type="submit" variant="accent">Crear usuario y enviar invitacion</Button>
+        <Button type="submit" variant="accent" disabled={isPending}>{isPending ? "Creando usuario..." : "Crear usuario y enviar invitacion"}</Button>
       </form>
     </Card>
   );
