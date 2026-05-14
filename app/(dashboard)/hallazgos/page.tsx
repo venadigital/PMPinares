@@ -176,7 +176,7 @@ function FindingsList({ findings, areas, activeFilter, canEdit, canDelete }: { f
 
 function FindingCard({ finding, areas, canEdit, canDelete }: { finding: FindingRecord; areas: FindingArea[]; canEdit: boolean; canDelete: boolean }) {
   return (
-    <details className="group rounded-[1.35rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5">
+    <details className="group rounded-[1.35rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5 open:bg-white/82 open:shadow-md open:shadow-blueprint/10">
       <summary className="flex cursor-pointer list-none flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -206,13 +206,21 @@ function FindingCard({ finding, areas, canEdit, canDelete }: { finding: FindingR
         </div>
       </summary>
 
-      <div className="mt-4 grid gap-4 border-t border-white/70 pt-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-4">
+      <div className="mt-5 border-t border-white/70 pt-5">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
           <FindingSnapshot finding={finding} />
-          <FindingForm action={updateFindingAction} finding={finding} areas={areas} canSubmit={canEdit} submitLabel="Guardar cambios" />
-        </div>
-        <div className="space-y-4">
           <AttachmentPanel attachments={finding.attachments} canDelete={canDelete} />
+        </div>
+
+        <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/62 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/70 p-4">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Edicion</p>
+              <h4 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Actualizar hallazgo</h4>
+            </div>
+            <Badge tone={canEdit ? "blue" : "neutral"}>{canEdit ? "Editable" : "Solo lectura"}</Badge>
+          </div>
+          <FindingForm action={updateFindingAction} finding={finding} areas={areas} canSubmit={canEdit} submitLabel="Guardar cambios" variant="compact" />
         </div>
       </div>
     </details>
@@ -221,13 +229,25 @@ function FindingCard({ finding, areas, canEdit, canDelete }: { finding: FindingR
 
 function FindingSnapshot({ finding }: { finding: FindingRecord }) {
   return (
-    <div className="grid gap-3 md:grid-cols-3">
-      <InfoBlock label="Area" value={finding.area} />
-      <InfoBlock label="Clasificacion" value={finding.classification} />
-      <InfoBlock label="Estado" value={finding.status} />
-      <div className="rounded-2xl bg-white/62 p-3 ring-1 ring-white/80 md:col-span-3">
+    <div className="rounded-[1.35rem] border border-white/80 bg-white/62 p-4 shadow-sm shadow-ink/5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Resumen del hallazgo</p>
+          <h4 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Lectura rapida</h4>
+        </div>
+        <Badge tone={criticalityTone(finding.criticality)}>{finding.criticality}</Badge>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <InfoBlock label="Area" value={finding.area} />
+        <InfoBlock label="Clasificacion" value={finding.classification} />
+        <InfoBlock label="Estado" value={finding.status} />
+        <InfoBlock label="Reportado por" value={finding.identifiedBy} />
+      </div>
+
+      <div className="mt-3 rounded-2xl bg-white/72 p-4 ring-1 ring-white/80">
         <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Descripcion</p>
-        <p className="mt-1 text-sm leading-6 text-slate-700">{finding.description || "Sin descripcion registrada."}</p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{finding.description || "Sin descripcion registrada."}</p>
       </div>
     </div>
   );
@@ -235,9 +255,9 @@ function FindingSnapshot({ finding }: { finding: FindingRecord }) {
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white/62 p-3 ring-1 ring-white/80">
+    <div className="rounded-2xl bg-white/72 p-3 ring-1 ring-white/80">
       <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">{label}</p>
-      <p className="mt-1 text-sm leading-6 text-slate-700">{value}</p>
+      <p className="mt-1 line-clamp-2 text-sm font-medium leading-6 text-slate-700">{value}</p>
     </div>
   );
 }
@@ -247,14 +267,58 @@ function FindingForm({
   finding,
   areas,
   canSubmit,
-  submitLabel
+  submitLabel,
+  variant = "full"
 }: {
   action: (formData: FormData) => void | Promise<void>;
   finding?: FindingRecord;
   areas: FindingArea[];
   canSubmit: boolean;
   submitLabel: string;
+  variant?: "full" | "compact";
 }) {
+  if (variant === "compact") {
+    return (
+      <form action={action}>
+        <fieldset disabled={!canSubmit} className="grid gap-4 p-4 disabled:opacity-55">
+          {finding ? <input type="hidden" name="findingId" value={finding.id} /> : null}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Field label="Titulo">
+              <Input name="title" defaultValue={finding?.title} placeholder="Ej. Duplicidad manual entre sistemas" required />
+            </Field>
+            <SelectField label="Area" name="areaId" defaultValue={finding?.areaId ?? ""}>
+              <option value="">Sin area</option>
+              {areas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}
+            </SelectField>
+            <SelectField label="Clasificacion" name="classification" defaultValue={finding?.classification ?? "Operativo"}>
+              {findingClassifications.map((classification) => <option key={classification} value={classification}>{classification}</option>)}
+            </SelectField>
+            <SelectField label="Criticidad" name="criticality" defaultValue={finding?.criticality ?? "Media"}>
+              {findingCriticalities.map((criticality) => <option key={criticality} value={criticality}>{criticality}</option>)}
+            </SelectField>
+            <SelectField label="Estado" name="status" defaultValue={finding?.status ?? "Identificado"}>
+              {findingStatuses.map((status) => <option key={status} value={status}>{status}</option>)}
+            </SelectField>
+            <div className="rounded-2xl border border-dashed border-blueprint/20 bg-blueprint/10 p-3">
+              <p className="flex items-center gap-2 text-sm font-semibold text-ink">
+                <Paperclip className="h-4 w-4 text-blueprint" />
+                Agregar evidencias
+              </p>
+              <Input name="attachments" type="file" multiple className="mt-3 cursor-pointer bg-white/90 text-xs file:mr-3 file:rounded-full file:border-0 file:bg-blueprint/10 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-blueprint" />
+            </div>
+          </div>
+          <Field label="Descripcion">
+            <Textarea name="description" defaultValue={finding?.description} placeholder="Describe el hallazgo, evidencia observada, impacto o contexto operativo." className="min-h-28" />
+          </Field>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/70 pt-4">
+            {!canSubmit ? <p className="text-sm font-medium leading-6 text-slate-600">Tu usuario puede consultar hallazgos, pero no tiene permiso para modificarlos.</p> : <p className="text-sm font-medium leading-6 text-slate-500">Los cambios actualizaran la matriz y el panel ejecutivo.</p>}
+            <Button type="submit" variant="accent" className="min-w-40 shadow-lg shadow-sun/25">{submitLabel}</Button>
+          </div>
+        </fieldset>
+      </form>
+    );
+  }
+
   return (
     <form action={action} className="grid gap-0">
       <fieldset disabled={!canSubmit} className="grid gap-0 disabled:opacity-55">
