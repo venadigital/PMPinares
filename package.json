@@ -5,13 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node server.js",
+    "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "bootstrap:admin": "node --env-file=.env.local scripts/bootstrap-admin.mjs",
-    "start:hostinger": "node server.js",
-    "check:prod": "npm run typecheck && npm run lint && npm run build",
-    "postbuild": "node scripts/prepare-standalone.mjs"
+    "start:custom": "node server.js",
+    "check:prod": "npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
