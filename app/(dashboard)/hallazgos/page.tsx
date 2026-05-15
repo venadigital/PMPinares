@@ -15,7 +15,7 @@ interface FindingsPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-type FindingFilter = "all" | "critical" | "pending" | "validated" | "evidence";
+type FindingFilter = "all" | "high" | "medium" | "low";
 
 export default async function FindingsPage({ searchParams }: FindingsPageProps) {
   const params = searchParams ? await searchParams : {};
@@ -89,17 +89,16 @@ function FindingCreatePanel({ areas, canCreate }: { areas: FindingArea[]; canCre
 }
 
 function FindingsOverview({ findings, activeFilter }: { findings: FindingRecord[]; activeFilter: FindingFilter }) {
-  const critical = findings.filter((finding) => finding.criticality === "Alta").length;
-  const validated = findings.filter((finding) => finding.status === "Validado").length;
-  const evidenceCount = findings.filter((finding) => finding.attachments.length > 0).length;
-  const pending = findings.filter((finding) => finding.status === "Identificado" || finding.status === "En analisis").length;
+  const high = findings.filter((finding) => finding.criticality === "Alta").length;
+  const medium = findings.filter((finding) => finding.criticality === "Media").length;
+  const low = findings.filter((finding) => finding.criticality === "Baja").length;
 
   return (
     <div className="mt-5 grid gap-3 sm:grid-cols-4">
-        <Metric label="Criticos" value={critical} tone="red" filter="critical" activeFilter={activeFilter} />
-        <Metric label="Pendientes" value={pending} tone="yellow" filter="pending" activeFilter={activeFilter} />
-        <Metric label="Validados" value={validated} tone="green" filter="validated" activeFilter={activeFilter} />
-        <Metric label="Evidencias" value={evidenceCount} tone="blue" filter="evidence" activeFilter={activeFilter} />
+      <Metric label="Todos" value={findings.length} tone="blue" filter="all" activeFilter={activeFilter} />
+      <Metric label="Criticidad alta" value={high} tone="red" filter="high" activeFilter={activeFilter} />
+      <Metric label="Criticidad media" value={medium} tone="yellow" filter="medium" activeFilter={activeFilter} />
+      <Metric label="Criticidad baja" value={low} tone="green" filter="low" activeFilter={activeFilter} />
     </div>
   );
 }
@@ -115,7 +114,7 @@ function Metric({ label, value, tone = "neutral", filter, activeFilter }: { labe
   const activeClass = activeFilter === filter ? "ring-2 ring-blueprint/35 shadow-md shadow-blueprint/10" : "hover:-translate-y-px hover:bg-white/80";
 
   return (
-    <Link href={`/hallazgos?findingFilter=${filter}`} className={`focus-ring block rounded-2xl px-4 py-3 transition ring-1 ring-white/80 ${toneClass} ${activeClass}`}>
+    <Link href={filter === "all" ? "/hallazgos" : `/hallazgos?findingFilter=${filter}`} className={`focus-ring block rounded-2xl px-4 py-3 transition ring-1 ring-white/80 ${toneClass} ${activeClass}`}>
       <p className="text-xl font-bold">{value}</p>
       <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-70">{label}</p>
     </Link>
@@ -464,14 +463,14 @@ function statusTone(status: FindingRecord["status"]): "neutral" | "blue" | "yell
 
 function normalizeFindingFilter(value: string | string[] | undefined): FindingFilter {
   const parsed = Array.isArray(value) ? value[0] : value;
-  if (parsed === "critical" || parsed === "pending" || parsed === "validated" || parsed === "evidence") return parsed;
+  if (parsed === "critical" || parsed === "high") return "high";
+  if (parsed === "medium" || parsed === "low") return parsed;
   return "all";
 }
 
 function filterFindings(findings: FindingRecord[], filter: FindingFilter) {
-  if (filter === "critical") return findings.filter((finding) => finding.criticality === "Alta");
-  if (filter === "pending") return findings.filter((finding) => finding.status === "Identificado" || finding.status === "En analisis");
-  if (filter === "validated") return findings.filter((finding) => finding.status === "Validado");
-  if (filter === "evidence") return findings.filter((finding) => finding.attachments.length > 0);
+  if (filter === "high") return findings.filter((finding) => finding.criticality === "Alta");
+  if (filter === "medium") return findings.filter((finding) => finding.criticality === "Media");
+  if (filter === "low") return findings.filter((finding) => finding.criticality === "Baja");
   return findings;
 }
