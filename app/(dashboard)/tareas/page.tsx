@@ -1,9 +1,9 @@
-import { CalendarDays, CheckCircle2, Download, Eye, FileText, Link2, MessageSquare, Paperclip, Plus, Send, Trash2, Users } from "lucide-react";
+import { CalendarDays, Download, Eye, FileText, Link2, MessageSquare, Paperclip, Plus, Send, SlidersHorizontal, Trash2, Users } from "lucide-react";
 import { createProjectTaskAction, createProjectTaskCommentAction, deleteProjectTaskAction, updateProjectTaskAction } from "@/app/(dashboard)/tareas/actions";
 import { PageHeader } from "@/components/modules/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { getCurrentProfile, hasPermission } from "@/lib/auth";
 import { formatOptionalDate, getProjectTasksData, projectTaskPriorities, projectTaskStatuses, type ProjectTaskAttachment, type ProjectTaskRecord, type ProjectTaskStatus } from "@/lib/project-tasks";
@@ -61,7 +61,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
 
       <StatusMessages params={params} />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)]">
+      <div className="grid gap-5">
         <TaskCreatePanel canCreate={canCreate} phases={phases} users={users} findings={findings} risks={risks} />
         <TaskMatrix
           tasks={filteredTasks}
@@ -87,79 +87,89 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
 function TaskCreatePanel({ canCreate, phases, users, findings, risks }: { canCreate: boolean; phases: Phase[]; users: UserProfile[]; findings: { id: string; label: string }[]; risks: { id: string; label: string }[] }) {
   return (
     <Card className="overflow-hidden p-0">
-      <div className="border-b border-white/70 p-5">
-        <CardHeader eyebrow="Nueva tarea" title="Crear tarea" action={<Badge tone="blue">Asignable</Badge>} />
-        <p className="text-sm leading-6 text-slate-600">Registra una tarea operativa, asigna usuarios y vincula hallazgos o riesgos si aplica.</p>
+      <div className="grid gap-3 border-b border-white/70 bg-white/45 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div>
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Nueva tarea</p>
+          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">Crear tarea operativa</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Completa lo esencial, asigna responsables y vincula hallazgos o riesgos solo si aportan contexto.</p>
+        </div>
+        <Badge tone="blue" className="w-fit">Notifica por correo</Badge>
       </div>
 
-      <form action={createProjectTaskAction} className="grid gap-5 p-5">
+      <form action={createProjectTaskAction} className="p-5">
         <fieldset disabled={!canCreate} className="grid gap-5 disabled:opacity-55">
-          <section className="rounded-[1.35rem] border border-white/80 bg-white/62 p-4">
-            <p className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Datos base</p>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <Field label="Titulo">
-                <Input name="title" placeholder="Ej. Validar responsable de inventario" required />
-              </Field>
-              <Field label="Prioridad">
-                <Select name="priority" defaultValue="Media">
-                  {projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}
-                </Select>
-              </Field>
-              <Field label="Fase ligada">
-                <Select name="phaseId" defaultValue="">
-                  <option value="">Sin fase</option>
-                  {phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}
-                </Select>
-              </Field>
-              <Field label="Estado">
-                <Select name="status" defaultValue="Pendiente">
-                  {projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}
-                </Select>
-              </Field>
-              <Field label="Fecha inicio">
-                <Input name="startDate" type="date" />
-              </Field>
-              <Field label="Fecha finalizacion">
-                <Input name="dueDate" type="date" />
+          <section className="grid gap-4 rounded-[1.35rem] border border-white/80 bg-white/62 p-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
+            <div className="grid gap-4">
+              <SectionTitle title="Que se debe hacer" eyebrow="Datos base" />
+              <div className="grid gap-4 md:grid-cols-[minmax(0,1.4fr)_13rem]">
+                <Field label="Titulo">
+                  <Input name="title" placeholder="Ej. Validar responsable de inventario" required />
+                </Field>
+                <Field label="Prioridad">
+                  <Select name="priority" defaultValue="Media">
+                    {projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}
+                  </Select>
+                </Field>
+              </div>
+              <Field label="Descripcion">
+                <Textarea name="description" placeholder="Contexto, alcance o instrucciones para resolver la tarea." className="min-h-20" />
               </Field>
             </div>
-            <Field label="Descripcion">
-              <Textarea name="description" placeholder="Contexto, alcance o instrucciones para resolver la tarea." className="min-h-28" />
-            </Field>
+
+            <div className="grid gap-4 rounded-[1.1rem] bg-white/60 p-4 ring-1 ring-white/80">
+              <SectionTitle title="Gestion" eyebrow="Asignacion" compact />
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                <Field label="Fase ligada">
+                  <Select name="phaseId" defaultValue="">
+                    <option value="">Sin fase</option>
+                    {phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}
+                  </Select>
+                </Field>
+                <Field label="Estado">
+                  <Select name="status" defaultValue="Pendiente">
+                    {projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}
+                  </Select>
+                </Field>
+                <Field label="Fecha inicio">
+                  <Input name="startDate" type="date" />
+                </Field>
+                <Field label="Fecha finalizacion">
+                  <Input name="dueDate" type="date" />
+                </Field>
+              </div>
+            </div>
           </section>
 
-          <OptionPanel title="Usuarios asignados" icon={<Users className="h-4 w-4" />} empty="No hay usuarios disponibles.">
-            {users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} description={user.area || user.role} />)}
-          </OptionPanel>
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            <OptionPanel title="Hallazgos vinculados" icon={<Link2 className="h-4 w-4" />} empty="No hay hallazgos registrados.">
+          <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(0,1fr)]">
+            <OptionPanel title="Usuarios asignados" icon={<Users className="h-4 w-4" />} empty="No hay usuarios disponibles." count={users.length}>
+              {users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} description={user.area || user.role} />)}
+            </OptionPanel>
+            <OptionPanel title="Hallazgos" icon={<Link2 className="h-4 w-4" />} empty="No hay hallazgos registrados." count={findings.length}>
               {findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} />)}
             </OptionPanel>
-            <OptionPanel title="Riesgos vinculados" icon={<Link2 className="h-4 w-4" />} empty="No hay riesgos registrados.">
+            <OptionPanel title="Riesgos" icon={<Link2 className="h-4 w-4" />} empty="No hay riesgos registrados." count={risks.length}>
               {risks.map((risk) => <CheckboxPill key={risk.id} name="riskIds" value={risk.id} title={risk.label} />)}
             </OptionPanel>
-          </div>
+          </section>
 
-          <section className="rounded-[1.35rem] border border-dashed border-blueprint/25 bg-blueprint/7 p-4">
-            <div className="mb-3 flex items-start gap-3">
-              <Paperclip className="mt-0.5 h-4 w-4 text-blueprint" />
+          <section className="grid gap-4 rounded-[1.35rem] border border-dashed border-blueprint/25 bg-blueprint/7 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.9fr)_auto] lg:items-center">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint">
+                <Paperclip className="h-4 w-4" />
+              </span>
               <div>
-                <p className="text-sm font-semibold text-ink">Adjuntar archivos</p>
-                <p className="mt-1 text-xs leading-5 text-slate-500">Puedes subir soportes de hasta 250 MB por archivo.</p>
+                <p className="text-sm font-semibold text-ink">Adjuntos de soporte</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">PDF, Word, Excel, imagenes u otros archivos. Maximo 250 MB por archivo.</p>
               </div>
             </div>
             <Input name="attachments" type="file" multiple className="bg-white/85" />
-          </section>
-
-          <div className="flex justify-end">
-            <Button type="submit" variant="accent" className="gap-2">
+            <Button type="submit" variant="accent" className="gap-2 whitespace-nowrap">
               <Plus className="h-4 w-4" />
               Crear tarea
             </Button>
-          </div>
+          </section>
         </fieldset>
-        {!canCreate ? <p className="rounded-xl bg-blueprint/10 p-3 text-sm font-medium text-slate-600">Tu usuario puede consultar tareas, pero no tiene permiso para crearlas.</p> : null}
+        {!canCreate ? <p className="mt-4 rounded-xl bg-blueprint/10 p-3 text-sm font-medium text-slate-600">Tu usuario puede consultar tareas, pero no tiene permiso para crearlas.</p> : null}
       </form>
     </Card>
   );
@@ -186,41 +196,54 @@ function TaskMatrix(props: {
 
   return (
     <Card className="overflow-hidden p-0">
-      <div className="border-b border-white/70 p-5">
-        <CardHeader eyebrow="Matriz" title="Tareas registradas" action={<Badge tone="yellow">{tasks.length} tareas</Badge>} />
-        <p className="text-sm leading-6 text-slate-600">Filtra por estado, prioridad, fase, responsable o trazabilidad asociada.</p>
+      <div className="grid gap-3 border-b border-white/70 bg-white/45 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div>
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Matriz</p>
+          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">Tareas registradas</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Revisa estado, responsables, vencimientos y trazabilidad asociada sin mezclarlo con el avance del cronograma.</p>
+        </div>
+        <Badge tone="yellow" className="w-fit">{tasks.length} tareas</Badge>
       </div>
 
-      <div className="grid gap-4 p-5">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-5 p-5">
+        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           <FilterCard href="/tareas" active={activeStatus === "all"} count={allTasks.length} label="Todas" />
           {projectTaskStatuses.map((status) => (
             <FilterCard key={status} href={`/tareas?status=${encodeURIComponent(status)}`} active={activeStatus === status} count={statusCounts[status]} label={status} />
           ))}
         </div>
 
-        <form className="grid gap-3 rounded-[1.35rem] border border-white/80 bg-white/55 p-4 lg:grid-cols-5">
-          <Select name="priority" defaultValue={activePriority} aria-label="Filtrar por prioridad">
-            <option value="all">Todas las prioridades</option>
-            {projectTaskPriorities.map((priority) => <option key={priority} value={priority}>{priority}</option>)}
-          </Select>
-          <Select name="phase" defaultValue={activePhase} aria-label="Filtrar por fase">
-            <option value="all">Todas las fases</option>
-            {phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}
-          </Select>
-          <Select name="user" defaultValue={activeUser} aria-label="Filtrar por usuario">
-            <option value="all">Todos los usuarios</option>
-            {users.map((user) => <option key={user.id} value={user.id}>{user.name}</option>)}
-          </Select>
-          <Select name="finding" defaultValue={activeFinding} aria-label="Filtrar por hallazgo">
-            <option value="all">Todos los hallazgos</option>
-            {findings.map((finding) => <option key={finding.id} value={finding.id}>{finding.label}</option>)}
-          </Select>
-          <Select name="risk" defaultValue={activeRisk} aria-label="Filtrar por riesgo">
-            <option value="all">Todos los riesgos</option>
-            {risks.map((risk) => <option key={risk.id} value={risk.id}>{risk.label}</option>)}
-          </Select>
-          <Button type="submit" variant="ghost" className="lg:col-span-5">Aplicar filtros</Button>
+        <form className="rounded-[1.25rem] border border-white/80 bg-white/58 p-4 shadow-inner shadow-white/60">
+          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            <SlidersHorizontal className="h-4 w-4 text-blueprint" />
+            Filtros avanzados
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <Select name="priority" defaultValue={activePriority} aria-label="Filtrar por prioridad">
+              <option value="all">Todas las prioridades</option>
+              {projectTaskPriorities.map((priority) => <option key={priority} value={priority}>{priority}</option>)}
+            </Select>
+            <Select name="phase" defaultValue={activePhase} aria-label="Filtrar por fase">
+              <option value="all">Todas las fases</option>
+              {phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}
+            </Select>
+            <Select name="user" defaultValue={activeUser} aria-label="Filtrar por usuario">
+              <option value="all">Todos los usuarios</option>
+              {users.map((user) => <option key={user.id} value={user.id}>{user.name}</option>)}
+            </Select>
+            <Select name="finding" defaultValue={activeFinding} aria-label="Filtrar por hallazgo">
+              <option value="all">Todos los hallazgos</option>
+              {findings.map((finding) => <option key={finding.id} value={finding.id}>{finding.label}</option>)}
+            </Select>
+            <Select name="risk" defaultValue={activeRisk} aria-label="Filtrar por riesgo">
+              <option value="all">Todos los riesgos</option>
+              {risks.map((risk) => <option key={risk.id} value={risk.id}>{risk.label}</option>)}
+            </Select>
+          </div>
+          <div className="mt-3 flex flex-wrap justify-end gap-2">
+            <Button href="/tareas" variant="ghost" className="px-3.5 py-1.5 text-xs">Limpiar</Button>
+            <Button type="submit" variant="primary" className="px-4 py-1.5 text-xs">Aplicar filtros</Button>
+          </div>
         </form>
 
         {tasks.length === 0 ? <EmptyTasks /> : <div className="grid gap-3">{tasks.map((task) => <TaskRow key={task.id} task={task} phases={phases} users={users} findings={findings} risks={risks} canEdit={canEdit} canDelete={canDelete} />)}</div>}
@@ -235,8 +258,8 @@ function TaskRow({ task, phases, users, findings, risks, canEdit, canDelete }: {
   const assignedIds = new Set(task.assignees.map((assignee) => assignee.id));
 
   return (
-    <details id={`task-${task.id}`} className="group scroll-mt-8 rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5 open:bg-white/78">
-      <summary className="grid cursor-pointer list-none gap-3 lg:grid-cols-[minmax(0,1.4fr)_10rem_13rem_8rem] lg:items-center">
+    <details id={`task-${task.id}`} className="group scroll-mt-8 rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5 open:bg-white/82">
+      <summary className="grid cursor-pointer list-none gap-3 lg:grid-cols-[minmax(0,1.4fr)_12rem_14rem_8rem] lg:items-center">
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap gap-2">
             <Badge tone={priorityTone(task.priority)}>{task.priority}</Badge>
@@ -255,7 +278,7 @@ function TaskRow({ task, phases, users, findings, risks, canEdit, canDelete }: {
           <p className="mt-1">Inicio: {formatOptionalDate(task.startDate)}</p>
           <p>Fin: {formatOptionalDate(task.dueDate)}</p>
         </div>
-        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-blueprint">Ver detalle</span>
+        <span className="rounded-full bg-blueprint/10 px-3 py-1.5 text-center text-xs font-semibold uppercase tracking-[0.12em] text-blueprint ring-1 ring-blueprint/15">Detalle</span>
       </summary>
 
       <div className="mt-5 grid gap-5 border-t border-white/80 pt-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
@@ -267,8 +290,8 @@ function TaskRow({ task, phases, users, findings, risks, canEdit, canDelete }: {
 
           <form action={updateProjectTaskAction} className="rounded-2xl bg-white/65 p-4 ring-1 ring-white/80">
             <input type="hidden" name="taskId" value={task.id} />
-            <p className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Editar tarea</p>
-            <div className="grid gap-4 lg:grid-cols-2">
+            <SectionTitle title="Editar tarea" eyebrow="Gestion" compact />
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
               <Field label="Titulo"><Input name="title" defaultValue={task.title} required /></Field>
               <Field label="Estado"><Select name="status" defaultValue={task.status}>{projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}</Select></Field>
               <Field label="Prioridad"><Select name="priority" defaultValue={task.priority}>{projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}</Select></Field>
@@ -365,12 +388,23 @@ function StatusMessages({ params }: { params: Record<string, string | string[] |
   );
 }
 
-function OptionPanel({ title, icon, empty, children }: { title: string; icon: React.ReactNode; empty: string; children: React.ReactNode }) {
-  const childArray = Array.isArray(children) ? children : [children];
+function SectionTitle({ title, eyebrow, compact = false }: { title: string; eyebrow: string; compact?: boolean }) {
   return (
-    <section className="rounded-[1.35rem] border border-white/80 bg-white/62 p-4">
-      <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">{icon}{title}</div>
-      {childArray.length > 0 ? <div className="max-h-52 space-y-2 overflow-y-auto pr-1">{children}</div> : <p className="text-sm text-slate-500">{empty}</p>}
+    <div>
+      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-blueprint">{eyebrow}</p>
+      <h3 className={cn("font-display font-bold tracking-tight text-ink", compact ? "text-lg" : "text-xl")}>{title}</h3>
+    </div>
+  );
+}
+
+function OptionPanel({ title, icon, empty, count, children }: { title: string; icon: React.ReactNode; empty: string; count: number; children: React.ReactNode }) {
+  return (
+    <section className="rounded-[1.25rem] border border-white/80 bg-white/62 p-4 shadow-sm shadow-ink/5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm font-semibold text-ink">{icon}{title}</div>
+        <Badge tone="neutral">{count}</Badge>
+      </div>
+      {count > 0 ? <div className="max-h-44 space-y-2 overflow-y-auto pr-1">{children}</div> : <p className="text-sm text-slate-500">{empty}</p>}
     </section>
   );
 }
@@ -386,7 +420,7 @@ function CompactChecks({ title, children }: { title: string; children: React.Rea
 
 function CheckboxPill({ name, value, title, description, defaultChecked = false }: { name: string; value: string; title: string; description?: string; defaultChecked?: boolean }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/72 p-3 text-sm ring-1 ring-white/80 transition hover:bg-white">
+    <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/72 p-2.5 text-sm ring-1 ring-white/80 transition hover:bg-white hover:ring-blueprint/20">
       <input name={name} value={value} type="checkbox" defaultChecked={defaultChecked} className="mt-1 h-4 w-4 rounded border-slate-300 accent-blueprint" />
       <span className="min-w-0">
         <span className="block truncate font-semibold text-ink">{title}</span>
@@ -427,9 +461,9 @@ function AttachmentList({ attachments }: { attachments: ProjectTaskAttachment[] 
 
 function FilterCard({ href, active, count, label }: { href: string; active: boolean; count: number; label: string }) {
   return (
-    <a href={href} className={cn("focus-ring rounded-[1.2rem] p-4 ring-1 transition", active ? "bg-blueprint text-white ring-blueprint shadow-lg shadow-blueprint/20" : "bg-white/62 text-ink ring-white/80 hover:bg-white")}>
-      <p className="font-display text-2xl font-semibold">{count}</p>
-      <p className={cn("mt-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em]", active ? "text-white/80" : "text-slate-500")}>{label}</p>
+    <a href={href} className={cn("focus-ring flex min-h-20 flex-col justify-between rounded-[1.05rem] p-3 ring-1 transition", active ? "bg-blueprint text-white ring-blueprint shadow-lg shadow-blueprint/20" : "bg-white/62 text-ink ring-white/80 hover:bg-white")}>
+      <p className="font-display text-xl font-semibold leading-none">{count}</p>
+      <p className={cn("text-[0.62rem] font-semibold uppercase tracking-[0.13em]", active ? "text-white/80" : "text-slate-500")}>{label}</p>
     </a>
   );
 }
