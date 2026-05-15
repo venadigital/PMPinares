@@ -1,15 +1,6 @@
 const { createServer } = require("node:http");
-const { existsSync } = require("node:fs");
-const { join } = require("node:path");
-
 process.env.NODE_ENV = process.env.NODE_ENV || "production";
 process.env.HOSTNAME = "0.0.0.0";
-
-const standaloneServer = join(__dirname, ".next", "standalone", "server.js");
-if (existsSync(standaloneServer) && process.env.PINARES_USE_CUSTOM_SERVER !== "1") {
-  require(standaloneServer);
-  return;
-}
 
 const next = require("next");
 
