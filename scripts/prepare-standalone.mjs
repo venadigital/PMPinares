@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
@@ -24,5 +24,15 @@ if (existsSync(staticDir)) {
   rmSync(standaloneStaticDir, { recursive: true, force: true });
   cpSync(staticDir, standaloneStaticDir, { recursive: true });
 }
+
+writeFileSync(
+  join(root, ".next", "server.js"),
+  [
+    "process.env.NODE_ENV = process.env.NODE_ENV || 'production';",
+    "process.env.HOSTNAME = '0.0.0.0';",
+    "require('./standalone/server.js');",
+    ""
+  ].join("\n")
+);
 
 console.log("Standalone assets ready.");
