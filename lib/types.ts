@@ -5,6 +5,7 @@ export type ModuleKey =
   | "stakeholders"
   | "documentos"
   | "cronograma"
+  | "tareas"
   | "comunicacion"
   | "inventario"
   | "procesos"

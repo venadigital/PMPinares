@@ -5,6 +5,7 @@ export const modules: { key: ModuleKey; label: string; description: string }[] =
   { key: "stakeholders", label: "Stakeholders", description: "Usuarios, roles y permisos" },
   { key: "documentos", label: "Documentos", description: "Repositorio por fases" },
   { key: "cronograma", label: "Cronograma", description: "Kanban de tareas e hitos" },
+  { key: "tareas", label: "Tareas", description: "Gestion operativa y asignaciones" },
   { key: "comunicacion", label: "Comunicacion", description: "Muro general con menciones" },
   { key: "inventario", label: "Inventario TI", description: "Herramientas, costos y uso" },
   { key: "procesos", label: "Procesos", description: "Documentacion por area" },

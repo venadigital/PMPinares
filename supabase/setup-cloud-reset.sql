@@ -495,6 +495,7 @@ insert into public.modules (key, label, description) values
 ('stakeholders', 'Stakeholders', 'Usuarios, roles y permisos'),
 ('documentos', 'Documentos', 'Repositorio por fases'),
 ('cronograma', 'Cronograma', 'Kanban de tareas e hitos'),
+('tareas', 'Tareas', 'Gestion operativa y asignaciones'),
 ('comunicacion', 'Comunicacion', 'Muro general con menciones'),
 ('inventario', 'Inventario TI', 'Herramientas, costos y uso'),
 ('procesos', 'Procesos', 'Documentacion por area'),

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, CheckSquare, Cpu, FolderOpen, LayoutDashboard, MessagesSquare, PackageCheck, SearchCheck, ShieldAlert, Users, Workflow } from "lucide-react";
+import { CalendarDays, CheckSquare, ClipboardList, Cpu, FolderOpen, LayoutDashboard, MessagesSquare, PackageCheck, SearchCheck, ShieldAlert, Users, Workflow } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ModuleKey } from "@/lib/types";
 
@@ -11,6 +11,7 @@ const icons: Record<ModuleKey, React.ComponentType<{ className?: string }>> = {
   stakeholders: Users,
   documentos: FolderOpen,
   cronograma: CalendarDays,
+  tareas: ClipboardList,
   comunicacion: MessagesSquare,
   inventario: Cpu,
   procesos: Workflow,
