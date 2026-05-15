@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { AlertTriangle, CalendarClock, CheckCircle2, FileText, Gauge, PackageCheck, ShieldAlert } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader } from "@/components/ui/card";
-import { getDashboardData, type DashboardItem, type DashboardTask } from "@/lib/dashboard";
+import { getDashboardData, type DashboardTask } from "@/lib/dashboard";
 import type { PhaseProgress } from "@/lib/schedule-progress";
 
 export default async function DashboardPage() {
@@ -21,12 +21,6 @@ export default async function DashboardPage() {
       <section className="mt-5 grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
         <PhaseProgressPanel phases={data.phases} />
         <UpcomingPanel tasks={data.upcomingTasks} />
-      </section>
-
-      <section className="mt-5 grid gap-4 lg:grid-cols-3">
-        <ActivityPanel title="Documentos recientes" eyebrow="Repositorio" href="/documentos" items={data.recentDocuments} empty="Sin documentos cargados todavia." icon={<FileText className="h-4 w-4" />} />
-        <ActivityPanel title="Riesgos altos" eyebrow="Alertas" href="/riesgos?riskFilter=high" items={data.highRisks} empty="Sin riesgos altos registrados." icon={<ShieldAlert className="h-4 w-4" />} />
-        <ActivityPanel title="Decisiones pendientes" eyebrow="Trazabilidad" href="/decisiones?decisionFilter=pending" items={data.pendingDecisions} empty="Sin decisiones pendientes." icon={<CheckCircle2 className="h-4 w-4" />} />
       </section>
     </>
   );
@@ -147,26 +141,6 @@ function UpcomingPanel({ tasks }: { tasks: DashboardTask[] }) {
               <Badge tone={task.isOverdue ? "red" : task.priority === "Alta" ? "yellow" : "neutral"}>{task.priority}</Badge>
             </div>
             <p className="mt-2 text-xs font-medium text-slate-500">{task.phaseName} / {task.status}{task.dueDate ? ` / Fin: ${task.dueDate}` : ""}</p>
-          </Link>
-        ))}
-      </div>
-    </Card>
-  );
-}
-
-function ActivityPanel({ title, eyebrow, href, items, empty, icon }: { title: string; eyebrow: string; href: string; items: DashboardItem[]; empty: string; icon: React.ReactNode }) {
-  return (
-    <Card>
-      <CardHeader eyebrow={eyebrow} title={title} action={<Link href={href} className="focus-ring rounded-full"><Badge tone="neutral">Ver</Badge></Link>} />
-      <div className="space-y-2.5">
-        {items.length === 0 ? <p className="rounded-xl bg-white/50 p-3 text-sm text-slate-500">{empty}</p> : null}
-        {items.slice(0, 4).map((item) => (
-          <Link key={item.id} href={href} className="focus-ring flex items-start gap-3 rounded-xl bg-white/50 p-3 text-sm font-medium text-slate-700 transition hover:bg-white">
-            <span className="mt-0.5 text-blueprint">{icon}</span>
-            <span className="min-w-0">
-              <span className="block truncate text-ink">{item.title}</span>
-              {item.meta ? <span className="mt-0.5 block truncate text-xs text-slate-500">{item.meta}</span> : null}
-            </span>
           </Link>
         ))}
       </div>
