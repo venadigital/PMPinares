@@ -62,7 +62,6 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
       <StatusMessages params={params} />
 
       <div className="grid gap-5">
-        <TaskCreatePanel canCreate={canCreate} phases={phases} users={users} findings={findings} risks={risks} />
         <TaskMatrix
           tasks={filteredTasks}
           allTasks={tasks}
@@ -79,6 +78,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           canEdit={canEdit}
           canDelete={canDelete}
         />
+        <TaskCreatePanel canCreate={canCreate} phases={phases} users={users} findings={findings} risks={risks} />
       </div>
     </>
   );
