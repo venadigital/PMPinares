@@ -86,84 +86,88 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
 
 function TaskCreatePanel({ canCreate, phases, users, findings, risks }: { canCreate: boolean; phases: Phase[]; users: UserProfile[]; findings: { id: string; label: string }[]; risks: { id: string; label: string }[] }) {
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="grid gap-3 border-b border-white/70 bg-white/45 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+    <Card className="overflow-hidden border-white/80 bg-white/70 p-0">
+      <div className="grid gap-3 border-b border-white/70 bg-white/50 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div>
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Nueva tarea</p>
-          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">Crear tarea operativa</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Completa lo esencial, asigna responsables y vincula hallazgos o riesgos solo si aportan contexto.</p>
+          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Nueva tarea</p>
+          <h2 className="mt-1 font-display text-xl font-bold tracking-tight text-ink">Crear tarea operativa</h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">Registra la actividad, asigna responsables y agrega trazabilidad solo si aplica.</p>
         </div>
         <Badge tone="blue" className="w-fit">Notifica por correo</Badge>
       </div>
 
-      <form action={createProjectTaskAction} className="p-5">
-        <fieldset disabled={!canCreate} className="grid gap-5 disabled:opacity-55">
-          <section className="grid gap-4 rounded-[1.35rem] border border-white/80 bg-white/62 p-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
-            <div className="grid gap-4">
-              <SectionTitle title="Que se debe hacer" eyebrow="Datos base" />
-              <div className="grid gap-4 md:grid-cols-[minmax(0,1.4fr)_13rem]">
+      <form action={createProjectTaskAction} className="p-4">
+        <fieldset disabled={!canCreate} className="grid gap-4 disabled:opacity-55">
+          <section className="rounded-[1.25rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+            <SectionTitle title="Informacion base" eyebrow="Datos principales" compact />
+            <div className="mt-4 grid gap-3 lg:grid-cols-12">
+              <div className="lg:col-span-4">
                 <Field label="Titulo">
-                  <Input name="title" placeholder="Ej. Validar responsable de inventario" required />
+                  <Input name="title" placeholder="Ej. Validar responsable de inventario" required className="h-10" />
                 </Field>
+              </div>
+              <div className="lg:col-span-2">
                 <Field label="Prioridad">
-                  <Select name="priority" defaultValue="Media">
+                  <Select name="priority" defaultValue="Media" className="h-10">
                     {projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}
                   </Select>
                 </Field>
               </div>
-              <Field label="Descripcion">
-                <Textarea name="description" placeholder="Contexto, alcance o instrucciones para resolver la tarea." className="min-h-20" />
-              </Field>
-            </div>
-
-            <div className="grid gap-4 rounded-[1.1rem] bg-white/60 p-4 ring-1 ring-white/80">
-              <SectionTitle title="Gestion" eyebrow="Asignacion" compact />
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+              <div className="lg:col-span-3">
                 <Field label="Fase ligada">
-                  <Select name="phaseId" defaultValue="">
+                  <Select name="phaseId" defaultValue="" className="h-10">
                     <option value="">Sin fase</option>
                     {phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}
                   </Select>
                 </Field>
+              </div>
+              <div className="lg:col-span-3">
                 <Field label="Estado">
-                  <Select name="status" defaultValue="Pendiente">
+                  <Select name="status" defaultValue="Pendiente" className="h-10">
                     {projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}
                   </Select>
                 </Field>
-                <Field label="Fecha inicio">
-                  <Input name="startDate" type="date" />
+              </div>
+              <div className="lg:col-span-6">
+                <Field label="Descripcion">
+                  <Textarea name="description" placeholder="Contexto, alcance o instrucciones para resolver la tarea." className="min-h-20" />
                 </Field>
+              </div>
+              <div className="lg:col-span-3">
+                <Field label="Fecha inicio">
+                  <Input name="startDate" type="date" className="h-10" />
+                </Field>
+              </div>
+              <div className="lg:col-span-3">
                 <Field label="Fecha finalizacion">
-                  <Input name="dueDate" type="date" />
+                  <Input name="dueDate" type="date" className="h-10" />
                 </Field>
               </div>
             </div>
           </section>
 
-          <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(0,1fr)]">
-            <OptionPanel title="Usuarios asignados" icon={<Users className="h-4 w-4" />} empty="No hay usuarios disponibles." count={users.length}>
+          <section className="grid gap-3 lg:grid-cols-3">
+            <CollapsibleOptionPanel title="Asignar usuarios" icon={<Users className="h-4 w-4" />} empty="No hay usuarios disponibles." count={users.length}>
               {users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} description={user.area || user.role} />)}
-            </OptionPanel>
-            <OptionPanel title="Hallazgos" icon={<Link2 className="h-4 w-4" />} empty="No hay hallazgos registrados." count={findings.length}>
+            </CollapsibleOptionPanel>
+            <CollapsibleOptionPanel title="Vincular hallazgos" icon={<Link2 className="h-4 w-4" />} empty="No hay hallazgos registrados." count={findings.length}>
               {findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} />)}
-            </OptionPanel>
-            <OptionPanel title="Riesgos" icon={<Link2 className="h-4 w-4" />} empty="No hay riesgos registrados." count={risks.length}>
+            </CollapsibleOptionPanel>
+            <CollapsibleOptionPanel title="Vincular riesgos" icon={<Link2 className="h-4 w-4" />} empty="No hay riesgos registrados." count={risks.length}>
               {risks.map((risk) => <CheckboxPill key={risk.id} name="riskIds" value={risk.id} title={risk.label} />)}
-            </OptionPanel>
+            </CollapsibleOptionPanel>
           </section>
 
-          <section className="grid gap-4 rounded-[1.35rem] border border-dashed border-blueprint/25 bg-blueprint/7 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.9fr)_auto] lg:items-center">
+          <section className="grid gap-3 rounded-[1.25rem] border border-dashed border-blueprint/25 bg-blueprint/7 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.9fr)_auto] lg:items-center">
             <div className="flex items-start gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint">
-                <Paperclip className="h-4 w-4" />
-              </span>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint"><Paperclip className="h-4 w-4" /></span>
               <div>
                 <p className="text-sm font-semibold text-ink">Adjuntos de soporte</p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">PDF, Word, Excel, imagenes u otros archivos. Maximo 250 MB por archivo.</p>
               </div>
             </div>
-            <Input name="attachments" type="file" multiple className="bg-white/85" />
-            <Button type="submit" variant="accent" className="gap-2 whitespace-nowrap">
+            <Input name="attachments" type="file" multiple className="h-10 bg-white/85" />
+            <Button type="submit" variant="accent" className="h-10 gap-2 whitespace-nowrap px-5">
               <Plus className="h-4 w-4" />
               Crear tarea
             </Button>
@@ -406,6 +410,26 @@ function OptionPanel({ title, icon, empty, count, children }: { title: string; i
       </div>
       {count > 0 ? <div className="max-h-44 space-y-2 overflow-y-auto pr-1">{children}</div> : <p className="text-sm text-slate-500">{empty}</p>}
     </section>
+  );
+}
+
+function CollapsibleOptionPanel({ title, icon, empty, count, children }: { title: string; icon: React.ReactNode; empty: string; count: number; children: React.ReactNode }) {
+  return (
+    <details className="group rounded-[1.15rem] border border-white/80 bg-white/62 p-3 shadow-sm shadow-ink/5">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-ink">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-blueprint/10 text-blueprint">{icon}</span>
+          <span className="truncate">{title}</span>
+        </span>
+        <span className="flex shrink-0 items-center gap-2">
+          <Badge tone="neutral">{count}</Badge>
+          <span className="text-xs font-semibold text-blueprint transition group-open:rotate-180">v</span>
+        </span>
+      </summary>
+      <div className="mt-3 border-t border-white/70 pt-3">
+        {count > 0 ? <div className="max-h-44 space-y-2 overflow-y-auto pr-1">{children}</div> : <p className="text-sm text-slate-500">{empty}</p>}
+      </div>
+    </details>
   );
 }
 
