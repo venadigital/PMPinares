@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { AlertTriangle, ArrowUpRight, CalendarClock, CheckCircle2, FileText, Gauge, PackageCheck, ShieldAlert } from "lucide-react";
+import { AlertTriangle, CalendarClock, CheckCircle2, FileText, Gauge, PackageCheck, ShieldAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader } from "@/components/ui/card";
 import { getDashboardData, type DashboardItem, type DashboardTask } from "@/lib/dashboard";
@@ -16,14 +16,6 @@ export default async function DashboardPage() {
       <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
         <ExecutiveSummary progress={data.metrics.overallProgress} health={data.health} completedTasks={data.metrics.completedTasks} totalTasks={data.metrics.totalTasks} />
         <ExecutiveAlerts data={data} />
-      </section>
-
-      <section className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-        <MetricCard label="Entregables pendientes" value={data.metrics.pendingDeliverables} tone="yellow" href="/entregables?deliverableFilter=pending" description={`${data.metrics.approvedDeliverables} aprobados`} />
-        <MetricCard label="Hallazgos criticos" value={data.metrics.criticalFindings} tone="red" href="/hallazgos?findingFilter=critical" description="Prioridad alta" />
-        <MetricCard label="Riesgos altos" value={data.metrics.highRisks} tone="red" href="/riesgos?riskFilter=high" description="Requieren seguimiento" />
-        <MetricCard label="Tareas bloqueadas" value={data.metrics.blockedTasks} tone="yellow" href="/cronograma" description={`${data.metrics.overdueTasks} vencidas`} />
-        <MetricCard label="Decisiones pendientes" value={data.metrics.pendingDecisions} tone="blue" href="/decisiones?decisionFilter=pending" description="Por cerrar" />
       </section>
 
       <section className="mt-5 grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
@@ -117,19 +109,6 @@ function ExecutiveAlerts({ data }: { data: Awaited<ReturnType<typeof getDashboar
         ))}
       </div>
     </Card>
-  );
-}
-
-function MetricCard({ label, value, tone, href, description }: { label: string; value: string | number; tone: "blue" | "yellow" | "red"; href: string; description: string }) {
-  return (
-    <Link href={href} className="apple-card focus-ring group block p-4 transition hover:-translate-y-px hover:bg-white/82">
-      <div className="flex items-start justify-between gap-3">
-        <Badge tone={tone}>{label}</Badge>
-        <ArrowUpRight className="h-4 w-4 text-slate-400 transition group-hover:text-blueprint" />
-      </div>
-      <p className="mt-4 font-display text-3xl font-semibold tracking-tight text-ink">{value}</p>
-      <p className="mt-1 text-xs font-medium text-slate-500">{description}</p>
-    </Link>
   );
 }
 
