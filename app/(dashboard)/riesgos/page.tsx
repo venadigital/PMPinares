@@ -15,7 +15,7 @@ interface RisksPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-type RiskFilter = "all" | "high" | "open" | "closed" | "linked" | "evidence";
+type RiskFilter = "all" | "high" | "medium" | "low";
 
 export default async function RisksPage({ searchParams }: RisksPageProps) {
   const params = searchParams ? await searchParams : {};
@@ -90,18 +90,15 @@ function RiskCreatePanel({ options, canCreate }: { options: RiskOptions; canCrea
 
 function RiskOverview({ risks, activeFilter }: { risks: RiskRecord[]; activeFilter: RiskFilter }) {
   const high = risks.filter((risk) => risk.level === "Alto").length;
-  const open = risks.filter((risk) => risk.status === "Abierto" || risk.status === "En revision").length;
-  const closed = risks.filter((risk) => risk.status === "Cerrado").length;
-  const linked = risks.filter((risk) => risk.linkRecords.length > 0).length;
-  const evidence = risks.filter((risk) => risk.attachments.length > 0).length;
+  const medium = risks.filter((risk) => risk.level === "Medio").length;
+  const low = risks.filter((risk) => risk.level === "Bajo").length;
 
   return (
-    <div className="mt-5 grid gap-3 sm:grid-cols-5">
-      <Metric label="Altos" value={high} tone="red" filter="high" activeFilter={activeFilter} />
-      <Metric label="Abiertos" value={open} tone="yellow" filter="open" activeFilter={activeFilter} />
-      <Metric label="Cerrados" value={closed} tone="green" filter="closed" activeFilter={activeFilter} />
-      <Metric label="Vinculados" value={linked} tone="blue" filter="linked" activeFilter={activeFilter} />
-      <Metric label="Evidencias" value={evidence} tone="neutral" filter="evidence" activeFilter={activeFilter} />
+    <div className="mt-5 grid gap-3 sm:grid-cols-4">
+      <Metric label="Todos" value={risks.length} tone="blue" filter="all" activeFilter={activeFilter} />
+      <Metric label="Nivel alto" value={high} tone="red" filter="high" activeFilter={activeFilter} />
+      <Metric label="Nivel medio" value={medium} tone="yellow" filter="medium" activeFilter={activeFilter} />
+      <Metric label="Nivel bajo" value={low} tone="green" filter="low" activeFilter={activeFilter} />
     </div>
   );
 }
@@ -117,7 +114,7 @@ function Metric({ label, value, tone = "neutral", filter, activeFilter }: { labe
   const activeClass = activeFilter === filter ? "ring-2 ring-blueprint/35 shadow-md shadow-blueprint/10" : "hover:-translate-y-px hover:bg-white/80";
 
   return (
-    <Link href={`/riesgos?riskFilter=${filter}`} className={`focus-ring block rounded-2xl px-4 py-3 transition ring-1 ring-white/80 ${toneClass} ${activeClass}`}>
+    <Link href={filter === "all" ? "/riesgos" : `/riesgos?riskFilter=${filter}`} className={`focus-ring block rounded-2xl px-4 py-3 transition ring-1 ring-white/80 ${toneClass} ${activeClass}`}>
       <p className="text-xl font-bold">{value}</p>
       <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-70">{label}</p>
     </Link>
@@ -507,16 +504,14 @@ function SelectField({ label, name, defaultValue, children }: { label: string; n
 
 function normalizeRiskFilter(value: string | string[] | undefined): RiskFilter {
   const parsed = Array.isArray(value) ? value[0] : value;
-  if (parsed === "high" || parsed === "open" || parsed === "closed" || parsed === "linked" || parsed === "evidence") return parsed;
+  if (parsed === "high" || parsed === "medium" || parsed === "low") return parsed;
   return "all";
 }
 
 function filterRisks(risks: RiskRecord[], filter: RiskFilter) {
   if (filter === "high") return risks.filter((risk) => risk.level === "Alto");
-  if (filter === "open") return risks.filter((risk) => risk.status === "Abierto" || risk.status === "En revision");
-  if (filter === "closed") return risks.filter((risk) => risk.status === "Cerrado");
-  if (filter === "linked") return risks.filter((risk) => risk.linkRecords.length > 0);
-  if (filter === "evidence") return risks.filter((risk) => risk.attachments.length > 0);
+  if (filter === "medium") return risks.filter((risk) => risk.level === "Medio");
+  if (filter === "low") return risks.filter((risk) => risk.level === "Bajo");
   return risks;
 }
 
