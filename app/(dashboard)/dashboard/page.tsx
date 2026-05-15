@@ -85,7 +85,7 @@ function ExecutiveAlerts({ data }: { data: Awaited<ReturnType<typeof getDashboar
   const alerts = [
     { label: "Riesgos altos", value: data.metrics.highRisks, href: "/riesgos?riskFilter=high", tone: "red" as const },
     { label: "Hallazgos criticos", value: data.metrics.criticalFindings, href: "/hallazgos?findingFilter=critical", tone: "red" as const },
-    { label: "Tareas bloqueadas", value: data.metrics.blockedTasks, href: "/cronograma", tone: "yellow" as const },
+    { label: "Decisiones pendientes", value: data.metrics.pendingDecisions, href: "/decisiones?decisionFilter=pending", tone: "blue" as const },
     { label: "Entregables pendientes", value: data.metrics.pendingDeliverables, href: "/entregables?deliverableFilter=pending", tone: "blue" as const }
   ];
 
