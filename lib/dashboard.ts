@@ -93,9 +93,10 @@ export async function getDashboardData(): Promise<DashboardData> {
   }
 
   const supabase = await createClient();
-  const [phasesResult, tasksResult, deliverablesResult, findingsResult, risksResult, decisionsResult, filesResult] = await Promise.all([
+  const [phasesResult, tasksResult, subtasksResult, deliverablesResult, findingsResult, risksResult, decisionsResult, filesResult] = await Promise.all([
     supabase.from("phases").select("id, code, name, week_range, progress").order("code"),
     supabase.from("tasks").select("id, title, phase_id, status, priority, due_date").order("created_at", { ascending: false }),
+    supabase.from("task_subtasks").select("task_id, is_completed"),
     supabase.from("deliverables").select("id, status"),
     supabase.from("findings").select("id, title, criticality, status, areas:area_id(name)").order("created_at", { ascending: false }),
     supabase.from("risks").select("id, title, level, status").order("created_at", { ascending: false }),
@@ -112,6 +113,16 @@ export async function getDashboardData(): Promise<DashboardData> {
   }));
   const phasesById = new Map(phases.map((phase) => [phase.id, phase.name]));
   const tasks = (tasksResult.data ?? []) as { id: string; title: string; phase_id: string | null; status: Status; priority: Priority; due_date: string | null }[];
+  const subtasksByTask = groupDashboardSubtasks((subtasksResult.error ? [] : subtasksResult.data ?? []) as { task_id: string; is_completed: boolean }[]);
+  const tasksWithEffectiveProgress = tasks.map((task) => {
+    const subtasks = subtasksByTask.get(task.id) ?? [];
+    const progress = getDashboardTaskProgress(task.status, subtasks);
+    return {
+      ...task,
+      effectiveProgress: progress,
+      effectiveStatus: getDashboardEffectiveStatus(task.status, subtasks, progress)
+    };
+  });
   const deliverables = deliverablesResult.data ?? [];
   const findings = (findingsResult.data ?? []) as { id: string; title: string; criticality: string; status: string; areas?: { name: string } | { name: string }[] | null }[];
   const risks = (risksResult.data ?? []) as { id: string; title: string; level: RiskLevel; status: string }[];
@@ -120,10 +131,10 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   const scheduleProgress = calculateScheduleProgress(
     phases,
-    tasks.map((task) => ({ phaseId: task.phase_id ?? "", status: task.status }))
+    tasksWithEffectiveProgress.map((task) => ({ phaseId: task.phase_id ?? "", status: task.effectiveStatus, progress: task.effectiveProgress }))
   );
   const today = new Date().toISOString().slice(0, 10);
-  const openTasks = tasks.filter((task) => task.status !== "Completado");
+  const openTasks = tasksWithEffectiveProgress.filter((task) => task.effectiveStatus !== "Completado");
   const upcomingTasks = [...openTasks]
     .sort((a, b) => {
       if (!a.due_date && !b.due_date) return 0;
@@ -135,7 +146,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     .map((task) => ({
       id: task.id,
       title: task.title,
-      status: task.status,
+      status: task.effectiveStatus,
       priority: task.priority,
       phaseId: task.phase_id ?? "",
       phaseName: phasesById.get(task.phase_id ?? "") ?? "Sin fase",
@@ -148,7 +159,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     totalTasks: scheduleProgress.totalTasks,
     completedTasks: scheduleProgress.completedTasks,
     pendingTasks: scheduleProgress.pendingTasks,
-    blockedTasks: openTasks.filter((task) => task.status === "Bloqueado").length,
+    blockedTasks: openTasks.filter((task) => task.effectiveStatus === "Bloqueado").length,
     overdueTasks: openTasks.filter((task) => Boolean(task.due_date && task.due_date < today)).length,
     pendingDeliverables: deliverables.filter((item) => item.status !== "Aprobado").length,
     approvedDeliverables: deliverables.filter((item) => item.status === "Aprobado").length,
@@ -168,6 +179,30 @@ export async function getDashboardData(): Promise<DashboardData> {
     criticalFindings: findings.filter((finding) => finding.criticality === "Alta").map((finding) => ({ id: finding.id, title: finding.title, meta: firstRelation(finding.areas)?.name ?? finding.status })),
     pendingDecisions: decisions.filter((decision) => decision.status === "Pendiente" || decision.status === "En seguimiento").map((decision) => ({ id: decision.id, title: decision.title, meta: decision.status }))
   };
+}
+
+function groupDashboardSubtasks(rows: { task_id: string; is_completed: boolean }[]) {
+  const grouped = new Map<string, { is_completed: boolean }[]>();
+
+  for (const row of rows) {
+    const list = grouped.get(row.task_id) ?? [];
+    list.push({ is_completed: row.is_completed });
+    grouped.set(row.task_id, list);
+  }
+
+  return grouped;
+}
+
+function getDashboardTaskProgress(status: Status, subtasks: { is_completed: boolean }[]) {
+  if (subtasks.length === 0) return status === "Completado" ? 100 : 0;
+  return Math.round((subtasks.filter((subtask) => subtask.is_completed).length / subtasks.length) * 100);
+}
+
+function getDashboardEffectiveStatus(status: Status, subtasks: { is_completed: boolean }[], progress: number): Status {
+  if (subtasks.length === 0) return status;
+  if (progress === 0) return "No iniciado";
+  if (progress === 100) return "Completado";
+  return "En progreso";
 }
 
 function getProjectHealth(metrics: DashboardData["metrics"]): DashboardData["health"] {

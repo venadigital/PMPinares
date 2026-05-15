@@ -91,6 +91,10 @@ export async function updateTaskAction(formData: FormData) {
   if (linkError) {
     redirect(`/cronograma?error=${encodeURIComponent(linkError)}`);
   }
+  const automaticStatus = await syncParentTaskStatusFromSubtasks(supabase, taskId);
+  if (automaticStatus) {
+    updated.status = automaticStatus;
+  }
   await syncLinkedDeliverableStatuses(supabase, taskId, updated.item_type, updated.status);
 
   const owner = updated?.profiles as { full_name?: string; email?: string } | null;
@@ -124,8 +128,11 @@ export async function updateTaskStatusAction(formData: FormData) {
 
   if (error) redirect(`/cronograma?error=${encodeURIComponent(error.message)}`);
 
+  const automaticStatus = await syncParentTaskStatusFromSubtasks(supabase, taskId);
+  const finalStatus = automaticStatus ?? status;
+
   if (task?.item_type === "Entregable") {
-    await syncLinkedDeliverableStatuses(supabase, taskId, task.item_type, status);
+    await syncLinkedDeliverableStatuses(supabase, taskId, task.item_type, finalStatus);
   }
 
   const returnPhase = getReturnPhase(formData);
@@ -157,6 +164,76 @@ export async function deleteTaskAction(formData: FormData) {
   const returnPhase = getReturnPhase(formData);
   revalidateSchedulePaths();
   redirectWithScheduleFlag("deleted", returnPhase);
+}
+
+export async function createSubtaskAction(formData: FormData) {
+  if (!isSupabaseConfigured()) redirect("/cronograma?error=Configura Supabase para crear subtareas reales");
+
+  const profile = await getCurrentProfile();
+  if (!hasPermission(profile, "cronograma", "edit")) redirect("/cronograma?error=No tienes permiso para editar tareas");
+
+  const taskId = String(formData.get("taskId") ?? "").trim();
+  const title = String(formData.get("subtaskTitle") ?? "").trim();
+  if (!taskId) redirect("/cronograma?error=No se encontro la tarea");
+  if (!title) redirect("/cronograma?error=El titulo de la subtarea es obligatorio");
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("task_subtasks").insert({ task_id: taskId, title, created_by: profile.id });
+  if (error) redirect(`/cronograma?error=${encodeURIComponent(error.message)}`);
+
+  await syncComputedTaskAndDeliverableStatus(supabase, taskId);
+
+  const returnPhase = getReturnPhase(formData);
+  revalidateSchedulePaths();
+  redirectWithScheduleFlag("subtask", returnPhase);
+}
+
+export async function toggleSubtaskAction(formData: FormData) {
+  if (!isSupabaseConfigured()) redirect("/cronograma?error=Configura Supabase para editar subtareas reales");
+
+  const profile = await getCurrentProfile();
+  if (!hasPermission(profile, "cronograma", "edit")) redirect("/cronograma?error=No tienes permiso para editar tareas");
+
+  const subtaskId = String(formData.get("subtaskId") ?? "").trim();
+  const taskId = String(formData.get("taskId") ?? "").trim();
+  const isCompleted = String(formData.get("isCompleted") ?? "") === "true";
+  if (!subtaskId || !taskId) redirect("/cronograma?error=No se encontro la subtarea");
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("task_subtasks")
+    .update({ is_completed: isCompleted, updated_at: new Date().toISOString() })
+    .eq("id", subtaskId)
+    .eq("task_id", taskId);
+
+  if (error) redirect(`/cronograma?error=${encodeURIComponent(error.message)}`);
+
+  await syncComputedTaskAndDeliverableStatus(supabase, taskId);
+
+  const returnPhase = getReturnPhase(formData);
+  revalidateSchedulePaths();
+  redirectWithScheduleFlag("subtask", returnPhase);
+}
+
+export async function deleteSubtaskAction(formData: FormData) {
+  if (!isSupabaseConfigured()) redirect("/cronograma?error=Configura Supabase para eliminar subtareas reales");
+
+  const profile = await getCurrentProfile();
+  if (!hasPermission(profile, "cronograma", "delete")) redirect("/cronograma?error=Solo administradores pueden eliminar subtareas");
+
+  const subtaskId = String(formData.get("subtaskId") ?? "").trim();
+  const taskId = String(formData.get("taskId") ?? "").trim();
+  if (!subtaskId || !taskId) redirect("/cronograma?error=No se encontro la subtarea");
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("task_subtasks").delete().eq("id", subtaskId).eq("task_id", taskId);
+  if (error) redirect(`/cronograma?error=${encodeURIComponent(error.message)}`);
+
+  await syncComputedTaskAndDeliverableStatus(supabase, taskId);
+
+  const returnPhase = getReturnPhase(formData);
+  revalidateSchedulePaths();
+  redirectWithScheduleFlag("subtask", returnPhase);
 }
 
 function parseTaskPayload(formData: FormData) {
@@ -214,6 +291,28 @@ async function syncLinkedDeliverableStatuses(supabase: Awaited<ReturnType<typeof
     .in("id", links.map((link) => link.deliverable_id));
 }
 
+async function syncComputedTaskAndDeliverableStatus(supabase: Awaited<ReturnType<typeof createClient>>, taskId: string) {
+  const status = await syncParentTaskStatusFromSubtasks(supabase, taskId);
+  if (!status) return;
+
+  const { data: task } = await supabase.from("tasks").select("item_type").eq("id", taskId).single<{ item_type: ItemType }>();
+  if (task?.item_type === "Entregable") {
+    await syncLinkedDeliverableStatuses(supabase, taskId, task.item_type, status);
+  }
+}
+
+async function syncParentTaskStatusFromSubtasks(supabase: Awaited<ReturnType<typeof createClient>>, taskId: string): Promise<Status | null> {
+  const { data: subtasks, error } = await supabase.from("task_subtasks").select("is_completed").eq("task_id", taskId);
+  if (error || !subtasks?.length) return null;
+
+  const completed = subtasks.filter((subtask) => subtask.is_completed).length;
+  const progress = Math.round((completed / subtasks.length) * 100);
+  const status: Status = progress === 0 ? "No iniciado" : progress === 100 ? "Completado" : "En progreso";
+
+  await supabase.from("tasks").update({ status }).eq("id", taskId);
+  return status;
+}
+
 async function sendAssignmentEmail(email: string, name: string | undefined, taskTitle: string) {
   await sendProjectEmail({
     to: email,
@@ -237,7 +336,7 @@ function parseDeliverableIds(formData: FormData) {
   return Array.from(new Set(formData.getAll("deliverableIds").map((value) => String(value).trim()).filter(Boolean)));
 }
 
-function redirectWithScheduleFlag(flag: "edited" | "updated" | "deleted", returnPhase: string) {
+function redirectWithScheduleFlag(flag: "edited" | "updated" | "deleted" | "subtask", returnPhase: string) {
   const params = new URLSearchParams({ [flag]: "1", phase: returnPhase });
   redirect(`/cronograma?${params.toString()}`);
 }

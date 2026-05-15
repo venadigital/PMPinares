@@ -13,6 +13,7 @@ const phaseWeights: Record<string, number> = {
 export interface ProgressTask {
   phaseId: string;
   status: Status;
+  progress?: number;
 }
 
 export interface PhaseProgress extends Phase {
@@ -24,8 +25,8 @@ export interface PhaseProgress extends Phase {
 export function calculateScheduleProgress(phases: Phase[], tasks: ProgressTask[]) {
   const phasesWithProgress: PhaseProgress[] = phases.map((phase) => {
     const phaseTasks = tasks.filter((task) => task.phaseId === phase.id);
-    const completedTasks = phaseTasks.filter((task) => task.status === "Completado").length;
-    const progress = phaseTasks.length > 0 ? Math.round((completedTasks / phaseTasks.length) * 100) : 0;
+    const completedTasks = phaseTasks.filter((task) => getTaskProgress(task) === 100).length;
+    const progress = phaseTasks.length > 0 ? Math.round(phaseTasks.reduce((sum, task) => sum + getTaskProgress(task), 0) / phaseTasks.length) : 0;
 
     return {
       ...phase,
@@ -39,7 +40,7 @@ export function calculateScheduleProgress(phases: Phase[], tasks: ProgressTask[]
   const totalWeight = phasesWithProgress.reduce((sum, phase) => sum + getPhaseWeight(phase), 0);
   const weightedProgress = phasesWithProgress.reduce((sum, phase) => sum + phase.progress * getPhaseWeight(phase), 0);
   const totalTasks = tasks.length;
-  const completedTasks = tasks.filter((task) => task.status === "Completado").length;
+  const completedTasks = tasks.filter((task) => getTaskProgress(task) === 100).length;
 
   return {
     overallProgress: totalWeight > 0 ? Math.round(weightedProgress / totalWeight) : 0,
@@ -48,6 +49,11 @@ export function calculateScheduleProgress(phases: Phase[], tasks: ProgressTask[]
     completedTasks,
     pendingTasks: Math.max(totalTasks - completedTasks, 0)
   };
+}
+
+function getTaskProgress(task: ProgressTask) {
+  if (typeof task.progress === "number") return Math.max(0, Math.min(100, Math.round(task.progress)));
+  return task.status === "Completado" ? 100 : 0;
 }
 
 function getPhaseWeight(phase: Phase) {

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { TaskDeliverableChecklist } from "@/components/modules/task-deliverable-checklist";
-import { deleteTaskAction, updateTaskAction } from "@/app/(dashboard)/cronograma/actions";
+import { createSubtaskAction, deleteSubtaskAction, deleteTaskAction, toggleSubtaskAction, updateTaskAction } from "@/app/(dashboard)/cronograma/actions";
 import type { Deliverable, Phase, UserProfile } from "@/lib/types";
 import type { ScheduleTask } from "@/lib/schedule";
 
@@ -57,13 +57,15 @@ export function TaskEditForm({
             </label>
             <label className="block space-y-2 text-sm font-semibold text-ink">
               <span>Estado</span>
-              <select name="status" defaultValue={task.status} className="focus-ring w-full rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-ink">
+              {task.totalSubtasks > 0 ? <input type="hidden" name="status" value={task.effectiveStatus} /> : null}
+              <select name={task.totalSubtasks > 0 ? "displayStatus" : "status"} defaultValue={task.effectiveStatus} disabled={task.totalSubtasks > 0} className="focus-ring w-full rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-ink disabled:opacity-60">
                 <option>No iniciado</option>
                 <option>En progreso</option>
                 <option>En revision</option>
                 <option>Bloqueado</option>
                 <option>Completado</option>
               </select>
+              {task.totalSubtasks > 0 ? <span className="text-xs font-medium text-slate-500">El estado se calcula automaticamente con las subtareas.</span> : null}
             </label>
             <label className="block space-y-2 text-sm font-semibold text-ink">
               <span>Prioridad</span>
@@ -79,6 +81,7 @@ export function TaskEditForm({
           <Button type="submit" variant="primary" className="w-full">Guardar cambios</Button>
         </fieldset>
       </form>
+      <SubtasksPanel task={task} canEdit={canEdit} canDelete={canDelete} returnPhase={returnPhase} />
       {canDelete ? (
         <form action={deleteTaskAction} className="mt-3">
           <input type="hidden" name="taskId" value={task.id} />
@@ -89,5 +92,66 @@ export function TaskEditForm({
         </form>
       ) : null}
     </details>
+  );
+}
+
+function SubtasksPanel({ task, canEdit, canDelete, returnPhase }: { task: ScheduleTask; canEdit: boolean; canDelete: boolean; returnPhase: string }) {
+  return (
+    <div className="mt-4 rounded-[1rem] border border-blueprint/10 bg-blueprint/5 p-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Subtareas</p>
+          <h4 className="mt-1 font-display text-base font-bold text-ink">Checklist de avance</h4>
+          <p className="mt-1 text-xs font-medium text-slate-500">
+            {task.totalSubtasks > 0 ? `${task.completedSubtasks}/${task.totalSubtasks} completadas · ${task.subtaskProgress}%` : "Agrega subtareas para calcular automaticamente el avance."}
+          </p>
+        </div>
+        {task.totalSubtasks > 0 ? (
+          <div className="min-w-[8rem] flex-1 sm:max-w-[12rem]">
+            <div className="h-2 overflow-hidden rounded-full bg-white/90">
+              <div className="h-full rounded-full bg-gradient-to-r from-blueprint to-sun" style={{ width: `${task.subtaskProgress}%` }} />
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {task.subtasks.length === 0 ? <p className="rounded-xl bg-white/60 p-3 text-sm text-slate-500">Esta tarea aun no tiene subtareas.</p> : null}
+        {task.subtasks.map((subtask) => (
+          <div key={subtask.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white/70 p-2.5 ring-1 ring-white/80">
+            <form action={toggleSubtaskAction} className="flex min-w-0 flex-1 items-center gap-2">
+              <input type="hidden" name="taskId" value={task.id} />
+              <input type="hidden" name="subtaskId" value={subtask.id} />
+              <input type="hidden" name="isCompleted" value={String(!subtask.isCompleted)} />
+              <input type="hidden" name="returnPhase" value={returnPhase} />
+              <button
+                type="submit"
+                disabled={!canEdit}
+                className="focus-ring grid h-6 w-6 shrink-0 place-items-center rounded-lg border border-blueprint/30 bg-white text-xs font-bold text-blueprint transition hover:bg-blueprint hover:text-white disabled:opacity-50"
+                aria-label={subtask.isCompleted ? "Marcar subtarea como pendiente" : "Marcar subtarea como completada"}
+              >
+                {subtask.isCompleted ? "✓" : ""}
+              </button>
+              <span className={subtask.isCompleted ? "truncate text-sm font-medium text-slate-500 line-through" : "truncate text-sm font-semibold text-ink"}>{subtask.title}</span>
+            </form>
+            {canDelete ? (
+              <form action={deleteSubtaskAction}>
+                <input type="hidden" name="taskId" value={task.id} />
+                <input type="hidden" name="subtaskId" value={subtask.id} />
+                <input type="hidden" name="returnPhase" value={returnPhase} />
+                <button className="rounded-full bg-coral/10 px-3 py-1.5 text-xs font-bold text-coral transition hover:bg-coral hover:text-white">Eliminar</button>
+              </form>
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      <form action={createSubtaskAction} className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <input type="hidden" name="taskId" value={task.id} />
+        <input type="hidden" name="returnPhase" value={returnPhase} />
+        <Input name="subtaskTitle" placeholder="Nueva subtarea" disabled={!canEdit} />
+        <Button type="submit" variant="ghost" disabled={!canEdit} className="shrink-0">Agregar subtarea</Button>
+      </form>
+    </div>
   );
 }

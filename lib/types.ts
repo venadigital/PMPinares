@@ -51,6 +51,14 @@ export interface Task {
   type: "Tarea" | "Hito" | "Entregable";
 }
 
+export interface TaskSubtask {
+  id: string;
+  taskId: string;
+  title: string;
+  isCompleted: boolean;
+  createdAt?: string;
+}
+
 export interface Deliverable {
   id: string;
   title: string;
