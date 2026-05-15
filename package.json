@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
+    "postbuild": "node scripts/prepare-standalone.mjs",
+    "start": "node server.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "bootstrap:admin": "node --env-file=.env.local scripts/bootstrap-admin.mjs",
