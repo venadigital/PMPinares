@@ -261,7 +261,7 @@ function DocumentTable({ files, totalFiles, activeFolder, canDelete }: { files: 
                 </div>
                 <p className="truncate text-sm font-medium text-slate-700">{file.uploadedBy}</p>
                 <div className="flex items-center gap-2">
-                  <Button href={`/documentos/files/${file.id}/preview`} variant="ghost" className="h-9 w-9 px-0" aria-label={`Ver ${file.name}`}>
+                  <Button href={`/documentos/files/${file.id}/preview`} target="_blank" rel="noopener noreferrer" variant="ghost" className="h-9 w-9 px-0" aria-label={`Ver ${file.name}`}>
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button href={`/documentos/files/${file.id}/download`} variant="ghost" className="h-9 w-9 px-0" aria-label={`Descargar ${file.name}`}>
