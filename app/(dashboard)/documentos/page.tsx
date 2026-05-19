@@ -7,7 +7,7 @@ import { Field, Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/modules/page-header";
 import { createFolderAction, deleteDocumentAction, deleteFolderAction, uploadDocumentAction } from "@/app/(dashboard)/documentos/actions";
 import { getCurrentProfile, hasPermission } from "@/lib/auth";
-import { formatFileSize, getDocumentData } from "@/lib/documents";
+import { getDocumentData } from "@/lib/documents";
 import type { DocumentFile, DocumentFolder } from "@/lib/documents";
 
 interface DocumentsPageProps {
@@ -236,23 +236,21 @@ function DocumentTable({ files, totalFiles, activeFolder, canDelete }: { files: 
             <FileText className="mx-auto h-9 w-9 text-blueprint" />
             <p className="mt-4 font-display text-xl font-bold text-ink">Aun no hay archivos cargados</p>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
-              Cuando subas documentos, apareceran aqui con su carpeta, fase, tamano, responsable y acciones.
+              Cuando subas documentos, apareceran aqui con su carpeta, fase, responsable y acciones.
             </p>
           </div>
         </div>
       ) : (
         <div className="overflow-x-auto p-4 sm:p-5">
-          <div className="min-w-[880px] space-y-2.5">
-            <div className="grid grid-cols-[minmax(18rem,1.4fr)_minmax(12rem,0.9fr)_8rem_8rem_10rem_12rem] gap-3 rounded-xl bg-ink/5 px-4 py-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <div className="min-w-[720px] space-y-2.5">
+            <div className="grid grid-cols-[minmax(18rem,1.5fr)_minmax(14rem,1fr)_minmax(10rem,0.65fr)_12rem] gap-3 rounded-xl bg-ink/5 px-4 py-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
               <span>Archivo</span>
               <span>Carpeta</span>
-              <span>Tipo</span>
-              <span>Tamano</span>
               <span>Subido por</span>
               <span>Acciones</span>
             </div>
             {files.map((file) => (
-              <div key={file.id} className="grid grid-cols-[minmax(18rem,1.4fr)_minmax(12rem,0.9fr)_8rem_8rem_10rem_12rem] items-center gap-3 rounded-[1.15rem] border border-white/80 bg-white/75 px-4 py-3 shadow-sm shadow-ink/5">
+              <div key={file.id} className="grid grid-cols-[minmax(18rem,1.5fr)_minmax(14rem,1fr)_minmax(10rem,0.65fr)_12rem] items-center gap-3 rounded-[1.15rem] border border-white/80 bg-white/75 px-4 py-3 shadow-sm shadow-ink/5">
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-ink">{file.name}</p>
                   <p className="mt-1 text-xs font-semibold text-slate-500">{file.uploadedAt}</p>
@@ -261,8 +259,6 @@ function DocumentTable({ files, totalFiles, activeFolder, canDelete }: { files: 
                   <p className="truncate text-sm font-medium text-slate-700">{file.folder}</p>
                   <p className="mt-1 truncate text-xs font-semibold text-slate-500">{file.phaseName ?? "Sin fase"}</p>
                 </div>
-                <Badge tone="blue">{file.type}</Badge>
-                <p className="text-sm font-medium text-slate-600">{formatFileSize(file.sizeBytes)}</p>
                 <p className="truncate text-sm font-medium text-slate-700">{file.uploadedBy}</p>
                 <div className="flex items-center gap-2">
                   <Button href={`/documentos/files/${file.id}/preview`} variant="ghost" className="h-9 w-9 px-0" aria-label={`Ver ${file.name}`}>
