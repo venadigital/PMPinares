@@ -28,32 +28,44 @@ interface CreateUserPayload {
   permissions?: PermissionInput[];
 }
 
+interface UpdatePermissionsPayload {
+  profileId?: string;
+  permissions?: PermissionInput[];
+}
+
+async function getCurrentAdminRole() {
+  const supabase = await createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { error: "Tu sesion expiro. Vuelve a iniciar sesion para continuar.", status: 401 as const };
+  }
+
+  const { data: currentProfile, error: profileError } = await supabase
+    .from("profiles")
+    .select("id, role")
+    .eq("id", user.id)
+    .single<{ id: string; role: Role }>();
+
+  if (profileError || !currentProfile) {
+    return { error: "No se encontro el perfil administrador activo para esta sesion.", status: 403 as const };
+  }
+
+  if (currentProfile.role !== "Administrador Vena Digital") {
+    return { error: "Solo Administrador Vena Digital puede administrar usuarios", status: 403 as const };
+  }
+
+  return { currentProfile };
+}
+
 export async function POST(request: Request) {
   try {
     if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
       return NextResponse.json({ error: "Configura Supabase y SUPABASE_SERVICE_ROLE_KEY para crear usuarios reales" }, { status: 500 });
     }
 
-    const supabase = await createClient();
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      return NextResponse.json({ error: "Tu sesion expiro. Vuelve a iniciar sesion para crear usuarios." }, { status: 401 });
-    }
-
-    const { data: currentProfile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single<{ role: Role }>();
-
-    if (profileError || !currentProfile) {
-      return NextResponse.json({ error: "No se encontro el perfil administrador activo para esta sesion." }, { status: 403 });
-    }
-
-    if (currentProfile.role !== "Administrador Vena Digital") {
-      return NextResponse.json({ error: "Solo Administrador Vena Digital puede crear usuarios" }, { status: 403 });
-    }
+    const adminCheck = await getCurrentAdminRole();
+    if ("error" in adminCheck) return NextResponse.json({ error: adminCheck.error }, { status: adminCheck.status });
 
     const payload = await request.json() as CreateUserPayload;
     const fullName = String(payload.fullName ?? "").trim();
@@ -133,6 +145,47 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
+      return NextResponse.json({ error: "Configura Supabase y SUPABASE_SERVICE_ROLE_KEY para editar permisos reales" }, { status: 500 });
+    }
+
+    const adminCheck = await getCurrentAdminRole();
+    if ("error" in adminCheck) return NextResponse.json({ error: adminCheck.error }, { status: adminCheck.status });
+
+    const payload = await request.json() as UpdatePermissionsPayload;
+    const profileId = String(payload.profileId ?? "").trim();
+
+    if (!profileId) {
+      return NextResponse.json({ error: "No se encontro el usuario para editar permisos" }, { status: 400 });
+    }
+
+    if (profileId === adminCheck.currentProfile.id) {
+      return NextResponse.json({ error: "Por seguridad no puedes editar tus propios permisos desde esta pantalla" }, { status: 400 });
+    }
+
+    const permissions = modules.map((module) => buildEditablePermissionRow(payload.permissions ?? [], profileId, module.key));
+    const admin = createAdminClient();
+    const { error: deleteError } = await admin.from("module_permissions").delete().eq("profile_id", profileId);
+
+    if (deleteError) {
+      return NextResponse.json({ error: deleteError.message }, { status: 400 });
+    }
+
+    const { error: insertError } = await admin.from("module_permissions").insert(permissions);
+
+    if (insertError) {
+      return NextResponse.json({ error: insertError.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Error inesperado editando permisos de usuario:", error);
+    return NextResponse.json({ error: getSafeErrorMessage(error, "No se pudieron actualizar los permisos") }, { status: 500 });
+  }
+}
+
 function buildPermissionRow(permissions: PermissionInput[], profileId: string, moduleKey: ModuleKey, role: Role) {
   const modulePermission = permissions.find((permission) => permission.moduleKey === moduleKey);
   const canView = Boolean(modulePermission?.canView) || adminRoles.includes(role);
@@ -147,6 +200,19 @@ function buildPermissionRow(permissions: PermissionInput[], profileId: string, m
     can_create: canCreate,
     can_edit: canEdit,
     can_delete: canDelete
+  };
+}
+
+function buildEditablePermissionRow(permissions: PermissionInput[], profileId: string, moduleKey: ModuleKey) {
+  const modulePermission = permissions.find((permission) => permission.moduleKey === moduleKey);
+
+  return {
+    profile_id: profileId,
+    module_key: moduleKey,
+    can_view: Boolean(modulePermission?.canView),
+    can_create: Boolean(modulePermission?.canCreate),
+    can_edit: Boolean(modulePermission?.canEdit),
+    can_delete: Boolean(modulePermission?.canDelete)
   };
 }
 

@@ -1,4 +1,7 @@
-import { updateUserPermissionsAction } from "@/app/(dashboard)/stakeholders/actions";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { modules } from "@/lib/data";
 import type { PermissionKey, UserProfile } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +18,63 @@ const permissionLabels: Record<PermissionKey, string> = {
 const permissions: PermissionKey[] = ["view", "create", "edit", "delete"];
 
 export function UserPermissionsEditor({ users, currentUserId, canEdit }: { users: UserProfile[]; currentUserId: string; canEdit: boolean }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [activeUserId, setActiveUserId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   if (!canEdit) return null;
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>, profileId: string) {
+    event.preventDefault();
+    setError(null);
+    setActiveUserId(profileId);
+
+    const formData = new FormData(event.currentTarget);
+    const payload = {
+      profileId,
+      permissions: modules.map((module) => ({
+        moduleKey: module.key,
+        canView: formData.get(`${module.key}:view`) === "on",
+        canCreate: formData.get(`${module.key}:create`) === "on",
+        canEdit: formData.get(`${module.key}:edit`) === "on",
+        canDelete: formData.get(`${module.key}:delete`) === "on"
+      }))
+    };
+
+    startTransition(async () => {
+      try {
+        const response = await fetch("/api/stakeholders/users", {
+          method: "PUT",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        const responseText = await response.text();
+        const result = parseJsonResponse(responseText);
+
+        if (!result) {
+          setError(`La plataforma recibio una respuesta inesperada (${response.status}). Recarga la pagina e intenta nuevamente.`);
+          return;
+        }
+
+        if (!response.ok || result.error) {
+          setError(result.error ?? "No se pudieron actualizar los permisos");
+          return;
+        }
+
+        router.push("/stakeholders?permissionsUpdated=1");
+        router.refresh();
+      } catch (requestError) {
+        console.error("No se pudieron actualizar los permisos:", requestError);
+        setError("No se pudieron actualizar los permisos. Intentalo nuevamente.");
+      } finally {
+        setActiveUserId(null);
+      }
+    });
+  }
 
   return (
     <Card className="mb-6 overflow-hidden border-white/80 bg-white/75 p-0">
@@ -23,6 +82,7 @@ export function UserPermissionsEditor({ users, currentUserId, canEdit }: { users
         <CardHeader eyebrow="Acceso granular" title="Editar permisos por usuario" action={<Badge tone="blue">{users.length} usuarios</Badge>} />
         <p className="text-sm leading-6 text-slate-600">Ajusta que modulos puede ver, crear, editar o eliminar cada usuario creado en la plataforma.</p>
       </div>
+      {error ? <p className="mx-5 mt-5 rounded-2xl bg-coral/10 p-4 text-sm font-bold text-coral">{error}</p> : null}
       <div className="grid gap-3 p-4 sm:p-5">
         {users.map((user) => (
           <details key={user.id} className="group rounded-[1.15rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5">
@@ -37,8 +97,7 @@ export function UserPermissionsEditor({ users, currentUserId, canEdit }: { users
               </div>
             </summary>
 
-            <form action={updateUserPermissionsAction} className="mt-4 border-t border-white/70 pt-4">
-              <input type="hidden" name="profileId" value={user.id} />
+            <form onSubmit={(event) => handleSubmit(event, user.id)} className="mt-4 border-t border-white/70 pt-4">
               {user.id === currentUserId ? (
                 <p className="mb-4 rounded-2xl bg-sun/15 p-3 text-sm font-semibold text-amber-700">Por seguridad, tus propios permisos no se editan desde esta pantalla.</p>
               ) : null}
@@ -70,7 +129,9 @@ export function UserPermissionsEditor({ users, currentUserId, canEdit }: { users
                 </table>
               </div>
               <div className="mt-4 flex justify-end">
-                <Button type="submit" variant="accent" disabled={user.id === currentUserId}>Guardar permisos</Button>
+                <Button type="submit" variant="accent" disabled={isPending || user.id === currentUserId}>
+                  {isPending && activeUserId === user.id ? "Guardando..." : "Guardar permisos"}
+                </Button>
               </div>
             </form>
           </details>
@@ -78,6 +139,14 @@ export function UserPermissionsEditor({ users, currentUserId, canEdit }: { users
       </div>
     </Card>
   );
+}
+
+function parseJsonResponse(responseText: string) {
+  try {
+    return JSON.parse(responseText) as { ok?: boolean; error?: string };
+  } catch {
+    return null;
+  }
 }
 
 function PermissionCheckbox({ name, checked, disabled }: { name: string; checked: boolean; disabled: boolean }) {
