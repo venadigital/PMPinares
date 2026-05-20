@@ -1,17 +1,17 @@
 "use client";
 
-import { ClipboardList, FileWarning } from "lucide-react";
+import { BarChart3, ClipboardList, FileWarning } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-type FindingsTab = "create" | "matrix";
+type FindingsTab = "create" | "matrix" | "analytics";
 
-export function FindingsTabs({ createPanel, matrixPanel, findingCount, criticalCount }: { createPanel: React.ReactNode; matrixPanel: React.ReactNode; findingCount: number; criticalCount: number }) {
+export function FindingsTabs({ createPanel, matrixPanel, analyticsPanel, findingCount, criticalCount }: { createPanel: React.ReactNode; matrixPanel: React.ReactNode; analyticsPanel: React.ReactNode; findingCount: number; criticalCount: number }) {
   const [activeTab, setActiveTab] = useState<FindingsTab>("matrix");
 
   return (
     <section className="space-y-4">
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-3">
         <TabButton
           active={activeTab === "create"}
           eyebrow="Nuevo hallazgo"
@@ -30,10 +30,19 @@ export function FindingsTabs({ createPanel, matrixPanel, findingCount, criticalC
           icon={<ClipboardList className="h-5 w-5" />}
           onClick={() => setActiveTab("matrix")}
         />
+        <TabButton
+          active={activeTab === "analytics"}
+          eyebrow="Analitica"
+          title="Lectura dinamica"
+          description="Visualiza criticidad, areas afectadas, clasificaciones frecuentes y estado de gestion."
+          meta={findingCount > 0 ? `${findingCount} datos` : undefined}
+          icon={<BarChart3 className="h-5 w-5" />}
+          onClick={() => setActiveTab("analytics")}
+        />
       </div>
 
       <div className="min-h-[24rem]">
-        {activeTab === "create" ? createPanel : matrixPanel}
+        {activeTab === "create" ? createPanel : activeTab === "analytics" ? analyticsPanel : matrixPanel}
       </div>
     </section>
   );

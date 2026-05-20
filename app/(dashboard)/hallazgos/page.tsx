@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, Eye, FileWarning, Gauge, MapPin, Paperclip, Trash2 } from "lucide-react";
+import { BarChart3, Download, Eye, FileWarning, Gauge, MapPin, Paperclip, Trash2 } from "lucide-react";
 import { createFindingAction, deleteFindingAction, deleteFindingAttachmentAction, updateFindingAction } from "@/app/(dashboard)/hallazgos/actions";
 import { FindingsTabs } from "@/components/modules/findings-tabs";
 import { PageHeader } from "@/components/modules/page-header";
@@ -15,7 +15,7 @@ interface FindingsPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-type FindingFilter = "all" | "high" | "medium" | "low";
+type FindingFilter = "all" | "high" | "medium" | "low" | `area:${string}` | `classification:${string}` | `status:${string}`;
 
 export default async function FindingsPage({ searchParams }: FindingsPageProps) {
   const params = searchParams ? await searchParams : {};
@@ -59,6 +59,7 @@ export default async function FindingsPage({ searchParams }: FindingsPageProps) 
         criticalCount={findings.filter((finding) => finding.criticality === "Alta").length}
         createPanel={<FindingCreatePanel areas={areas} canCreate={canCreate} />}
         matrixPanel={<FindingsList findings={findings} areas={areas} activeFilter={activeFilter} canEdit={canEdit} canDelete={canDelete} />}
+        analyticsPanel={<FindingsAnalytics findings={findings} />}
       />
     </>
   );
@@ -103,6 +104,139 @@ function FindingsOverview({ findings, activeFilter }: { findings: FindingRecord[
   );
 }
 
+function FindingsAnalytics({ findings }: { findings: FindingRecord[] }) {
+  const total = findings.length;
+  const criticalityRows = findingCriticalities.map((criticality) => ({
+    label: criticality,
+    count: findings.filter((finding) => finding.criticality === criticality).length,
+    filter: criticalityFilter(criticality),
+    tone: criticalityTone(criticality)
+  }));
+  const areaRows = rankBy(findings, (finding) => finding.area).slice(0, 7);
+  const classificationRows = rankBy(findings, (finding) => finding.classification);
+  const statusRows = findingStatuses.map((status) => ({
+    label: status,
+    count: findings.filter((finding) => finding.status === status).length,
+    filter: `status:${status}`
+  }));
+  const criticalFindings = findings.filter((finding) => finding.criticality === "Alta").slice(0, 5);
+
+  if (total === 0) {
+    return (
+      <Card className="overflow-hidden border-white/80 bg-white/75 p-0">
+        <div className="p-6">
+          <div className="rounded-[1.5rem] border border-dashed border-blueprint/25 bg-white/62 p-8 text-center">
+            <BarChart3 className="mx-auto h-10 w-10 text-blueprint" />
+            <p className="mt-4 font-display text-xl font-bold text-ink">Aun no hay hallazgos suficientes para graficar</p>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">Cuando registres hallazgos, aqui apareceran porcentajes, rankings por area y patrones de clasificacion.</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="overflow-hidden border-white/80 bg-white/75 p-0">
+      <div className="border-b border-white/70 p-5">
+        <CardHeader eyebrow="Analitica" title="Lectura dinamica de hallazgos" action={<Badge tone="yellow">{total} hallazgos</Badge>} />
+        <p className="text-sm leading-6 text-slate-600">Explora criticidad, areas afectadas, clasificaciones frecuentes y avance de gestion. Cada bloque puede llevarte a la matriz filtrada.</p>
+      </div>
+
+      <div className="grid gap-4 p-4 sm:p-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Criticidad</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Distribucion general</h3>
+            </div>
+            <Badge tone="blue">100%</Badge>
+          </div>
+
+          <div className="mt-5 grid gap-5 sm:grid-cols-[13rem_minmax(0,1fr)] sm:items-center">
+            <CriticalityDonut rows={criticalityRows} total={total} />
+            <div className="grid gap-2">
+              {criticalityRows.map((row) => (
+                <AnalyticsMetricLink key={row.label} href={filterHref(row.filter)} label={`Criticidad ${row.label}`} count={row.count} total={total} tone={row.tone} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Areas</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Donde se concentran</h3>
+            </div>
+            <Badge tone="neutral">{areaRows.length} areas</Badge>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {areaRows.map((row) => (
+              <BarLink key={row.label} href={filterHref(`area:${row.label}`)} label={row.label} count={row.count} total={total} />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Clasificacion</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Temas mas frecuentes</h3>
+            </div>
+            <Badge tone="blue">{classificationRows.length} categorias</Badge>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {classificationRows.map((row) => (
+              <BarLink key={row.label} href={filterHref(`classification:${row.label}`)} label={row.label} count={row.count} total={total} tone="blue" />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Gestion</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Estado de avance</h3>
+            </div>
+            <Badge tone="green">{statusRows.filter((row) => row.count > 0).length} activos</Badge>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {statusRows.map((row) => (
+              <BarLink key={row.label} href={filterHref(row.filter)} label={row.label} count={row.count} total={total} tone="green" />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5 xl:col-span-2">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Prioridad</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Hallazgos criticos para revisar primero</h3>
+            </div>
+            <Link href={filterHref("high")} className="focus-ring rounded-full">
+              <Badge tone="red">{criticalFindings.length} criticos</Badge>
+            </Link>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {criticalFindings.length === 0 ? (
+              <p className="rounded-2xl bg-white/70 p-4 text-sm text-slate-500">No hay hallazgos de criticidad alta identificados hasta el momento.</p>
+            ) : criticalFindings.map((finding) => (
+              <Link key={finding.id} href={filterHref("high")} className="focus-ring grid gap-3 rounded-2xl bg-white/72 p-3 ring-1 ring-white/80 transition hover:bg-white md:grid-cols-[minmax(0,1fr)_10rem_8rem] md:items-center">
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-ink">{finding.title}</span>
+                  <span className="mt-1 block text-xs font-medium text-slate-500">{finding.area} - {finding.classification}</span>
+                </span>
+                <Badge tone={statusTone(finding.status)}>{finding.status}</Badge>
+                <span className="text-xs font-semibold text-slate-500">{finding.attachments.length} evidencias</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
+    </Card>
+  );
+}
+
 function Metric({ label, value, tone = "neutral", filter, activeFilter }: { label: string; value: number; tone?: "neutral" | "red" | "blue" | "green" | "yellow"; filter: FindingFilter; activeFilter: FindingFilter }) {
   const toneClass = {
     neutral: "text-ink bg-white/70",
@@ -117,6 +251,60 @@ function Metric({ label, value, tone = "neutral", filter, activeFilter }: { labe
     <Link href={filter === "all" ? "/hallazgos" : `/hallazgos?findingFilter=${filter}`} className={`focus-ring block rounded-2xl px-4 py-3 transition ring-1 ring-white/80 ${toneClass} ${activeClass}`}>
       <p className="text-xl font-bold">{value}</p>
       <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-70">{label}</p>
+    </Link>
+  );
+}
+
+function CriticalityDonut({ rows, total }: { rows: { label: Criticality; count: number; tone: "neutral" | "blue" | "yellow" | "red" | "green" }[]; total: number }) {
+  const high = rows.find((row) => row.label === "Alta")?.count ?? 0;
+  const medium = rows.find((row) => row.label === "Media")?.count ?? 0;
+  const highEnd = percentage(high, total);
+  const mediumEnd = highEnd + percentage(medium, total);
+  const chartStyle = {
+    background: `conic-gradient(#ff5a5f 0% ${highEnd}%, #f6c90e ${highEnd}% ${mediumEnd}%, #10b981 ${mediumEnd}% 100%)`
+  };
+
+  return (
+    <div className="mx-auto grid h-48 w-48 place-items-center rounded-full p-4 shadow-inner shadow-ink/10" style={chartStyle}>
+      <div className="grid h-32 w-32 place-items-center rounded-full bg-white/92 text-center shadow-sm shadow-ink/5">
+        <div>
+          <p className="font-display text-3xl font-bold text-ink">{percentage(high, total)}%</p>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-coral">Alta</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsMetricLink({ href, label, count, total, tone }: { href: string; label: string; count: number; total: number; tone: "neutral" | "blue" | "yellow" | "red" | "green" }) {
+  return (
+    <Link href={href} className="focus-ring grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-white/72 p-3 ring-1 ring-white/80 transition hover:bg-white">
+      <span className="min-w-0">
+        <span className="block truncate text-sm font-semibold text-ink">{label}</span>
+        <span className="mt-1 block text-xs text-slate-500">{percentage(count, total)}% del total</span>
+      </span>
+      <Badge tone={tone}>{count}</Badge>
+    </Link>
+  );
+}
+
+function BarLink({ href, label, count, total, tone = "yellow" }: { href: string; label: string; count: number; total: number; tone?: "blue" | "green" | "yellow" }) {
+  const width = `${percentage(count, total)}%`;
+  const barClass = {
+    blue: "bg-blueprint",
+    green: "bg-emerald-500",
+    yellow: "bg-sun"
+  }[tone];
+
+  return (
+    <Link href={href} className="focus-ring block rounded-2xl bg-white/72 p-3 ring-1 ring-white/80 transition hover:bg-white">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <span className="truncate text-sm font-semibold text-ink">{label}</span>
+        <span className="text-xs font-semibold text-slate-500">{count} / {percentage(count, total)}%</span>
+      </div>
+      <span className="block h-2 overflow-hidden rounded-full bg-ink/5">
+        <span className={`block h-full rounded-full ${barClass}`} style={{ width }} />
+      </span>
     </Link>
   );
 }
@@ -465,6 +653,7 @@ function normalizeFindingFilter(value: string | string[] | undefined): FindingFi
   const parsed = Array.isArray(value) ? value[0] : value;
   if (parsed === "critical" || parsed === "high") return "high";
   if (parsed === "medium" || parsed === "low") return parsed;
+  if (parsed?.startsWith("area:") || parsed?.startsWith("classification:") || parsed?.startsWith("status:")) return parsed as FindingFilter;
   return "all";
 }
 
@@ -472,5 +661,35 @@ function filterFindings(findings: FindingRecord[], filter: FindingFilter) {
   if (filter === "high") return findings.filter((finding) => finding.criticality === "Alta");
   if (filter === "medium") return findings.filter((finding) => finding.criticality === "Media");
   if (filter === "low") return findings.filter((finding) => finding.criticality === "Baja");
+  if (filter.startsWith("area:")) return findings.filter((finding) => finding.area === filter.slice("area:".length));
+  if (filter.startsWith("classification:")) return findings.filter((finding) => finding.classification === filter.slice("classification:".length));
+  if (filter.startsWith("status:")) return findings.filter((finding) => finding.status === filter.slice("status:".length));
   return findings;
+}
+
+function criticalityFilter(criticality: Criticality): FindingFilter {
+  if (criticality === "Alta") return "high";
+  if (criticality === "Media") return "medium";
+  return "low";
+}
+
+function filterHref(filter: FindingFilter | string) {
+  return filter === "all" ? "/hallazgos" : `/hallazgos?findingFilter=${encodeURIComponent(filter)}`;
+}
+
+function percentage(count: number, total: number) {
+  if (total === 0) return 0;
+  return Math.round((count / total) * 100);
+}
+
+function rankBy(findings: FindingRecord[], getLabel: (finding: FindingRecord) => string) {
+  const counts = findings.reduce<Record<string, number>>((accumulator, finding) => {
+    const label = getLabel(finding) || "Sin dato";
+    accumulator[label] = (accumulator[label] ?? 0) + 1;
+    return accumulator;
+  }, {});
+
+  return Object.entries(counts)
+    .map(([label, count]) => ({ label, count }))
+    .sort((first, second) => second.count - first.count || first.label.localeCompare(second.label));
 }
