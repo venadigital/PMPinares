@@ -14,7 +14,7 @@ interface TasksPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-type FilterKey = "all" | ProjectTaskStatus;
+type FilterKey = "all" | "mine" | ProjectTaskStatus;
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
   const params = searchParams ? await searchParams : {};
@@ -42,7 +42,8 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   }
 
   const filteredTasks = tasks.filter((task) => {
-    if (activeStatus !== "all" && task.status !== activeStatus) return false;
+    if (activeStatus === "mine" && !task.assignees.some((assignee) => assignee.id === profile.id)) return false;
+    if (activeStatus !== "all" && activeStatus !== "mine" && task.status !== activeStatus) return false;
     if (activePriority !== "all" && task.priority !== activePriority) return false;
     if (activePhase !== "all" && task.phaseId !== activePhase) return false;
     if (activeUser !== "all" && !task.assignees.some((assignee) => assignee.id === activeUser)) return false;
@@ -75,6 +76,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           activeUser={activeUser}
           activeFinding={activeFinding}
           activeRisk={activeRisk}
+          currentUserId={profile.id}
           canEdit={canEdit}
           canDelete={canDelete}
         />
@@ -192,11 +194,14 @@ function TaskMatrix(props: {
   activeUser: string;
   activeFinding: string;
   activeRisk: string;
+  currentUserId: string;
   canEdit: boolean;
   canDelete: boolean;
 }) {
-  const { tasks, allTasks, phases, users, findings, risks, activeStatus, activePriority, activePhase, activeUser, activeFinding, activeRisk, canEdit, canDelete } = props;
+  const { tasks, allTasks, phases, users, findings, risks, activeStatus, activePriority, activePhase, activeUser, activeFinding, activeRisk, currentUserId, canEdit, canDelete } = props;
   const statusCounts = Object.fromEntries(projectTaskStatuses.map((status) => [status, allTasks.filter((task) => task.status === status).length])) as Record<ProjectTaskStatus, number>;
+  const assignedToMeCount = allTasks.filter((task) => task.assignees.some((assignee) => assignee.id === currentUserId)).length;
+  const visibleStatusCards = projectTaskStatuses.filter((status) => status !== "Cerrada");
 
   return (
     <Card className="overflow-hidden p-0">
@@ -212,7 +217,8 @@ function TaskMatrix(props: {
       <div className="grid gap-5 p-5">
         <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           <FilterCard href="/tareas" active={activeStatus === "all"} count={allTasks.length} label="Todas" />
-          {projectTaskStatuses.map((status) => (
+          <FilterCard href="/tareas?status=mine" active={activeStatus === "mine"} count={assignedToMeCount} label="Asignadas a mi" />
+          {visibleStatusCards.map((status) => (
             <FilterCard key={status} href={`/tareas?status=${encodeURIComponent(status)}`} active={activeStatus === status} count={statusCounts[status]} label={status} />
           ))}
         </div>
@@ -508,6 +514,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 
 function normalizeFilter(value: string | string[] | undefined): FilterKey {
   if (typeof value !== "string") return "all";
+  if (value === "mine") return "mine";
   return projectTaskStatuses.includes(value as ProjectTaskStatus) ? (value as ProjectTaskStatus) : "all";
 }
 
