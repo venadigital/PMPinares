@@ -34,7 +34,7 @@ export const getCurrentProfile = cache(async (): Promise<UserProfile> => {
 
   const { data } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)")
+    .select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view, can_create, can_edit, can_delete)")
     .eq("id", user.id)
     .single<DbProfile>();
 
@@ -78,12 +78,24 @@ export async function getModulePermissions(profileId: string) {
 }
 
 export function hasPermission(profile: UserProfile, moduleKey: ModuleKey, permission: PermissionKey) {
+  const modulePermission = profile.modulePermissions?.find((item) => item.moduleKey === moduleKey);
+
+  if (modulePermission) {
+    if (permission === "view") return modulePermission.canView;
+    if (!modulePermission.canView) return false;
+    if (permission === "create") return modulePermission.canCreate;
+    if (permission === "edit") return modulePermission.canEdit;
+    if (permission === "delete") return modulePermission.canDelete;
+  }
+
   if (!profile.moduleAccess.includes(moduleKey)) return false;
   if (permission === "delete") return profile.role === "Administrador Vena Digital" || profile.role === "Administrador Pinares";
   return true;
 }
 
 function mapProfile(profile: DbProfile): UserProfile {
+  const permissions = profile.module_permissions ?? [];
+
   return {
     id: profile.id,
     name: profile.full_name,
@@ -93,8 +105,15 @@ function mapProfile(profile: DbProfile): UserProfile {
     position: profile.position ?? "",
     area: profile.area ?? "",
     status: profile.status,
-    moduleAccess: (profile.module_permissions ?? [])
+    moduleAccess: permissions
       .filter((permission) => permission.can_view)
-      .map((permission) => permission.module_key)
+      .map((permission) => permission.module_key),
+    modulePermissions: permissions.map((permission) => ({
+      moduleKey: permission.module_key,
+      canView: permission.can_view,
+      canCreate: permission.can_create,
+      canEdit: permission.can_edit,
+      canDelete: permission.can_delete
+    }))
   };
 }

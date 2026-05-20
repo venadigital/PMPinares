@@ -31,6 +31,15 @@ export interface UserProfile {
   area: string;
   status: "Activo" | "Inactivo";
   moduleAccess: ModuleKey[];
+  modulePermissions?: UserModulePermission[];
+}
+
+export interface UserModulePermission {
+  moduleKey: ModuleKey;
+  canView: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 export interface Phase {

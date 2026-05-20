@@ -116,6 +116,57 @@ export async function deleteUserAction(formData: FormData) {
   }
 }
 
+export async function updateUserPermissionsAction(formData: FormData) {
+  try {
+    await updateUserPermissions(formData);
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("Error inesperado actualizando permisos:", error);
+    redirect(`/stakeholders?error=${encodeURIComponent(getSafeErrorMessage(error, "No se pudieron actualizar los permisos"))}`);
+  }
+}
+
+async function updateUserPermissions(formData: FormData) {
+  if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
+    redirect("/stakeholders?error=Configura Supabase y SUPABASE_SERVICE_ROLE_KEY para editar permisos reales");
+  }
+
+  const currentProfile = await getCurrentProfile();
+  if (currentProfile.role !== "Administrador Vena Digital") {
+    redirect("/stakeholders?error=Solo Administrador Vena Digital puede editar permisos");
+  }
+
+  const profileId = String(formData.get("profileId") ?? "");
+  if (!profileId) {
+    redirect("/stakeholders?error=No se encontro el usuario para editar permisos");
+  }
+
+  if (profileId === currentProfile.id) {
+    redirect("/stakeholders?error=Por seguridad no puedes editar tus propios permisos desde esta pantalla");
+  }
+
+  const admin = createAdminClient();
+  const rows = modules.map((module) => ({
+    profile_id: profileId,
+    module_key: module.key,
+    can_view: formData.get(`${module.key}:view`) === "on",
+    can_create: formData.get(`${module.key}:create`) === "on",
+    can_edit: formData.get(`${module.key}:edit`) === "on",
+    can_delete: formData.get(`${module.key}:delete`) === "on"
+  }));
+
+  const { error } = await admin
+    .from("module_permissions")
+    .upsert(rows, { onConflict: "profile_id,module_key" });
+
+  if (error) {
+    redirect(`/stakeholders?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/stakeholders");
+  redirect("/stakeholders?permissionsUpdated=1");
+}
+
 async function deleteUser(formData: FormData) {
   if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) {
     redirect("/stakeholders?error=Configura Supabase y SUPABASE_SERVICE_ROLE_KEY para eliminar usuarios reales");
