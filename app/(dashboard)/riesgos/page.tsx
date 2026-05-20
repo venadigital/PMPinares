@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, Eye, FileWarning, Gauge, Link2, Paperclip, ScrollText, Trash2, TriangleAlert } from "lucide-react";
+import { BarChart3, Download, Eye, Gauge, Link2, Paperclip, ScrollText, Trash2, TriangleAlert } from "lucide-react";
 import { createRiskAction, deleteRiskAction, deleteRiskAttachmentAction, updateRiskAction } from "@/app/(dashboard)/riesgos/actions";
 import { PageHeader } from "@/components/modules/page-header";
 import { RisksTabs } from "@/components/modules/risks-tabs";
@@ -15,7 +15,7 @@ interface RisksPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-type RiskFilter = "all" | "high" | "medium" | "low";
+type RiskFilter = "all" | "high" | "medium" | "low" | `level:${RiskLevel}` | `category:${string}` | `status:${string}` | `regulation:${string}` | `link:${RiskLinkType}:${string}`;
 
 export default async function RisksPage({ searchParams }: RisksPageProps) {
   const params = searchParams ? await searchParams : {};
@@ -59,6 +59,7 @@ export default async function RisksPage({ searchParams }: RisksPageProps) {
         highCount={risks.filter((risk) => risk.level === "Alto").length}
         createPanel={<RiskCreatePanel options={options} canCreate={canCreate} />}
         matrixPanel={<RiskList risks={risks} options={options} activeFilter={activeFilter} canEdit={canEdit} canDelete={canDelete} />}
+        analyticsPanel={<RisksAnalytics risks={risks} />}
       />
     </>
   );
@@ -96,9 +97,9 @@ function RiskOverview({ risks, activeFilter }: { risks: RiskRecord[]; activeFilt
   return (
     <div className="mt-5 grid gap-3 sm:grid-cols-4">
       <Metric label="Todos" value={risks.length} tone="blue" filter="all" activeFilter={activeFilter} />
-      <Metric label="Nivel alto" value={high} tone="red" filter="high" activeFilter={activeFilter} />
-      <Metric label="Nivel medio" value={medium} tone="yellow" filter="medium" activeFilter={activeFilter} />
-      <Metric label="Nivel bajo" value={low} tone="green" filter="low" activeFilter={activeFilter} />
+      <Metric label="Nivel alto" value={high} tone="red" filter="level:Alto" activeFilter={activeFilter} />
+      <Metric label="Nivel medio" value={medium} tone="yellow" filter="level:Medio" activeFilter={activeFilter} />
+      <Metric label="Nivel bajo" value={low} tone="green" filter="level:Bajo" activeFilter={activeFilter} />
     </div>
   );
 }
@@ -114,9 +115,185 @@ function Metric({ label, value, tone = "neutral", filter, activeFilter }: { labe
   const activeClass = activeFilter === filter ? "ring-2 ring-blueprint/35 shadow-md shadow-blueprint/10" : "hover:-translate-y-px hover:bg-white/80";
 
   return (
-    <Link href={filter === "all" ? "/riesgos" : `/riesgos?riskFilter=${filter}`} className={`focus-ring block rounded-2xl px-4 py-3 transition ring-1 ring-white/80 ${toneClass} ${activeClass}`}>
+    <Link href={riskFilterHref(filter)} className={`focus-ring block rounded-2xl px-4 py-3 transition ring-1 ring-white/80 ${toneClass} ${activeClass}`}>
       <p className="text-xl font-bold">{value}</p>
       <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-70">{label}</p>
+    </Link>
+  );
+}
+
+function RisksAnalytics({ risks }: { risks: RiskRecord[] }) {
+  const total = risks.length;
+  const levelRows = riskLevels.map((level) => ({
+    label: level,
+    count: risks.filter((risk) => risk.level === level).length,
+    filter: riskLevelFilter(level),
+    tone: levelTone(level)
+  }));
+  const linkRows = rankByRiskLinks(risks).slice(0, 8);
+  const categoryRows = rankRisksBy(risks, (risk) => risk.category);
+  const statusRows = riskStatuses.map((status) => ({
+    label: status,
+    count: risks.filter((risk) => risk.status === status).length,
+    filter: `status:${status}` as RiskFilter
+  }));
+  const regulationRows = rankRisksBy(risks, (risk) => risk.regulation);
+
+  if (total === 0) {
+    return (
+      <Card className="overflow-hidden border-white/80 bg-white/75 p-0">
+        <div className="p-6">
+          <div className="rounded-[1.5rem] border border-dashed border-blueprint/25 bg-white/62 p-8 text-center">
+            <BarChart3 className="mx-auto h-10 w-10 text-blueprint" />
+            <p className="mt-4 font-display text-xl font-bold text-ink">Aun no hay riesgos suficientes para graficar</p>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">Cuando registres riesgos, aqui apareceran niveles de exposicion, vinculos frecuentes, categorias y normativas relacionadas.</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="overflow-hidden border-white/80 bg-white/75 p-0">
+      <div className="border-b border-white/70 p-5">
+        <CardHeader eyebrow="Analitica" title="Lectura dinamica de riesgos" action={<Badge tone="yellow">{total} riesgos</Badge>} />
+        <p className="text-sm leading-6 text-slate-600">Explora exposicion, concentracion, categorias, normativas y estado de gestion. Cada bloque puede llevarte a la matriz filtrada.</p>
+      </div>
+
+      <div className="grid gap-4 p-4 sm:p-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Nivel</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Exposicion general</h3>
+            </div>
+            <Badge tone="blue">100%</Badge>
+          </div>
+
+          <div className="mt-5 grid gap-5 sm:grid-cols-[13rem_minmax(0,1fr)] sm:items-center">
+            <RiskLevelDonut rows={levelRows} total={total} />
+            <div className="grid gap-2">
+              {levelRows.map((row) => (
+                <AnalyticsMetricLink key={row.label} href={riskFilterHref(row.filter)} label={`Nivel ${row.label}`} count={row.count} total={total} tone={row.tone} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Vinculos</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Donde se concentran</h3>
+            </div>
+            <Badge tone="neutral">{linkRows.length} vinculos</Badge>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {linkRows.length > 0 ? linkRows.map((row) => (
+              <BarLink key={`${row.type}:${row.label}`} href={riskFilterHref(`link:${row.type}:${row.label}`)} label={`${linkTypeLabel(row.type)}: ${row.label}`} count={row.count} total={total} />
+            )) : <p className="rounded-2xl bg-white/70 p-4 text-sm text-slate-500">Aun no hay vinculos suficientes para graficar.</p>}
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Categoria</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Tipos mas frecuentes</h3>
+            </div>
+            <Badge tone="blue">{categoryRows.length} categorias</Badge>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {categoryRows.map((row) => (
+              <BarLink key={row.label} href={riskFilterHref(`category:${row.label}`)} label={row.label} count={row.count} total={total} tone="blue" />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Gestion</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Estado de avance</h3>
+            </div>
+            <Badge tone="green">{statusRows.filter((row) => row.count > 0).length} activos</Badge>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {statusRows.map((row) => (
+              <BarLink key={row.label} href={riskFilterHref(row.filter)} label={row.label} count={row.count} total={total} tone="green" />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5 xl:col-span-2">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Normativa</p>
+              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Normativas mas relacionadas</h3>
+            </div>
+            <Badge tone="yellow">{regulationRows.length} normativas</Badge>
+          </div>
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            {regulationRows.map((row) => (
+              <BarLink key={row.label} href={riskFilterHref(`regulation:${row.label}`)} label={row.label} count={row.count} total={total} tone="yellow" />
+            ))}
+          </div>
+        </section>
+      </div>
+    </Card>
+  );
+}
+
+function RiskLevelDonut({ rows, total }: { rows: { label: RiskLevel; count: number; tone: "neutral" | "blue" | "yellow" | "red" | "green" }[]; total: number }) {
+  const high = rows.find((row) => row.label === "Alto")?.count ?? 0;
+  const medium = rows.find((row) => row.label === "Medio")?.count ?? 0;
+  const highEnd = percentage(high, total);
+  const mediumEnd = highEnd + percentage(medium, total);
+  const chartStyle = {
+    background: `conic-gradient(#ff5a5f 0% ${highEnd}%, #f6c90e ${highEnd}% ${mediumEnd}%, #10b981 ${mediumEnd}% 100%)`
+  };
+
+  return (
+    <div className="mx-auto grid h-48 w-48 place-items-center rounded-full p-4 shadow-inner shadow-ink/10" style={chartStyle}>
+      <div className="grid h-32 w-32 place-items-center rounded-full bg-white/92 text-center shadow-sm shadow-ink/5">
+        <div>
+          <p className="font-display text-3xl font-bold text-ink">{percentage(high, total)}%</p>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-coral">Alto</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsMetricLink({ href, label, count, total, tone }: { href: string; label: string; count: number; total: number; tone: "neutral" | "blue" | "yellow" | "red" | "green" }) {
+  return (
+    <Link href={href} className="focus-ring grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-white/72 p-3 ring-1 ring-white/80 transition hover:bg-white">
+      <span className="min-w-0">
+        <span className="block truncate text-sm font-semibold text-ink">{label}</span>
+        <span className="mt-1 block text-xs text-slate-500">{percentage(count, total)}% del total</span>
+      </span>
+      <Badge tone={tone}>{count}</Badge>
+    </Link>
+  );
+}
+
+function BarLink({ href, label, count, total, tone = "yellow" }: { href: string; label: string; count: number; total: number; tone?: "blue" | "green" | "yellow" }) {
+  const width = `${percentage(count, total)}%`;
+  const barClass = {
+    blue: "bg-blueprint",
+    green: "bg-emerald-500",
+    yellow: "bg-sun"
+  }[tone];
+
+  return (
+    <Link href={href} className="focus-ring block rounded-2xl bg-white/72 p-3 ring-1 ring-white/80 transition hover:bg-white">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <span className="truncate text-sm font-semibold text-ink">{label}</span>
+        <span className="text-xs font-semibold text-slate-500">{count} / {percentage(count, total)}%</span>
+      </div>
+      <span className="block h-2 overflow-hidden rounded-full bg-ink/5">
+        <span className={`block h-full rounded-full ${barClass}`} style={{ width }} />
+      </span>
     </Link>
   );
 }
@@ -504,15 +681,64 @@ function SelectField({ label, name, defaultValue, children }: { label: string; n
 
 function normalizeRiskFilter(value: string | string[] | undefined): RiskFilter {
   const parsed = Array.isArray(value) ? value[0] : value;
-  if (parsed === "high" || parsed === "medium" || parsed === "low") return parsed;
+  if (parsed === "high") return "level:Alto";
+  if (parsed === "medium") return "level:Medio";
+  if (parsed === "low") return "level:Bajo";
+  if (parsed?.startsWith("level:") || parsed?.startsWith("category:") || parsed?.startsWith("status:") || parsed?.startsWith("regulation:") || parsed?.startsWith("link:")) return parsed as RiskFilter;
   return "all";
 }
 
 function filterRisks(risks: RiskRecord[], filter: RiskFilter) {
-  if (filter === "high") return risks.filter((risk) => risk.level === "Alto");
-  if (filter === "medium") return risks.filter((risk) => risk.level === "Medio");
-  if (filter === "low") return risks.filter((risk) => risk.level === "Bajo");
+  if (filter === "high" || filter === "level:Alto") return risks.filter((risk) => risk.level === "Alto");
+  if (filter === "medium" || filter === "level:Medio") return risks.filter((risk) => risk.level === "Medio");
+  if (filter === "low" || filter === "level:Bajo") return risks.filter((risk) => risk.level === "Bajo");
+  if (filter.startsWith("category:")) return risks.filter((risk) => risk.category === filter.slice("category:".length));
+  if (filter.startsWith("status:")) return risks.filter((risk) => risk.status === filter.slice("status:".length));
+  if (filter.startsWith("regulation:")) return risks.filter((risk) => risk.regulation === filter.slice("regulation:".length));
+  if (filter.startsWith("link:")) {
+    const [type, ...labelParts] = filter.slice("link:".length).split(":");
+    const label = labelParts.join(":");
+    return risks.filter((risk) => risk.linkRecords.some((link) => link.type === type && link.label === label));
+  }
   return risks;
+}
+
+function riskLevelFilter(level: RiskLevel): RiskFilter {
+  return `level:${level}`;
+}
+
+function riskFilterHref(filter: RiskFilter | string) {
+  return filter === "all" ? "/riesgos" : `/riesgos?riskFilter=${encodeURIComponent(filter)}`;
+}
+
+function percentage(count: number, total: number) {
+  if (total === 0) return 0;
+  return Math.round((count / total) * 100);
+}
+
+function rankRisksBy(risks: RiskRecord[], getLabel: (risk: RiskRecord) => string) {
+  const counts = risks.reduce<Record<string, number>>((accumulator, risk) => {
+    const label = getLabel(risk) || "Sin dato";
+    accumulator[label] = (accumulator[label] ?? 0) + 1;
+    return accumulator;
+  }, {});
+
+  return Object.entries(counts)
+    .map(([label, count]) => ({ label, count }))
+    .sort((first, second) => second.count - first.count || first.label.localeCompare(second.label));
+}
+
+function rankByRiskLinks(risks: RiskRecord[]) {
+  const counts = risks.reduce<Record<string, { type: RiskLinkType; label: string; count: number }>>((accumulator, risk) => {
+    risk.linkRecords.forEach((link) => {
+      const key = `${link.type}:${link.label}`;
+      accumulator[key] = accumulator[key] ?? { type: link.type, label: link.label, count: 0 };
+      accumulator[key].count += 1;
+    });
+    return accumulator;
+  }, {});
+
+  return Object.values(counts).sort((first, second) => second.count - first.count || first.label.localeCompare(second.label));
 }
 
 function levelTone(level: RiskLevel): "neutral" | "blue" | "yellow" | "red" | "green" {

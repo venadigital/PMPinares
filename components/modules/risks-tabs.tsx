@@ -1,17 +1,17 @@
 "use client";
 
-import { ShieldAlert, TriangleAlert } from "lucide-react";
+import { BarChart3, ShieldAlert, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-type RisksTab = "create" | "matrix";
+type RisksTab = "create" | "matrix" | "analytics";
 
-export function RisksTabs({ createPanel, matrixPanel, riskCount, highCount }: { createPanel: React.ReactNode; matrixPanel: React.ReactNode; riskCount: number; highCount: number }) {
+export function RisksTabs({ createPanel, matrixPanel, analyticsPanel, riskCount, highCount }: { createPanel: React.ReactNode; matrixPanel: React.ReactNode; analyticsPanel: React.ReactNode; riskCount: number; highCount: number }) {
   const [activeTab, setActiveTab] = useState<RisksTab>("matrix");
 
   return (
     <section className="space-y-4">
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-3">
         <TabButton
           active={activeTab === "create"}
           eyebrow="Nuevo riesgo"
@@ -30,10 +30,19 @@ export function RisksTabs({ createPanel, matrixPanel, riskCount, highCount }: { 
           icon={<ShieldAlert className="h-5 w-5" />}
           onClick={() => setActiveTab("matrix")}
         />
+        <TabButton
+          active={activeTab === "analytics"}
+          eyebrow="Analitica"
+          title="Lectura dinamica"
+          description="Visualiza exposicion, concentracion, categorias, normativas y estado de gestion."
+          meta={riskCount > 0 ? `${riskCount} datos` : undefined}
+          icon={<BarChart3 className="h-5 w-5" />}
+          onClick={() => setActiveTab("analytics")}
+        />
       </div>
 
       <div className="min-h-[24rem]">
-        {activeTab === "create" ? createPanel : matrixPanel}
+        {activeTab === "create" ? createPanel : activeTab === "analytics" ? analyticsPanel : matrixPanel}
       </div>
     </section>
   );
