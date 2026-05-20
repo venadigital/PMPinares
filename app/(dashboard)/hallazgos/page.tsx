@@ -119,7 +119,6 @@ function FindingsAnalytics({ findings }: { findings: FindingRecord[] }) {
     count: findings.filter((finding) => finding.status === status).length,
     filter: `status:${status}`
   }));
-  const criticalFindings = findings.filter((finding) => finding.criticality === "Alta").slice(0, 5);
 
   if (total === 0) {
     return (
@@ -207,31 +206,6 @@ function FindingsAnalytics({ findings }: { findings: FindingRecord[] }) {
           </div>
         </section>
 
-        <section className="rounded-[1.35rem] border border-white/80 bg-white/68 p-4 shadow-sm shadow-ink/5 xl:col-span-2">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Prioridad</p>
-              <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">Hallazgos criticos para revisar primero</h3>
-            </div>
-            <Link href={filterHref("high")} className="focus-ring rounded-full">
-              <Badge tone="red">{criticalFindings.length} criticos</Badge>
-            </Link>
-          </div>
-          <div className="mt-4 grid gap-2">
-            {criticalFindings.length === 0 ? (
-              <p className="rounded-2xl bg-white/70 p-4 text-sm text-slate-500">No hay hallazgos de criticidad alta identificados hasta el momento.</p>
-            ) : criticalFindings.map((finding) => (
-              <Link key={finding.id} href={filterHref("high")} className="focus-ring grid gap-3 rounded-2xl bg-white/72 p-3 ring-1 ring-white/80 transition hover:bg-white md:grid-cols-[minmax(0,1fr)_10rem_8rem] md:items-center">
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold text-ink">{finding.title}</span>
-                  <span className="mt-1 block text-xs font-medium text-slate-500">{finding.area} - {finding.classification}</span>
-                </span>
-                <Badge tone={statusTone(finding.status)}>{finding.status}</Badge>
-                <span className="text-xs font-semibold text-slate-500">{finding.attachments.length} evidencias</span>
-              </Link>
-            ))}
-          </div>
-        </section>
       </div>
     </Card>
   );
