@@ -30,6 +30,7 @@ export async function createFindingAction(formData: FormData) {
 
   if (error || !finding) redirect(`/hallazgos?error=${encodeURIComponent(error?.message ?? "No se pudo crear el hallazgo")}`);
 
+  await replaceFindingTools(finding.id, parseToolIds(formData));
   await uploadFindingAttachments(formData.getAll("attachments"), finding.id, profile.id);
 
   revalidateFindings();
@@ -50,6 +51,7 @@ export async function updateFindingAction(formData: FormData) {
   const { error } = await admin.from("findings").update({ ...payload, updated_at: new Date().toISOString() }).eq("id", findingId);
   if (error) redirect(`/hallazgos?error=${encodeURIComponent(error.message)}`);
 
+  await replaceFindingTools(findingId, parseToolIds(formData));
   await uploadFindingAttachments(formData.getAll("attachments"), findingId, profile.id);
 
   revalidateFindings();
@@ -68,6 +70,7 @@ export async function deleteFindingAction(formData: FormData) {
   const paths = (attachments ?? []).map((attachment) => attachment.storage_path).filter(Boolean);
   if (paths.length > 0) await admin.storage.from(BUCKET).remove(paths);
 
+  await admin.from("entity_links").delete().eq("source_type", "finding").eq("source_id", findingId);
   const { error } = await admin.from("findings").delete().eq("id", findingId);
   if (error) redirect(`/hallazgos?error=${encodeURIComponent("No se pudo eliminar el hallazgo")}`);
 
@@ -103,6 +106,34 @@ function parseFindingPayload(formData: FormData) {
     status: normalizeEnum(formData.get("status"), findingStatuses, "Identificado"),
     area_id: emptyToNull(formData.get("areaId"))
   };
+}
+
+function parseToolIds(formData: FormData) {
+  return [...new Set(formData.getAll("toolIds").map((value) => String(value).trim()).filter(Boolean))];
+}
+
+async function replaceFindingTools(findingId: string, toolIds: string[]) {
+  const admin = getAdminOrRedirect();
+  await admin.from("entity_links").delete().eq("source_type", "finding").eq("source_id", findingId).eq("target_type", "tool");
+
+  if (toolIds.length === 0) return;
+
+  const { data, error: toolsError } = await admin.from("technology_tools").select("id").in("id", toolIds);
+  if (toolsError) redirect(`/hallazgos?error=${encodeURIComponent("No se pudieron validar las herramientas vinculadas")}`);
+
+  const validToolIds = new Set((data ?? []).map((tool) => tool.id));
+  const invalidSelection = toolIds.some((toolId) => !validToolIds.has(toolId));
+  if (invalidSelection) redirect(`/hallazgos?error=${encodeURIComponent("Una o mas herramientas seleccionadas no existen")}`);
+
+  const rows = toolIds.map((toolId) => ({
+    source_type: "finding",
+    source_id: findingId,
+    target_type: "tool",
+    target_id: toolId
+  }));
+
+  const { error } = await admin.from("entity_links").insert(rows);
+  if (error) redirect(`/hallazgos?error=${encodeURIComponent("No se pudieron guardar las herramientas vinculadas")}`);
 }
 
 async function uploadFindingAttachments(files: FormDataEntryValue[], findingId: string, uploadedBy: string) {

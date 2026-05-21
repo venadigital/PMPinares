@@ -1,7 +1,9 @@
 import { areas as demoAreas, findings as demoFindings } from "@/lib/data";
 import { formatFileSize, getFileKind } from "@/lib/documents";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
+import { baseTechnologyToolNames } from "@/lib/technology-tool-options";
 import type { Criticality, Finding } from "@/lib/types";
 
 export const findingClassifications = [
@@ -39,6 +41,16 @@ export interface FindingAttachment {
   downloadUrl: string;
 }
 
+export interface FindingToolOption {
+  id: string;
+  name: string;
+}
+
+export interface FindingToolLink {
+  id: string;
+  name: string;
+}
+
 export interface FindingRecord extends Finding {
   description: string;
   areaId: string | null;
@@ -47,6 +59,7 @@ export interface FindingRecord extends Finding {
   createdAt: string;
   updatedAt: string;
   attachments: FindingAttachment[];
+  tools: FindingToolLink[];
 }
 
 interface FindingRow {
@@ -72,10 +85,18 @@ interface AttachmentRow {
   size_bytes: number;
 }
 
-export async function getFindingsData(): Promise<{ findings: FindingRecord[]; areas: FindingArea[] }> {
+interface LinkRow {
+  id: string;
+  source_id: string;
+  target_type: string;
+  target_id: string;
+}
+
+export async function getFindingsData(): Promise<{ findings: FindingRecord[]; areas: FindingArea[]; tools: FindingToolOption[] }> {
   if (!isSupabaseConfigured()) {
     return {
       areas: demoAreas.map((area) => ({ id: area, name: area })),
+      tools: baseTechnologyToolNames.map((name) => ({ id: name, name })),
       findings: demoFindings.map((finding) => ({
         ...finding,
         description: "",
@@ -84,32 +105,44 @@ export async function getFindingsData(): Promise<{ findings: FindingRecord[]; ar
         identifiedByEmail: "",
         createdAt: "",
         updatedAt: "",
-        attachments: []
+        attachments: [],
+        tools: []
       }))
     };
   }
 
   const supabase = await createClient();
-  const [findingsResult, attachmentsResult, areasResult] = await Promise.all([
+  const toolClient = isSupabaseAdminConfigured() ? createAdminClient() : supabase;
+  const [findingsResult, attachmentsResult, areasResult, toolsResult, linksResult] = await Promise.all([
     supabase
       .from("findings")
       .select("id, title, description, classification, criticality, status, area_id, identified_by, created_at, updated_at, areas:area_id(name), profiles:identified_by(full_name, email)")
       .order("created_at", { ascending: false }),
     supabase.from("finding_attachments").select("id, finding_id, name, mime_type, size_bytes").order("created_at", { ascending: true }),
-    supabase.from("areas").select("id, name").order("name")
+    supabase.from("areas").select("id, name").order("name"),
+    toolClient.from("technology_tools").select("id, name").order("name"),
+    supabase.from("entity_links").select("id, source_id, target_type, target_id").eq("source_type", "finding").eq("target_type", "tool")
   ]);
 
   const attachments = (attachmentsResult.data ?? []) as AttachmentRow[];
+  const links = (linksResult.data ?? []) as LinkRow[];
+  const tools = (toolsResult.data ?? []) as FindingToolOption[];
 
   return {
     areas: (areasResult.data ?? []) as FindingArea[],
-    findings: ((findingsResult.data ?? []) as unknown as FindingRow[]).map((finding) => mapFinding(finding, attachments))
+    tools,
+    findings: ((findingsResult.data ?? []) as unknown as FindingRow[]).map((finding) => mapFinding(finding, attachments, links, tools))
   };
 }
 
-function mapFinding(finding: FindingRow, attachments: AttachmentRow[]): FindingRecord {
+function mapFinding(finding: FindingRow, attachments: AttachmentRow[], links: LinkRow[], tools: FindingToolOption[]): FindingRecord {
   const area = firstRelation(finding.areas);
   const profile = firstRelation(finding.profiles);
+  const toolsById = new Map(tools.map((tool) => [tool.id, tool.name]));
+  const linkedTools = links
+    .filter((link) => link.source_id === finding.id)
+    .map((link) => ({ id: link.target_id, name: toolsById.get(link.target_id) }))
+    .filter((tool): tool is FindingToolLink => Boolean(tool.name));
 
   return {
     id: finding.id,
@@ -124,7 +157,8 @@ function mapFinding(finding: FindingRow, attachments: AttachmentRow[]): FindingR
     identifiedByEmail: profile?.email ?? "",
     createdAt: formatFindingDate(finding.created_at),
     updatedAt: formatFindingDate(finding.updated_at ?? finding.created_at),
-    attachments: attachments.filter((attachment) => attachment.finding_id === finding.id).map(mapAttachment)
+    attachments: attachments.filter((attachment) => attachment.finding_id === finding.id).map(mapAttachment),
+    tools: linkedTools
   };
 }
 

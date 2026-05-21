@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { getCurrentProfile, hasPermission } from "@/lib/auth";
-import { findingClassifications, findingCriticalities, findingStatuses, getFindingsData, type FindingArea, type FindingAttachment, type FindingRecord } from "@/lib/findings";
+import { findingClassifications, findingCriticalities, findingStatuses, getFindingsData, type FindingArea, type FindingAttachment, type FindingRecord, type FindingToolOption } from "@/lib/findings";
 import type { Criticality } from "@/lib/types";
 
 interface FindingsPageProps {
@@ -19,7 +19,7 @@ type FindingFilter = "all" | "high" | "medium" | "low" | `area:${string}` | `cla
 
 export default async function FindingsPage({ searchParams }: FindingsPageProps) {
   const params = searchParams ? await searchParams : {};
-  const [{ findings, areas }, profile] = await Promise.all([getFindingsData(), getCurrentProfile()]);
+  const [{ findings, areas, tools }, profile] = await Promise.all([getFindingsData(), getCurrentProfile()]);
   const canView = hasPermission(profile, "hallazgos", "view");
   const canCreate = hasPermission(profile, "hallazgos", "create");
   const canEdit = hasPermission(profile, "hallazgos", "edit");
@@ -57,8 +57,8 @@ export default async function FindingsPage({ searchParams }: FindingsPageProps) 
       <FindingsTabs
         findingCount={findings.length}
         criticalCount={findings.filter((finding) => finding.criticality === "Alta").length}
-        createPanel={<FindingCreatePanel areas={areas} canCreate={canCreate} />}
-        matrixPanel={<FindingsList findings={findings} areas={areas} activeFilter={activeFilter} canEdit={canEdit} canDelete={canDelete} />}
+        createPanel={<FindingCreatePanel areas={areas} tools={tools} canCreate={canCreate} />}
+        matrixPanel={<FindingsList findings={findings} areas={areas} tools={tools} activeFilter={activeFilter} canEdit={canEdit} canDelete={canDelete} />}
         analyticsPanel={<FindingsAnalytics findings={findings} />}
       />
     </>
@@ -77,14 +77,14 @@ function StatusMessages({ error, created, updated, deleted, attachmentDeleted }:
   );
 }
 
-function FindingCreatePanel({ areas, canCreate }: { areas: FindingArea[]; canCreate: boolean }) {
+function FindingCreatePanel({ areas, tools, canCreate }: { areas: FindingArea[]; tools: FindingToolOption[]; canCreate: boolean }) {
   return (
     <Card className="overflow-hidden border-white/80 bg-white/75 p-0">
       <div className="border-b border-white/70 p-5">
         <CardHeader eyebrow="Nuevo hallazgo" title="Registrar hallazgo" action={<Badge tone="blue">Evidencia opcional</Badge>} />
         <p className="text-sm leading-6 text-slate-600">Captura el hallazgo con la informacion minima para priorizarlo y soportarlo con archivos si aplica.</p>
       </div>
-      <FindingForm action={createFindingAction} areas={areas} canSubmit={canCreate} submitLabel="Crear hallazgo" />
+      <FindingForm action={createFindingAction} areas={areas} tools={tools} canSubmit={canCreate} submitLabel="Crear hallazgo" />
     </Card>
   );
 }
@@ -283,7 +283,7 @@ function BarLink({ href, label, count, total, tone = "yellow" }: { href: string;
   );
 }
 
-function FindingsList({ findings, areas, activeFilter, canEdit, canDelete }: { findings: FindingRecord[]; areas: FindingArea[]; activeFilter: FindingFilter; canEdit: boolean; canDelete: boolean }) {
+function FindingsList({ findings, areas, tools, activeFilter, canEdit, canDelete }: { findings: FindingRecord[]; areas: FindingArea[]; tools: FindingToolOption[]; activeFilter: FindingFilter; canEdit: boolean; canDelete: boolean }) {
   const visibleFindings = filterFindings(findings, activeFilter);
   const isFiltered = activeFilter !== "all";
 
@@ -327,7 +327,7 @@ function FindingsList({ findings, areas, activeFilter, canEdit, canDelete }: { f
       ) : (
         <div className="grid gap-3 p-4 sm:p-5">
           {visibleFindings.map((finding) => (
-            <FindingCard key={finding.id} finding={finding} areas={areas} canEdit={canEdit} canDelete={canDelete} />
+            <FindingCard key={finding.id} finding={finding} areas={areas} tools={tools} canEdit={canEdit} canDelete={canDelete} />
           ))}
         </div>
       )}
@@ -335,7 +335,7 @@ function FindingsList({ findings, areas, activeFilter, canEdit, canDelete }: { f
   );
 }
 
-function FindingCard({ finding, areas, canEdit, canDelete }: { finding: FindingRecord; areas: FindingArea[]; canEdit: boolean; canDelete: boolean }) {
+function FindingCard({ finding, areas, tools, canEdit, canDelete }: { finding: FindingRecord; areas: FindingArea[]; tools: FindingToolOption[]; canEdit: boolean; canDelete: boolean }) {
   return (
     <details className="group rounded-[1.35rem] border border-white/80 bg-white/70 p-4 shadow-sm shadow-ink/5 open:bg-white/82 open:shadow-md open:shadow-blueprint/10">
       <summary className="flex cursor-pointer list-none flex-wrap items-start justify-between gap-4">
@@ -381,7 +381,7 @@ function FindingCard({ finding, areas, canEdit, canDelete }: { finding: FindingR
             </div>
             <Badge tone={canEdit ? "blue" : "neutral"}>{canEdit ? "Editable" : "Solo lectura"}</Badge>
           </div>
-          <FindingForm action={updateFindingAction} finding={finding} areas={areas} canSubmit={canEdit} submitLabel="Guardar cambios" variant="compact" />
+          <FindingForm action={updateFindingAction} finding={finding} areas={areas} tools={tools} canSubmit={canEdit} submitLabel="Guardar cambios" variant="compact" />
         </div>
       </div>
     </details>
@@ -410,6 +410,13 @@ function FindingSnapshot({ finding }: { finding: FindingRecord }) {
         <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Descripcion</p>
         <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{finding.description || "Sin descripcion registrada."}</p>
       </div>
+
+      <div className="mt-3 rounded-2xl bg-white/72 p-4 ring-1 ring-white/80">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Herramientas vinculadas</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {finding.tools.length > 0 ? finding.tools.map((tool) => <Badge key={tool.id} tone="neutral">{tool.name}</Badge>) : <span className="text-sm text-slate-500">Sin herramientas vinculadas.</span>}
+        </div>
+      </div>
     </div>
   );
 }
@@ -427,6 +434,7 @@ function FindingForm({
   action,
   finding,
   areas,
+  tools,
   canSubmit,
   submitLabel,
   variant = "full"
@@ -434,10 +442,13 @@ function FindingForm({
   action: (formData: FormData) => void | Promise<void>;
   finding?: FindingRecord;
   areas: FindingArea[];
+  tools: FindingToolOption[];
   canSubmit: boolean;
   submitLabel: string;
   variant?: "full" | "compact";
 }) {
+  const selectedTools = new Set(finding?.tools.map((tool) => tool.id) ?? []);
+
   if (variant === "compact") {
     return (
       <form action={action}>
@@ -471,6 +482,7 @@ function FindingForm({
           <Field label="Descripcion">
             <Textarea name="description" defaultValue={finding?.description} placeholder="Describe el hallazgo, evidencia observada, impacto o contexto operativo." className="min-h-28" />
           </Field>
+          <ToolLinks tools={tools} selectedTools={selectedTools} compact />
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/70 pt-4">
             {!canSubmit ? <p className="text-sm font-medium leading-6 text-slate-600">Tu usuario puede consultar hallazgos, pero no tiene permiso para modificarlos.</p> : <p className="text-sm font-medium leading-6 text-slate-500">Los cambios actualizaran la matriz y el panel ejecutivo.</p>}
             <Button type="submit" variant="accent" className="min-w-40 shadow-lg shadow-sun/25">{submitLabel}</Button>
@@ -526,6 +538,10 @@ function FindingForm({
         </div>
 
         <div className="border-t border-white/70 bg-white/35 p-5">
+          <ToolLinks tools={tools} selectedTools={selectedTools} />
+        </div>
+
+        <div className="border-t border-white/70 bg-white/35 p-5">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div className="rounded-[1.4rem] border border-dashed border-blueprint/25 bg-blueprint/10 p-4">
               <p className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -545,6 +561,29 @@ function FindingForm({
       </fieldset>
       {!canSubmit ? <p className="rounded-xl bg-blueprint/10 p-3 text-sm font-medium leading-6 text-slate-600">Tu usuario puede consultar hallazgos, pero no tiene permiso para modificarlos.</p> : null}
     </form>
+  );
+}
+
+function ToolLinks({ tools, selectedTools, compact = false }: { tools: FindingToolOption[]; selectedTools: Set<string>; compact?: boolean }) {
+  return (
+    <div className={`${compact ? "rounded-2xl bg-white/72 p-4" : "rounded-[1.4rem] bg-white/60 p-4"} ring-1 ring-white/80`}>
+      <SectionTitle icon={<MapPin className="h-4 w-4" />} eyebrow="Herramientas" title="Softwares vinculados" />
+      <p className="mt-3 text-xs leading-5 text-slate-500">Puedes asociar una o varias herramientas al hallazgo para dejar trazabilidad tecnica.</p>
+      {tools.length === 0 ? (
+        <div className="mt-4 rounded-xl border border-dashed border-blueprint/20 bg-blueprint/5 p-4 text-xs leading-5 text-slate-500">
+          No hay herramientas disponibles para vincular.
+        </div>
+      ) : (
+        <div className={`mt-4 grid max-h-56 gap-2 overflow-y-auto pr-1 ${compact ? "sm:grid-cols-2 xl:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+          {tools.map((tool) => (
+            <label key={tool.id} className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/65 p-3 text-sm text-slate-700 ring-1 ring-white/80 transition hover:bg-white">
+              <input type="checkbox" name="toolIds" value={tool.id} defaultChecked={selectedTools.has(tool.id)} className="mt-0.5 h-4 w-4 rounded border-ink/20 accent-blueprint" />
+              <span className="leading-5">{tool.name}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

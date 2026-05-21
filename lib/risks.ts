@@ -1,6 +1,7 @@
 import { areas as demoAreas, risks as demoRisks } from "@/lib/data";
 import { formatFileSize, getFileKind } from "@/lib/documents";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import type { Risk, RiskLevel } from "@/lib/types";
 
@@ -103,12 +104,13 @@ export async function getRisksData(): Promise<{ risks: RiskRecord[]; options: Ri
   }
 
   const supabase = await createClient();
+  const toolClient = isSupabaseAdminConfigured() ? createAdminClient() : supabase;
   const [risksResult, attachmentsResult, linksResult, areasResult, toolsResult, processesResult, findingsResult] = await Promise.all([
     supabase.from("risks").select("id, title, description, category, level, regulation, status, created_at, updated_at, profiles:created_by(full_name)").order("created_at", { ascending: false }),
     supabase.from("risk_attachments").select("id, risk_id, name, mime_type, size_bytes").order("created_at", { ascending: true }),
     supabase.from("entity_links").select("id, source_id, target_type, target_id").eq("source_type", "risk"),
     supabase.from("areas").select("id, name").order("name"),
-    supabase.from("technology_tools").select("id, name").order("name"),
+    toolClient.from("technology_tools").select("id, name").order("name"),
     supabase.from("processes").select("id, name").order("name"),
     supabase.from("findings").select("id, title").order("created_at", { ascending: false })
   ]);
