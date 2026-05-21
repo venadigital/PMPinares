@@ -15,7 +15,7 @@ interface RisksPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-type RiskFilter = "all" | "high" | "medium" | "low" | `level:${RiskLevel}` | `category:${string}` | `status:${string}` | `regulation:${string}` | `link:${RiskLinkType}:${string}`;
+type RiskFilter = "all" | "high" | "medium" | "low" | `area:${string}` | `level:${RiskLevel}` | `category:${string}` | `status:${string}` | `regulation:${string}` | `link:${RiskLinkType}:${string}`;
 
 export default async function RisksPage({ searchParams }: RisksPageProps) {
   const params = searchParams ? await searchParams : {};
@@ -316,6 +316,7 @@ function RiskList({ risks, options, activeFilter, canEdit, canDelete }: { risks:
         />
         <p className="text-sm leading-6 text-slate-600">Consulta, actualiza y soporta cada riesgo con vinculos formales y evidencias.</p>
         <RiskOverview risks={risks} activeFilter={activeFilter} />
+        <RiskAreaFilters risks={risks} areas={options.areas} activeFilter={activeFilter} />
       </div>
 
       {risks.length === 0 ? (
@@ -330,6 +331,57 @@ function RiskList({ risks, options, activeFilter, canEdit, canDelete }: { risks:
         </div>
       )}
     </Card>
+  );
+}
+
+function RiskAreaFilters({ risks, areas, activeFilter }: { risks: RiskRecord[]; areas: RiskOptions["areas"]; activeFilter: RiskFilter }) {
+  const unassignedCount = risks.filter((risk) => !risk.linkRecords.some((link) => link.type === "area")).length;
+
+  return (
+    <div className="mt-3 rounded-[1.25rem] border border-white/80 bg-white/58 p-4 shadow-inner shadow-white/60">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Filtrar por area</p>
+          <p className="mt-1 text-xs text-slate-500">Selecciona un area para ver solo los riesgos relacionados.</p>
+        </div>
+        <Link href="/riesgos" className="focus-ring rounded-full">
+          <Badge tone={activeFilter === "all" ? "blue" : "neutral"}>Ver todas</Badge>
+        </Link>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        {areas.map((area) => {
+          const count = risks.filter((risk) => risk.linkRecords.some((link) => link.type === "area" && (link.id === `area:${area.id}` || link.label === area.name))).length;
+          const active = activeFilter === `area:${area.id}` || activeFilter === `area:${area.name}`;
+          return (
+            <Link
+              key={area.id}
+              href={riskFilterHref(`area:${area.id}`)}
+              className={`focus-ring flex min-h-10 items-center justify-between gap-3 rounded-2xl px-3.5 py-2 text-sm font-semibold ring-1 transition ${
+                active
+                  ? "bg-blueprint text-white ring-blueprint shadow-md shadow-blueprint/20"
+                  : "bg-white/78 text-slate-700 ring-white/90 hover:bg-white hover:text-blueprint"
+              }`}
+            >
+              <span className="min-w-0 truncate">{area.name}</span>
+              <span className={`rounded-full px-2 py-0.5 text-[0.65rem] ${active ? "bg-white/20 text-white" : "bg-blueprint/10 text-blueprint"}`}>{count}</span>
+            </Link>
+          );
+        })}
+        {unassignedCount > 0 ? (
+          <Link
+            href={riskFilterHref("area:__none")}
+            className={`focus-ring flex min-h-10 items-center justify-between gap-3 rounded-2xl px-3.5 py-2 text-sm font-semibold ring-1 transition ${
+              activeFilter === "area:__none"
+                ? "bg-blueprint text-white ring-blueprint shadow-md shadow-blueprint/20"
+                : "bg-white/78 text-slate-700 ring-white/90 hover:bg-white hover:text-blueprint"
+            }`}
+          >
+            <span className="min-w-0 truncate">Sin area</span>
+            <span className={`rounded-full px-2 py-0.5 text-[0.65rem] ${activeFilter === "area:__none" ? "bg-white/20 text-white" : "bg-blueprint/10 text-blueprint"}`}>{unassignedCount}</span>
+          </Link>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -684,7 +736,7 @@ function normalizeRiskFilter(value: string | string[] | undefined): RiskFilter {
   if (parsed === "high") return "level:Alto";
   if (parsed === "medium") return "level:Medio";
   if (parsed === "low") return "level:Bajo";
-  if (parsed?.startsWith("level:") || parsed?.startsWith("category:") || parsed?.startsWith("status:") || parsed?.startsWith("regulation:") || parsed?.startsWith("link:")) return parsed as RiskFilter;
+  if (parsed?.startsWith("area:") || parsed?.startsWith("level:") || parsed?.startsWith("category:") || parsed?.startsWith("status:") || parsed?.startsWith("regulation:") || parsed?.startsWith("link:")) return parsed as RiskFilter;
   return "all";
 }
 
@@ -692,6 +744,11 @@ function filterRisks(risks: RiskRecord[], filter: RiskFilter) {
   if (filter === "high" || filter === "level:Alto") return risks.filter((risk) => risk.level === "Alto");
   if (filter === "medium" || filter === "level:Medio") return risks.filter((risk) => risk.level === "Medio");
   if (filter === "low" || filter === "level:Bajo") return risks.filter((risk) => risk.level === "Bajo");
+  if (filter.startsWith("area:")) {
+    const areaFilter = filter.slice("area:".length);
+    if (areaFilter === "__none") return risks.filter((risk) => !risk.linkRecords.some((link) => link.type === "area"));
+    return risks.filter((risk) => risk.linkRecords.some((link) => link.type === "area" && (link.id === `area:${areaFilter}` || link.label === areaFilter)));
+  }
   if (filter.startsWith("category:")) return risks.filter((risk) => risk.category === filter.slice("category:".length));
   if (filter.startsWith("status:")) return risks.filter((risk) => risk.status === filter.slice("status:".length));
   if (filter.startsWith("regulation:")) return risks.filter((risk) => risk.regulation === filter.slice("regulation:".length));
