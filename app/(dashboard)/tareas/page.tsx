@@ -312,34 +312,68 @@ function TaskRow({ task, phases, users, areas, findings, risks, canEdit, canDele
             <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{task.description || "Sin descripcion registrada."}</p>
           </div>
 
-          <form action={updateProjectTaskAction} className="rounded-2xl bg-white/65 p-4 ring-1 ring-white/80">
+          <form action={updateProjectTaskAction} className="overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/72 shadow-sm shadow-ink/5">
             <input type="hidden" name="taskId" value={task.id} />
-            <SectionTitle title="Editar tarea" eyebrow="Gestion" compact />
-            <div className="mt-4 grid gap-4 lg:grid-cols-2">
-              <Field label="Titulo"><Input name="title" defaultValue={task.title} required /></Field>
-              <Field label="Estado"><Select name="status" defaultValue={task.status}>{projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}</Select></Field>
-              <Field label="Prioridad"><Select name="priority" defaultValue={task.priority}>{projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}</Select></Field>
-              <Field label="Fase"><Select name="phaseId" defaultValue={task.phaseId ?? ""}><option value="">Sin fase</option>{phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}</Select></Field>
-              <Field label="Fecha inicio"><Input name="startDate" type="date" defaultValue={task.startDate ?? ""} /></Field>
-              <Field label="Fecha finalizacion"><Input name="dueDate" type="date" defaultValue={task.dueDate ?? ""} /></Field>
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/80 bg-white/45 p-4">
+              <SectionTitle title="Editar tarea" eyebrow="Gestion" compact />
+              <Badge tone={canEdit ? "blue" : "neutral"}>{canEdit ? "Editable" : "Solo lectura"}</Badge>
             </div>
-            <Field label="Descripcion"><Textarea name="description" defaultValue={task.description} /></Field>
+            <fieldset disabled={!canEdit} className="grid gap-4 p-4 disabled:opacity-60">
+              <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+                <div className="rounded-[1.15rem] bg-white/68 p-4 ring-1 ring-white/80">
+                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Datos base</p>
+                  <h4 className="mt-1 font-display text-lg font-bold text-ink">Que se debe resolver</h4>
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    <div className="md:col-span-2">
+                      <Field label="Titulo"><Input name="title" defaultValue={task.title} required className="h-10" /></Field>
+                    </div>
+                    <Field label="Fase"><Select name="phaseId" defaultValue={task.phaseId ?? ""} className="h-10"><option value="">Sin fase</option>{phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}</Select></Field>
+                    <Field label="Prioridad"><Select name="priority" defaultValue={task.priority} className="h-10">{projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}</Select></Field>
+                    <div className="md:col-span-2">
+                      <Field label="Descripcion"><Textarea name="description" defaultValue={task.description} className="min-h-28" /></Field>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="mt-4 grid gap-4 lg:grid-cols-4">
-              <CompactChecks title="Asignados">{users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} defaultChecked={assignedIds.has(user.id)} />)}</CompactChecks>
-              <CompactChecks title="Areas">{areas.map((area) => <CheckboxPill key={area.id} name="areaIds" value={area.id} title={area.label} defaultChecked={linkedAreaIds.includes(area.id)} />)}</CompactChecks>
-              <CompactChecks title="Hallazgos">{findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} defaultChecked={linkedFindingIds.includes(finding.id)} />)}</CompactChecks>
-              <CompactChecks title="Riesgos">{risks.map((risk) => <CheckboxPill key={risk.id} name="riskIds" value={risk.id} title={risk.label} defaultChecked={linkedRiskIds.includes(risk.id)} />)}</CompactChecks>
-            </div>
+                <div className="rounded-[1.15rem] bg-blueprint/6 p-4 ring-1 ring-blueprint/10">
+                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Gestion</p>
+                  <h4 className="mt-1 font-display text-lg font-bold text-ink">Estado y fechas</h4>
+                  <div className="mt-4 grid gap-3">
+                    <Field label="Estado"><Select name="status" defaultValue={task.status} className="h-10">{projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}</Select></Field>
+                    <Field label="Fecha inicio"><Input name="startDate" type="date" defaultValue={task.startDate ?? ""} className="h-10" /></Field>
+                    <Field label="Fecha finalizacion"><Input name="dueDate" type="date" defaultValue={task.dueDate ?? ""} className="h-10" /></Field>
+                  </div>
+                </div>
+              </section>
 
-            <div className="mt-4 rounded-2xl border border-dashed border-blueprint/20 bg-blueprint/5 p-3">
-              <p className="mb-2 text-xs font-semibold text-ink">Agregar adjuntos</p>
-              <Input name="attachments" type="file" multiple />
-            </div>
+              <section className="rounded-[1.15rem] bg-white/68 p-4 ring-1 ring-white/80">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Responsables y vinculos</p>
+                    <h4 className="mt-1 font-display text-lg font-bold text-ink">Trazabilidad de la tarea</h4>
+                  </div>
+                  <p className="max-w-md text-xs leading-5 text-slate-500">Selecciona responsables, areas relacionadas y conexiones opcionales con hallazgos o riesgos.</p>
+                </div>
+                <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                  <CompactChecks title="Asignados" count={users.length}>{users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} description={user.area || user.role} defaultChecked={assignedIds.has(user.id)} />)}</CompactChecks>
+                  <CompactChecks title="Areas" count={areas.length}>{areas.map((area) => <CheckboxPill key={area.id} name="areaIds" value={area.id} title={area.label} defaultChecked={linkedAreaIds.includes(area.id)} />)}</CompactChecks>
+                  <CompactChecks title="Hallazgos" count={findings.length}>{findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} defaultChecked={linkedFindingIds.includes(finding.id)} />)}</CompactChecks>
+                  <CompactChecks title="Riesgos" count={risks.length}>{risks.map((risk) => <CheckboxPill key={risk.id} name="riskIds" value={risk.id} title={risk.label} defaultChecked={linkedRiskIds.includes(risk.id)} />)}</CompactChecks>
+                </div>
+              </section>
 
-            <div className="mt-4 flex flex-wrap justify-end gap-2">
-              {canEdit ? <Button type="submit" variant="primary">Guardar cambios</Button> : null}
-            </div>
+              <section className="grid gap-3 rounded-[1.15rem] border border-dashed border-blueprint/25 bg-blueprint/6 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)_auto] lg:items-center">
+                <div className="flex items-start gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint"><Paperclip className="h-4 w-4" /></span>
+                  <div>
+                    <p className="text-sm font-semibold text-ink">Agregar adjuntos</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">Adjunta soportes nuevos sin perder los archivos ya cargados.</p>
+                  </div>
+                </div>
+                <Input name="attachments" type="file" multiple className="h-10 bg-white/85" />
+                {canEdit ? <Button type="submit" variant="primary" className="h-10 whitespace-nowrap px-5">Guardar cambios</Button> : null}
+              </section>
+            </fieldset>
           </form>
 
           <CommentBox task={task} canEdit={canEdit} />
@@ -454,22 +488,25 @@ function CollapsibleOptionPanel({ title, icon, empty, count, children }: { title
   );
 }
 
-function CompactChecks({ title, children }: { title: string; children: React.ReactNode }) {
+function CompactChecks({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl bg-white/55 p-3 ring-1 ring-white/80">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-blueprint">{title}</p>
-      <div className="max-h-44 space-y-2 overflow-y-auto pr-1">{children}</div>
+    <div className="rounded-[1.05rem] border border-white/80 bg-white/70 p-3 shadow-sm shadow-ink/5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-[0.64rem] font-semibold uppercase tracking-[0.14em] text-blueprint">{title}</p>
+        {typeof count === "number" ? <span className="rounded-full bg-blueprint/8 px-2 py-0.5 text-[0.68rem] font-semibold text-blueprint">{count}</span> : null}
+      </div>
+      <div className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">{children}</div>
     </div>
   );
 }
 
 function CheckboxPill({ name, value, title, description, defaultChecked = false }: { name: string; value: string; title: string; description?: string; defaultChecked?: boolean }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/72 p-2.5 text-sm ring-1 ring-white/80 transition hover:bg-white hover:ring-blueprint/20">
+    <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/76 p-2.5 text-sm ring-1 ring-white/80 transition hover:bg-white hover:ring-blueprint/20">
       <input name={name} value={value} type="checkbox" defaultChecked={defaultChecked} className="mt-1 h-4 w-4 rounded border-slate-300 accent-blueprint" />
       <span className="min-w-0">
-        <span className="block truncate font-semibold text-ink">{title}</span>
-        {description ? <span className="mt-0.5 block truncate text-xs text-slate-500">{description}</span> : null}
+        <span className="block text-sm font-semibold leading-5 text-ink">{title}</span>
+        {description ? <span className="mt-0.5 block text-xs leading-4 text-slate-500">{description}</span> : null}
       </span>
     </label>
   );
