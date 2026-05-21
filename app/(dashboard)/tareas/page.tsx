@@ -362,16 +362,24 @@ function TaskRow({ task, phases, users, areas, findings, risks, canEdit, canDele
                 </div>
               </section>
 
-              <section className="grid gap-3 rounded-[1.15rem] border border-dashed border-blueprint/25 bg-blueprint/6 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)_auto] lg:items-center">
-                <div className="flex items-start gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint"><Paperclip className="h-4 w-4" /></span>
+              <section className="rounded-[1.15rem] border border-dashed border-blueprint/25 bg-blueprint/6 p-4">
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] xl:items-end">
+                  <div className="flex items-start gap-3">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint"><Paperclip className="h-4 w-4" /></span>
+                    <div>
+                      <p className="text-sm font-semibold text-ink">Agregar adjuntos</p>
+                      <p className="mt-1 max-w-xl text-xs leading-5 text-slate-500">Adjunta soportes nuevos sin perder los archivos ya cargados.</p>
+                    </div>
+                  </div>
                   <div>
-                    <p className="text-sm font-semibold text-ink">Agregar adjuntos</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">Adjunta soportes nuevos sin perder los archivos ya cargados.</p>
+                    <Input name="attachments" type="file" multiple className="h-10 bg-white/90" />
                   </div>
                 </div>
-                <Input name="attachments" type="file" multiple className="h-10 bg-white/85" />
-                {canEdit ? <Button type="submit" variant="primary" className="h-10 whitespace-nowrap px-5">Guardar cambios</Button> : null}
+                {canEdit ? (
+                  <div className="mt-4 flex justify-end border-t border-blueprint/10 pt-4">
+                    <Button type="submit" variant="primary" className="h-10 whitespace-nowrap px-5">Guardar cambios</Button>
+                  </div>
+                ) : null}
               </section>
             </fieldset>
           </form>
@@ -408,28 +416,37 @@ function TaskRow({ task, phases, users, areas, findings, risks, canEdit, canDele
 
 function CommentBox({ task, canEdit }: { task: ProjectTaskRecord; canEdit: boolean }) {
   return (
-    <div className="rounded-2xl bg-ink/5 p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="inline-flex items-center gap-2 text-sm font-semibold text-ink"><MessageSquare className="h-4 w-4 text-blueprint" />Comentarios</p>
+    <div className="overflow-hidden rounded-[1.35rem] border border-white/75 bg-white/68 shadow-sm shadow-ink/5">
+      <div className="flex items-center justify-between gap-3 border-b border-white/80 bg-ink/4 p-4">
+        <p className="inline-flex items-center gap-2 text-sm font-semibold text-ink">
+          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-blueprint/10 text-blueprint"><MessageSquare className="h-4 w-4" /></span>
+          Comentarios
+        </p>
         <Badge tone="neutral">{task.comments.length}</Badge>
       </div>
-      {task.comments.length === 0 ? <p className="mb-3 rounded-xl bg-white/70 p-3 text-sm text-slate-500">Aun no hay comentarios para esta tarea.</p> : null}
-      <div className="mb-3 grid gap-2">
-        {task.comments.map((comment) => (
-          <div key={comment.id} className="rounded-xl bg-white/75 p-3 ring-1 ring-white/80">
-            <p className="text-sm font-semibold text-ink">{comment.authorName}</p>
-            <p className="text-xs text-slate-500">{comment.createdAt}</p>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.body}</p>
+      <div className="grid gap-3 p-4">
+        {task.comments.length === 0 ? <p className="rounded-2xl bg-white/72 p-4 text-sm text-slate-500">Aun no hay comentarios para esta tarea.</p> : null}
+        {task.comments.length > 0 ? (
+          <div className="grid gap-2">
+            {task.comments.map((comment) => (
+              <div key={comment.id} className="rounded-2xl bg-white/78 p-3 ring-1 ring-white/80">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-ink">{comment.authorName}</p>
+                  <p className="text-xs text-slate-500">{comment.createdAt}</p>
+                </div>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.body}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : null}
+        <form action={createProjectTaskCommentAction}>
+          <fieldset disabled={!canEdit} className="grid gap-3 disabled:opacity-55">
+            <input type="hidden" name="taskId" value={task.id} />
+            <Textarea name="body" placeholder="Comenta avance, solicita informacion o registra resolucion..." required className="min-h-24 bg-white/85" />
+            <div className="flex justify-end"><Button type="submit" variant="primary" className="h-10 gap-2 px-5"><Send className="h-4 w-4" />Comentar</Button></div>
+          </fieldset>
+        </form>
       </div>
-      <form action={createProjectTaskCommentAction} className="grid gap-3">
-        <fieldset disabled={!canEdit} className="grid gap-3 disabled:opacity-55">
-          <input type="hidden" name="taskId" value={task.id} />
-          <Textarea name="body" placeholder="Comenta avance, solicita informacion o registra resolucion..." required />
-          <div className="flex justify-end"><Button type="submit" variant="primary" className="gap-2"><Send className="h-4 w-4" />Comentar</Button></div>
-        </fieldset>
-      </form>
     </div>
   );
 }
