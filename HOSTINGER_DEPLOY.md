@@ -41,12 +41,12 @@ npm run build
 npm start
 ```
 
-El arranque se hace desde `server.js`, un servidor Node compatible con Hostinger que usa el puerto `PORT` asignado por la plataforma.
+El arranque se hace desde el runtime standalone de Next.js generado durante el build, usando el puerto `PORT` asignado por Hostinger.
 
 Si el panel pide un **startup file**, usa:
 
 ```bash
-server.js
+.next/standalone/server.js
 ```
 
 Si el panel pide un **start command**, usa:
