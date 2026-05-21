@@ -26,30 +26,24 @@ export const phases: Phase[] = [
 ];
 
 export const areas = [
-  "Admision y recepcion de pacientes",
-  "Agendamiento de citas",
-  "Historia clinica / Atencion medica",
-  "Hospitalizacion / Internacion",
-  "Gestion de medicamentos / Farmacia",
-  "Laboratorio y diagnostico",
-  "Nutricion y alimentacion",
-  "Facturacion y cartera",
-  "Contabilidad y finanzas",
-  "Nomina y gestion de RRHH",
-  "Compras y logistica",
-  "Calidad, acreditacion y auditoria",
-  "Reportes normativos / entes de control",
-  "Comunicaciones internas",
-  "Comunicaciones externas / Marketing",
-  "Seguridad e infraestructura fisica",
-  "Gestion de TI / Sistemas",
-  "Gerencia y toma de decisiones"
+  "Gerencia General",
+  "SubGerencia Administrativa",
+  "SubGerencia Asistencial",
+  "Comercial",
+  "Comercial - Comunicaciones",
+  "Contabilidad",
+  "SGSST",
+  "Gestión Documental",
+  "Talento Humano",
+  "Servicio Farmaceutico",
+  "Coordinación Administrativa",
+  "Todas"
 ];
 
 export const users: UserProfile[] = [
-  { id: "u-1", name: "Laura Salazar", email: "laura@venadigital.co", role: "Administrador Vena Digital", organization: "Vena Digital", position: "Consultora lider", area: "Consultoria", status: "Activo", moduleAccess: modules.map((module) => module.key) },
-  { id: "u-2", name: "Monica Pinares", email: "monica@pinares.co", role: "Administrador Pinares", organization: "Pinares", position: "Punto de contacto", area: "Gerencia y toma de decisiones", status: "Activo", moduleAccess: modules.map((module) => module.key) },
-  { id: "u-3", name: "Equipo Facturacion", email: "facturacion@pinares.co", role: "Stakeholder Pinares", organization: "Pinares", position: "Lider de area", area: "Facturacion y cartera", status: "Activo", moduleAccess: ["dashboard", "documentos", "comunicacion", "inventario", "procesos", "hallazgos", "riesgos"] }
+  { id: "u-1", name: "Laura Salazar", email: "laura@venadigital.co", role: "Administrador Vena Digital", organization: "Vena Digital", position: "Consultora lider", area: "", status: "Activo", moduleAccess: modules.map((module) => module.key) },
+  { id: "u-2", name: "Monica Pinares", email: "monica@pinares.co", role: "Administrador Pinares", organization: "Pinares", position: "Punto de contacto", area: "", status: "Activo", moduleAccess: modules.map((module) => module.key) },
+  { id: "u-3", name: "Equipo Facturacion", email: "facturacion@pinares.co", role: "Stakeholder Pinares", organization: "Pinares", position: "Lider de area", area: "", status: "Activo", moduleAccess: ["dashboard", "documentos", "comunicacion", "inventario", "procesos", "hallazgos", "riesgos"] }
 ];
 
 export const tasks: Task[] = [
@@ -69,26 +63,26 @@ export const documents: DocumentItem[] = [
 ];
 
 export const tools: ToolItem[] = [
-  { id: "tool-1", name: "Kommo", provider: "Kommo", cost: 280, currency: "USD", licenseType: "CRM SaaS", users: 8, owner: "Comercial", areas: ["Comunicaciones externas / Marketing", "Agendamiento de citas"], apiAvailable: true, trafficLight: "Amarillo", satisfaction: 3 },
-  { id: "tool-2", name: "Sistema contable", provider: "Proveedor local", cost: 1800000, currency: "COP", licenseType: "Anual", users: 5, owner: "Contabilidad", areas: ["Facturacion y cartera", "Contabilidad y finanzas"], apiAvailable: false, trafficLight: "Rojo", satisfaction: 2 },
-  { id: "tool-3", name: "Microsoft Teams", provider: "Microsoft", cost: 0, currency: "COP", licenseType: "Incluida", users: 32, owner: "Gestion de TI / Sistemas", areas: ["Comunicaciones internas"], apiAvailable: true, trafficLight: "Verde", satisfaction: 4 }
+  { id: "tool-1", name: "Kommo", provider: "Kommo", cost: 280, currency: "USD", licenseType: "CRM SaaS", users: 8, owner: "Comercial", areas: [], apiAvailable: true, trafficLight: "Amarillo", satisfaction: 3 },
+  { id: "tool-2", name: "Sistema contable", provider: "Proveedor local", cost: 1800000, currency: "COP", licenseType: "Anual", users: 5, owner: "Contabilidad", areas: [], apiAvailable: false, trafficLight: "Rojo", satisfaction: 2 },
+  { id: "tool-3", name: "Microsoft Teams", provider: "Microsoft", cost: 0, currency: "COP", licenseType: "Incluida", users: 32, owner: "Coordinación Administrativa", areas: [], apiAvailable: true, trafficLight: "Verde", satisfaction: 4 }
 ];
 
 export const processes: ProcessItem[] = [
-  { id: "p-1", name: "Revision de facturas e ICA", area: "Facturacion y cartera", impactedAreas: ["Contabilidad y finanzas", "Reportes normativos / entes de control"], documentName: "Proceso_facturacion_ICA.pdf" },
-  { id: "p-2", name: "Agendamiento de pacientes", area: "Agendamiento de citas", impactedAreas: ["Admision y recepcion de pacientes", "Historia clinica / Atencion medica"], documentName: "Proceso_agendamiento.md" }
+  { id: "p-1", name: "Revision de facturas e ICA", area: "", impactedAreas: [], documentName: "Proceso_facturacion_ICA.pdf" },
+  { id: "p-2", name: "Agendamiento de pacientes", area: "", impactedAreas: [], documentName: "Proceso_agendamiento.md" }
 ];
 
 export const findings: Finding[] = [
-  { id: "f-1", title: "Credenciales compartidas en plataformas sensibles", classification: "Seguridad", criticality: "Alta", status: "Identificado", area: "Gestion de TI / Sistemas" },
-  { id: "f-2", title: "Duplicidad manual entre facturacion y contabilidad", classification: "Operativo", criticality: "Alta", status: "En analisis", area: "Facturacion y cartera" },
-  { id: "f-3", title: "Subutilizacion de funcionalidades del CRM", classification: "Tecnologico", criticality: "Media", status: "Validado", area: "Comunicaciones externas / Marketing" }
+  { id: "f-1", title: "Credenciales compartidas en plataformas sensibles", classification: "Seguridad", criticality: "Alta", status: "Identificado", area: "Sin area" },
+  { id: "f-2", title: "Duplicidad manual entre facturacion y contabilidad", classification: "Operativo", criticality: "Alta", status: "En analisis", area: "Sin area" },
+  { id: "f-3", title: "Subutilizacion de funcionalidades del CRM", classification: "Tecnologico", criticality: "Media", status: "Validado", area: "Sin area" }
 ];
 
 export const risks: Risk[] = [
-  { id: "r-1", title: "Acceso no autorizado a informacion clinica", level: "Alto", regulation: "Ley 1581/2012", links: ["Gestion de TI / Sistemas", "Historias clinicas"], status: "Abierto" },
-  { id: "r-2", title: "Errores tributarios por calculo manual", level: "Alto", regulation: "Requisitos DIAN / facturacion electronica", links: ["Facturacion y cartera", "Sistema contable"], status: "En revision" },
-  { id: "r-3", title: "Perdida de trazabilidad en agendamiento", level: "Medio", regulation: "Seguridad de datos de pacientes", links: ["Agendamiento de citas", "Kommo"], status: "Abierto" }
+  { id: "r-1", title: "Acceso no autorizado a informacion clinica", level: "Alto", regulation: "Ley 1581/2012", links: [], status: "Abierto" },
+  { id: "r-2", title: "Errores tributarios por calculo manual", level: "Alto", regulation: "Requisitos DIAN / facturacion electronica", links: [], status: "En revision" },
+  { id: "r-3", title: "Perdida de trazabilidad en agendamiento", level: "Medio", regulation: "Seguridad de datos de pacientes", links: [], status: "Abierto" }
 ];
 
 export const decisions: Decision[] = [

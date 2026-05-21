@@ -2,12 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { modules, areas } from "@/lib/data";
+import { modules } from "@/lib/data";
+import type { CompanyArea } from "@/lib/areas";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/input";
 
-export function UserCreateForm({ configured }: { configured: boolean }) {
+export function UserCreateForm({ configured, areas }: { configured: boolean; areas: CompanyArea[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +100,8 @@ export function UserCreateForm({ configured }: { configured: boolean }) {
           <label className="block space-y-2 text-sm font-medium text-ink xl:col-span-3">
             <span>Area</span>
             <select name="area" className="focus-ring w-full rounded-xl border border-white/70 bg-white/70 px-3.5 py-2.5 text-sm text-ink shadow-inner shadow-ink/5">
-              {areas.map((area) => <option key={area}>{area}</option>)}
+              <option value="">Sin area</option>
+              {areas.map((area) => <option key={area.id} value={area.name}>{area.name}</option>)}
             </select>
           </label>
         </div>

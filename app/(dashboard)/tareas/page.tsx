@@ -18,7 +18,7 @@ type FilterKey = "all" | "mine" | ProjectTaskStatus;
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
   const params = searchParams ? await searchParams : {};
-  const [{ tasks, phases, users, findings, risks }, profile] = await Promise.all([getProjectTasksData(), getCurrentProfile()]);
+  const [{ tasks, phases, users, findings, risks, areas }, profile] = await Promise.all([getProjectTasksData(), getCurrentProfile()]);
   const canView = hasPermission(profile, "tareas", "view");
   const canCreate = hasPermission(profile, "tareas", "create");
   const canEdit = hasPermission(profile, "tareas", "edit");
@@ -27,6 +27,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   const activePriority = typeof params.priority === "string" ? params.priority : "all";
   const activePhase = typeof params.phase === "string" ? params.phase : "all";
   const activeUser = typeof params.user === "string" ? params.user : "all";
+  const activeArea = typeof params.area === "string" ? params.area : "all";
   const activeFinding = typeof params.finding === "string" ? params.finding : "all";
   const activeRisk = typeof params.risk === "string" ? params.risk : "all";
 
@@ -47,6 +48,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     if (activePriority !== "all" && task.priority !== activePriority) return false;
     if (activePhase !== "all" && task.phaseId !== activePhase) return false;
     if (activeUser !== "all" && !task.assignees.some((assignee) => assignee.id === activeUser)) return false;
+    if (activeArea !== "all" && !task.links.some((link) => link.type === "area" && link.targetId === activeArea)) return false;
     if (activeFinding !== "all" && !task.links.some((link) => link.type === "finding" && link.targetId === activeFinding)) return false;
     if (activeRisk !== "all" && !task.links.some((link) => link.type === "risk" && link.targetId === activeRisk)) return false;
     return true;
@@ -68,25 +70,27 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           allTasks={tasks}
           phases={phases}
           users={users}
+          areas={areas}
           findings={findings}
           risks={risks}
           activeStatus={activeStatus}
           activePriority={activePriority}
           activePhase={activePhase}
           activeUser={activeUser}
+          activeArea={activeArea}
           activeFinding={activeFinding}
           activeRisk={activeRisk}
           currentUserId={profile.id}
           canEdit={canEdit}
           canDelete={canDelete}
         />
-        <TaskCreatePanel canCreate={canCreate} phases={phases} users={users} findings={findings} risks={risks} />
+        <TaskCreatePanel canCreate={canCreate} phases={phases} users={users} areas={areas} findings={findings} risks={risks} />
       </div>
     </>
   );
 }
 
-function TaskCreatePanel({ canCreate, phases, users, findings, risks }: { canCreate: boolean; phases: Phase[]; users: UserProfile[]; findings: { id: string; label: string }[]; risks: { id: string; label: string }[] }) {
+function TaskCreatePanel({ canCreate, phases, users, areas, findings, risks }: { canCreate: boolean; phases: Phase[]; users: UserProfile[]; areas: { id: string; label: string }[]; findings: { id: string; label: string }[]; risks: { id: string; label: string }[] }) {
   return (
     <Card className="overflow-hidden border-white/80 bg-white/70 p-0">
       <div className="grid gap-3 border-b border-white/70 bg-white/50 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
@@ -148,9 +152,12 @@ function TaskCreatePanel({ canCreate, phases, users, findings, risks }: { canCre
             </div>
           </section>
 
-          <section className="grid gap-3 lg:grid-cols-3">
+          <section className="grid gap-3 lg:grid-cols-4">
             <CollapsibleOptionPanel title="Asignar usuarios" icon={<Users className="h-4 w-4" />} empty="No hay usuarios disponibles." count={users.length}>
               {users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} description={user.area || user.role} />)}
+            </CollapsibleOptionPanel>
+            <CollapsibleOptionPanel title="Vincular areas" icon={<Link2 className="h-4 w-4" />} empty="No hay areas registradas." count={areas.length}>
+              {areas.map((area) => <CheckboxPill key={area.id} name="areaIds" value={area.id} title={area.label} />)}
             </CollapsibleOptionPanel>
             <CollapsibleOptionPanel title="Vincular hallazgos" icon={<Link2 className="h-4 w-4" />} empty="No hay hallazgos registrados." count={findings.length}>
               {findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} />)}
@@ -186,19 +193,21 @@ function TaskMatrix(props: {
   allTasks: ProjectTaskRecord[];
   phases: Phase[];
   users: UserProfile[];
+  areas: { id: string; label: string }[];
   findings: { id: string; label: string }[];
   risks: { id: string; label: string }[];
   activeStatus: FilterKey;
   activePriority: string;
   activePhase: string;
   activeUser: string;
+  activeArea: string;
   activeFinding: string;
   activeRisk: string;
   currentUserId: string;
   canEdit: boolean;
   canDelete: boolean;
 }) {
-  const { tasks, allTasks, phases, users, findings, risks, activeStatus, activePriority, activePhase, activeUser, activeFinding, activeRisk, currentUserId, canEdit, canDelete } = props;
+  const { tasks, allTasks, phases, users, areas, findings, risks, activeStatus, activePriority, activePhase, activeUser, activeArea, activeFinding, activeRisk, currentUserId, canEdit, canDelete } = props;
   const statusCounts = Object.fromEntries(projectTaskStatuses.map((status) => [status, allTasks.filter((task) => task.status === status).length])) as Record<ProjectTaskStatus, number>;
   const assignedToMeCount = allTasks.filter((task) => task.assignees.some((assignee) => assignee.id === currentUserId)).length;
   const visibleStatusCards = projectTaskStatuses.filter((status) => status !== "Cerrada");
@@ -228,7 +237,7 @@ function TaskMatrix(props: {
             <SlidersHorizontal className="h-4 w-4 text-blueprint" />
             Filtros avanzados
           </div>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
             <Select name="priority" defaultValue={activePriority} aria-label="Filtrar por prioridad">
               <option value="all">Todas las prioridades</option>
               {projectTaskPriorities.map((priority) => <option key={priority} value={priority}>{priority}</option>)}
@@ -240,6 +249,10 @@ function TaskMatrix(props: {
             <Select name="user" defaultValue={activeUser} aria-label="Filtrar por usuario">
               <option value="all">Todos los usuarios</option>
               {users.map((user) => <option key={user.id} value={user.id}>{user.name}</option>)}
+            </Select>
+            <Select name="area" defaultValue={activeArea} aria-label="Filtrar por area">
+              <option value="all">Todas las areas</option>
+              {areas.map((area) => <option key={area.id} value={area.id}>{area.label}</option>)}
             </Select>
             <Select name="finding" defaultValue={activeFinding} aria-label="Filtrar por hallazgo">
               <option value="all">Todos los hallazgos</option>
@@ -256,13 +269,14 @@ function TaskMatrix(props: {
           </div>
         </form>
 
-        {tasks.length === 0 ? <EmptyTasks /> : <div className="grid gap-3">{tasks.map((task) => <TaskRow key={task.id} task={task} phases={phases} users={users} findings={findings} risks={risks} canEdit={canEdit} canDelete={canDelete} />)}</div>}
+        {tasks.length === 0 ? <EmptyTasks /> : <div className="grid gap-3">{tasks.map((task) => <TaskRow key={task.id} task={task} phases={phases} users={users} areas={areas} findings={findings} risks={risks} canEdit={canEdit} canDelete={canDelete} />)}</div>}
       </div>
     </Card>
   );
 }
 
-function TaskRow({ task, phases, users, findings, risks, canEdit, canDelete }: { task: ProjectTaskRecord; phases: Phase[]; users: UserProfile[]; findings: { id: string; label: string }[]; risks: { id: string; label: string }[]; canEdit: boolean; canDelete: boolean }) {
+function TaskRow({ task, phases, users, areas, findings, risks, canEdit, canDelete }: { task: ProjectTaskRecord; phases: Phase[]; users: UserProfile[]; areas: { id: string; label: string }[]; findings: { id: string; label: string }[]; risks: { id: string; label: string }[]; canEdit: boolean; canDelete: boolean }) {
+  const linkedAreaIds = task.links.filter((link) => link.type === "area").map((link) => link.targetId);
   const linkedFindingIds = task.links.filter((link) => link.type === "finding").map((link) => link.targetId);
   const linkedRiskIds = task.links.filter((link) => link.type === "risk").map((link) => link.targetId);
   const assignedIds = new Set(task.assignees.map((assignee) => assignee.id));
@@ -311,8 +325,9 @@ function TaskRow({ task, phases, users, findings, risks, canEdit, canDelete }: {
             </div>
             <Field label="Descripcion"><Textarea name="description" defaultValue={task.description} /></Field>
 
-            <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            <div className="mt-4 grid gap-4 lg:grid-cols-4">
               <CompactChecks title="Asignados">{users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} defaultChecked={assignedIds.has(user.id)} />)}</CompactChecks>
+              <CompactChecks title="Areas">{areas.map((area) => <CheckboxPill key={area.id} name="areaIds" value={area.id} title={area.label} defaultChecked={linkedAreaIds.includes(area.id)} />)}</CompactChecks>
               <CompactChecks title="Hallazgos">{findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} defaultChecked={linkedFindingIds.includes(finding.id)} />)}</CompactChecks>
               <CompactChecks title="Riesgos">{risks.map((risk) => <CheckboxPill key={risk.id} name="riskIds" value={risk.id} title={risk.label} defaultChecked={linkedRiskIds.includes(risk.id)} />)}</CompactChecks>
             </div>
@@ -332,7 +347,7 @@ function TaskRow({ task, phases, users, findings, risks, canEdit, canDelete }: {
 
         <aside className="grid content-start gap-4">
           <InfoPanel title="Trazabilidad" icon={<Link2 className="h-4 w-4" />}>
-            {task.links.length === 0 ? <p className="text-sm text-slate-500">Sin hallazgos o riesgos vinculados.</p> : task.links.map((link) => <Badge key={link.id} tone={link.type === "risk" ? "red" : "blue"}>{link.type === "risk" ? "Riesgo" : "Hallazgo"}: {link.label}</Badge>)}
+            {task.links.length === 0 ? <p className="text-sm text-slate-500">Sin areas, hallazgos o riesgos vinculados.</p> : task.links.map((link) => <Badge key={link.id} tone={link.type === "risk" ? "red" : link.type === "area" ? "green" : "blue"}>{link.type === "risk" ? "Riesgo" : link.type === "area" ? "Area" : "Hallazgo"}: {link.label}</Badge>)}
           </InfoPanel>
           <InfoPanel title="Adjuntos" icon={<Paperclip className="h-4 w-4" />}>
             <AttachmentList attachments={task.attachments} />

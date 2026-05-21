@@ -1,4 +1,4 @@
-import { phases as demoPhases, users as demoUsers } from "@/lib/data";
+import { areas as demoAreas, phases as demoPhases, users as demoUsers } from "@/lib/data";
 import { formatFileSize, getFileKind } from "@/lib/documents";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
@@ -27,7 +27,7 @@ export interface ProjectTaskComment {
 
 export interface ProjectTaskLink {
   id: string;
-  type: "finding" | "risk";
+  type: "finding" | "risk" | "area";
   targetId: string;
   label: string;
 }
@@ -108,7 +108,7 @@ interface AttachmentRow {
 interface LinkRow {
   id: string;
   task_id: string;
-  target_type: "finding" | "risk";
+  target_type: "finding" | "risk" | "area";
   target_id: string;
 }
 
@@ -118,6 +118,7 @@ export async function getProjectTasksData(): Promise<{
   users: UserProfile[];
   findings: ProjectTaskOption[];
   risks: ProjectTaskOption[];
+  areas: ProjectTaskOption[];
 }> {
   if (!isSupabaseConfigured()) {
     return {
@@ -125,12 +126,13 @@ export async function getProjectTasksData(): Promise<{
       users: demoUsers,
       findings: [],
       risks: [],
+      areas: demoAreas.map((area) => ({ id: area, label: area })),
       tasks: []
     };
   }
 
   const supabase = await createClient();
-  const [tasksResult, assigneesResult, commentsResult, attachmentsResult, linksResult, phasesResult, usersResult, findingsResult, risksResult] = await Promise.all([
+  const [tasksResult, assigneesResult, commentsResult, attachmentsResult, linksResult, phasesResult, usersResult, findingsResult, risksResult, areasResult] = await Promise.all([
     supabase
       .from("project_tasks")
       .select("id, title, description, phase_id, priority, status, start_date, due_date, created_at, updated_at, phases:phase_id(name), profiles:created_by(full_name)")
@@ -142,7 +144,8 @@ export async function getProjectTasksData(): Promise<{
     supabase.from("phases").select("id, code, name, week_range, progress").order("code"),
     supabase.from("profiles").select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)").eq("status", "Activo").order("full_name"),
     supabase.from("findings").select("id, title").order("created_at", { ascending: false }),
-    supabase.from("risks").select("id, title").order("created_at", { ascending: false })
+    supabase.from("risks").select("id, title").order("created_at", { ascending: false }),
+    supabase.from("areas").select("id, name").order("name")
   ]);
 
   const phases = (phasesResult.data ?? []).map((phase) => ({
@@ -167,19 +170,21 @@ export async function getProjectTasksData(): Promise<{
 
   const findings = (findingsResult.data ?? []).map((finding) => ({ id: finding.id, label: finding.title }));
   const risks = (risksResult.data ?? []).map((risk) => ({ id: risk.id, label: risk.title }));
+  const areas = (areasResult.data ?? []).map((area) => ({ id: area.id, label: area.name }));
   const links = (linksResult.data ?? []) as LinkRow[];
   const attachments = (attachmentsResult.data ?? []) as AttachmentRow[];
   const comments = (commentsResult.data ?? []) as unknown as CommentRow[];
   const assignees = (assigneesResult.data ?? []) as unknown as AssigneeRow[];
 
-  if (tasksResult.error) return { tasks: [], phases, users, findings, risks };
+  if (tasksResult.error) return { tasks: [], phases, users, findings, risks, areas };
 
   return {
     phases,
     users,
     findings,
     risks,
-    tasks: ((tasksResult.data ?? []) as unknown as TaskRow[]).map((task) => mapTask(task, { assignees, comments, attachments, links, findings, risks }))
+    areas,
+    tasks: ((tasksResult.data ?? []) as unknown as TaskRow[]).map((task) => mapTask(task, { assignees, comments, attachments, links, findings, risks, areas }))
   };
 }
 
@@ -192,6 +197,7 @@ function mapTask(
     links: LinkRow[];
     findings: ProjectTaskOption[];
     risks: ProjectTaskOption[];
+    areas: ProjectTaskOption[];
   }
 ): ProjectTaskRecord {
   const phase = firstRelation(task.phases);
@@ -213,7 +219,7 @@ function mapTask(
     assignees: data.assignees.filter((assignee) => assignee.task_id === task.id).map(mapAssignee).filter((assignee): assignee is ProjectTaskRecord["assignees"][number] => Boolean(assignee)),
     comments: data.comments.filter((comment) => comment.task_id === task.id).map(mapComment),
     attachments: data.attachments.filter((attachment) => attachment.task_id === task.id).map(mapAttachment),
-    links: data.links.filter((link) => link.task_id === task.id).map((link) => mapLink(link, data.findings, data.risks)).filter((link): link is ProjectTaskLink => Boolean(link))
+    links: data.links.filter((link) => link.task_id === task.id).map((link) => mapLink(link, data.findings, data.risks, data.areas)).filter((link): link is ProjectTaskLink => Boolean(link))
   };
 }
 
@@ -251,8 +257,8 @@ function mapAttachment(attachment: AttachmentRow): ProjectTaskAttachment {
   };
 }
 
-function mapLink(link: LinkRow, findings: ProjectTaskOption[], risks: ProjectTaskOption[]): ProjectTaskLink | null {
-  const source = link.target_type === "finding" ? findings : risks;
+function mapLink(link: LinkRow, findings: ProjectTaskOption[], risks: ProjectTaskOption[], areas: ProjectTaskOption[]): ProjectTaskLink | null {
+  const source = link.target_type === "finding" ? findings : link.target_type === "risk" ? risks : areas;
   const item = source.find((option) => option.id === link.target_id);
   if (!item) return null;
   return { id: link.id, type: link.target_type, targetId: link.target_id, label: item.label };

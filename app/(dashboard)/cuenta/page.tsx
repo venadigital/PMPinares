@@ -29,7 +29,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             <div><dt className="font-bold text-slate-500">Correo</dt><dd className="font-semibold text-ink">{profile.email}</dd></div>
             <div><dt className="font-bold text-slate-500">Rol</dt><dd className="font-semibold text-ink">{profile.role}</dd></div>
             <div><dt className="font-bold text-slate-500">Organizacion</dt><dd className="font-semibold text-ink">{profile.organization}</dd></div>
-            <div><dt className="font-bold text-slate-500">Area</dt><dd className="font-semibold text-ink">{profile.area}</dd></div>
+            <div><dt className="font-bold text-slate-500">Area</dt><dd className="font-semibold text-ink">{profile.area || "Sin area"}</dd></div>
           </dl>
         </Card>
         <Card>

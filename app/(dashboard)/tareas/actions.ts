@@ -13,7 +13,7 @@ const BUCKET = "project-files";
 const MAX_ATTACHMENT_SIZE = 250 * 1024 * 1024;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://pinarespm.venadigital.com.co";
 
-type TaskLinkType = "finding" | "risk";
+type TaskLinkType = "finding" | "risk" | "area";
 
 export async function createProjectTaskAction(formData: FormData) {
   const profile = await getCurrentProfile();
@@ -129,7 +129,8 @@ function parseIds(formData: FormData, key: string) {
 function parseTaskLinks(formData: FormData) {
   const findings = parseIds(formData, "findingIds").map((id) => ({ type: "finding" as const, id }));
   const risks = parseIds(formData, "riskIds").map((id) => ({ type: "risk" as const, id }));
-  return [...findings, ...risks];
+  const areas = parseIds(formData, "areaIds").map((id) => ({ type: "area" as const, id }));
+  return [...findings, ...risks, ...areas];
 }
 
 async function replaceAssignees(taskId: string, assigneeIds: string[]) {

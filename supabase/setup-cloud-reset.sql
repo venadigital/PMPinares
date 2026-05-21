@@ -516,24 +516,18 @@ insert into public.phases (code, name, week_range, progress) values
 on conflict (code) do nothing;
 
 insert into public.areas (name) values
-('Admision y recepcion de pacientes'),
-('Agendamiento de citas'),
-('Historia clinica / Atencion medica'),
-('Hospitalizacion / Internacion'),
-('Gestion de medicamentos / Farmacia'),
-('Laboratorio y diagnostico'),
-('Nutricion y alimentacion'),
-('Facturacion y cartera'),
-('Contabilidad y finanzas'),
-('Nomina y gestion de RRHH'),
-('Compras y logistica'),
-('Calidad, acreditacion y auditoria'),
-('Reportes normativos / entes de control'),
-('Comunicaciones internas'),
-('Comunicaciones externas / Marketing'),
-('Seguridad e infraestructura fisica'),
-('Gestion de TI / Sistemas'),
-('Gerencia y toma de decisiones')
+('Gerencia General'),
+('SubGerencia Administrativa'),
+('SubGerencia Asistencial'),
+('Comercial'),
+('Comercial - Comunicaciones'),
+('Contabilidad'),
+('SGSST'),
+('Gestión Documental'),
+('Talento Humano'),
+('Servicio Farmaceutico'),
+('Coordinación Administrativa'),
+('Todas')
 on conflict (name) do nothing;
 
 insert into public.tags (name) values

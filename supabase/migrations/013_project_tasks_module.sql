@@ -44,7 +44,7 @@ create table if not exists public.project_task_attachments (
 create table if not exists public.project_task_links (
   id uuid primary key default gen_random_uuid(),
   task_id uuid not null references public.project_tasks(id) on delete cascade,
-  target_type text not null check (target_type in ('finding', 'risk')),
+  target_type text not null check (target_type in ('finding', 'risk', 'area')),
   target_id uuid not null,
   created_at timestamptz not null default now(),
   unique(task_id, target_type, target_id)

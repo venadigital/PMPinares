@@ -301,6 +301,7 @@ function FindingsList({ findings, areas, tools, activeFilter, canEdit, canDelete
         />
         <p className="text-sm leading-6 text-slate-600">Consulta, actualiza y soporta cada observacion del diagnostico con evidencias formales.</p>
         <FindingsOverview findings={findings} activeFilter={activeFilter} />
+        <FindingAreaFilters findings={findings} areas={areas} activeFilter={activeFilter} />
       </div>
 
       {findings.length === 0 ? (
@@ -332,6 +333,54 @@ function FindingsList({ findings, areas, tools, activeFilter, canEdit, canDelete
         </div>
       )}
     </Card>
+  );
+}
+
+function FindingAreaFilters({ findings, areas, activeFilter }: { findings: FindingRecord[]; areas: FindingArea[]; activeFilter: FindingFilter }) {
+  const unassignedCount = findings.filter((finding) => !finding.areaId).length;
+
+  return (
+    <div className="mt-3 rounded-[1.25rem] border border-white/80 bg-white/58 p-3 shadow-inner shadow-white/60">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Filtrar por area</p>
+        <Link href="/hallazgos" className="focus-ring rounded-full">
+          <Badge tone={activeFilter === "all" ? "blue" : "neutral"}>Ver todas</Badge>
+        </Link>
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {areas.map((area) => {
+          const count = findings.filter((finding) => finding.areaId === area.id).length;
+          const active = activeFilter === `area:${area.id}` || activeFilter === `area:${area.name}`;
+          return (
+            <Link
+              key={area.id}
+              href={filterHref(`area:${area.id}`)}
+              className={`focus-ring inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition ${
+                active
+                  ? "bg-blueprint text-white ring-blueprint shadow-md shadow-blueprint/20"
+                  : "bg-white/78 text-slate-700 ring-white/90 hover:bg-white hover:text-blueprint"
+              }`}
+            >
+              <span>{area.name}</span>
+              <span className={`rounded-full px-2 py-0.5 text-[0.65rem] ${active ? "bg-white/20 text-white" : "bg-blueprint/10 text-blueprint"}`}>{count}</span>
+            </Link>
+          );
+        })}
+        {unassignedCount > 0 ? (
+          <Link
+            href={filterHref("area:__none")}
+            className={`focus-ring inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition ${
+              activeFilter === "area:__none"
+                ? "bg-blueprint text-white ring-blueprint shadow-md shadow-blueprint/20"
+                : "bg-white/78 text-slate-700 ring-white/90 hover:bg-white hover:text-blueprint"
+            }`}
+          >
+            <span>Sin area</span>
+            <span className={`rounded-full px-2 py-0.5 text-[0.65rem] ${activeFilter === "area:__none" ? "bg-white/20 text-white" : "bg-blueprint/10 text-blueprint"}`}>{unassignedCount}</span>
+          </Link>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -674,7 +723,11 @@ function filterFindings(findings: FindingRecord[], filter: FindingFilter) {
   if (filter === "high") return findings.filter((finding) => finding.criticality === "Alta");
   if (filter === "medium") return findings.filter((finding) => finding.criticality === "Media");
   if (filter === "low") return findings.filter((finding) => finding.criticality === "Baja");
-  if (filter.startsWith("area:")) return findings.filter((finding) => finding.area === filter.slice("area:".length));
+  if (filter.startsWith("area:")) {
+    const areaFilter = filter.slice("area:".length);
+    if (areaFilter === "__none") return findings.filter((finding) => !finding.areaId);
+    return findings.filter((finding) => finding.areaId === areaFilter || finding.area === areaFilter);
+  }
   if (filter.startsWith("classification:")) return findings.filter((finding) => finding.classification === filter.slice("classification:".length));
   if (filter.startsWith("status:")) return findings.filter((finding) => finding.status === filter.slice("status:".length));
   return findings;
