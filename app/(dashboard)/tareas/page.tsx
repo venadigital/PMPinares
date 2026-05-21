@@ -1,4 +1,4 @@
-import { CalendarDays, Download, Eye, FileText, Link2, MessageSquare, Paperclip, Plus, Send, SlidersHorizontal, Trash2, Users } from "lucide-react";
+import { CalendarDays, Download, Eye, FileText, Link2, MessageSquare, Paperclip, Plus, Send, Trash2, Users } from "lucide-react";
 import { createProjectTaskAction, createProjectTaskCommentAction, deleteProjectTaskAction, updateProjectTaskAction } from "@/app/(dashboard)/tareas/actions";
 import { PageHeader } from "@/components/modules/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -74,12 +74,6 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           findings={findings}
           risks={risks}
           activeStatus={activeStatus}
-          activePriority={activePriority}
-          activePhase={activePhase}
-          activeUser={activeUser}
-          activeArea={activeArea}
-          activeFinding={activeFinding}
-          activeRisk={activeRisk}
           currentUserId={profile.id}
           canEdit={canEdit}
           canDelete={canDelete}
@@ -197,17 +191,11 @@ function TaskMatrix(props: {
   findings: { id: string; label: string }[];
   risks: { id: string; label: string }[];
   activeStatus: FilterKey;
-  activePriority: string;
-  activePhase: string;
-  activeUser: string;
-  activeArea: string;
-  activeFinding: string;
-  activeRisk: string;
   currentUserId: string;
   canEdit: boolean;
   canDelete: boolean;
 }) {
-  const { tasks, allTasks, phases, users, areas, findings, risks, activeStatus, activePriority, activePhase, activeUser, activeArea, activeFinding, activeRisk, currentUserId, canEdit, canDelete } = props;
+  const { tasks, allTasks, phases, users, areas, findings, risks, activeStatus, currentUserId, canEdit, canDelete } = props;
   const statusCounts = Object.fromEntries(projectTaskStatuses.map((status) => [status, allTasks.filter((task) => task.status === status).length])) as Record<ProjectTaskStatus, number>;
   const assignedToMeCount = allTasks.filter((task) => task.assignees.some((assignee) => assignee.id === currentUserId)).length;
   const visibleStatusCards = projectTaskStatuses.filter((status) => status !== "Cerrada");
@@ -231,43 +219,6 @@ function TaskMatrix(props: {
             <FilterCard key={status} href={`/tareas?status=${encodeURIComponent(status)}`} active={activeStatus === status} count={statusCounts[status]} label={status} />
           ))}
         </div>
-
-        <form className="rounded-[1.25rem] border border-white/80 bg-white/58 p-4 shadow-inner shadow-white/60">
-          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-            <SlidersHorizontal className="h-4 w-4 text-blueprint" />
-            Filtros avanzados
-          </div>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
-            <Select name="priority" defaultValue={activePriority} aria-label="Filtrar por prioridad">
-              <option value="all">Todas las prioridades</option>
-              {projectTaskPriorities.map((priority) => <option key={priority} value={priority}>{priority}</option>)}
-            </Select>
-            <Select name="phase" defaultValue={activePhase} aria-label="Filtrar por fase">
-              <option value="all">Todas las fases</option>
-              {phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}
-            </Select>
-            <Select name="user" defaultValue={activeUser} aria-label="Filtrar por usuario">
-              <option value="all">Todos los usuarios</option>
-              {users.map((user) => <option key={user.id} value={user.id}>{user.name}</option>)}
-            </Select>
-            <Select name="area" defaultValue={activeArea} aria-label="Filtrar por area">
-              <option value="all">Todas las areas</option>
-              {areas.map((area) => <option key={area.id} value={area.id}>{area.label}</option>)}
-            </Select>
-            <Select name="finding" defaultValue={activeFinding} aria-label="Filtrar por hallazgo">
-              <option value="all">Todos los hallazgos</option>
-              {findings.map((finding) => <option key={finding.id} value={finding.id}>{finding.label}</option>)}
-            </Select>
-            <Select name="risk" defaultValue={activeRisk} aria-label="Filtrar por riesgo">
-              <option value="all">Todos los riesgos</option>
-              {risks.map((risk) => <option key={risk.id} value={risk.id}>{risk.label}</option>)}
-            </Select>
-          </div>
-          <div className="mt-3 flex flex-wrap justify-end gap-2">
-            <Button href="/tareas" variant="ghost" className="px-3.5 py-1.5 text-xs">Limpiar</Button>
-            <Button type="submit" variant="primary" className="px-4 py-1.5 text-xs">Aplicar filtros</Button>
-          </div>
-        </form>
 
         {tasks.length === 0 ? <EmptyTasks /> : <div className="grid gap-3">{tasks.map((task) => <TaskRow key={task.id} task={task} phases={phases} users={users} areas={areas} findings={findings} risks={risks} canEdit={canEdit} canDelete={canDelete} />)}</div>}
       </div>
