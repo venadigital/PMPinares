@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/input";
 import { getCurrentProfile, hasPermission } from "@/lib/auth";
-import { getCommunicationData, type CommunicationAttachment, type CommunicationPost } from "@/lib/communication";
+import { getCommunicationData, type CommunicationAttachment, type CommunicationDocumentLink, type CommunicationPost } from "@/lib/communication";
 import { getMentionHandle, normalizeHandle } from "@/lib/communication-utils";
 
 interface CommunicationPageProps {
@@ -17,7 +17,7 @@ interface CommunicationPageProps {
 
 export default async function CommunicationPage({ searchParams }: CommunicationPageProps) {
   const params = searchParams ? await searchParams : {};
-  const [{ posts, tags, users }, profile] = await Promise.all([getCommunicationData(), getCurrentProfile()]);
+  const [{ posts, tags, users, documents }, profile] = await Promise.all([getCommunicationData(), getCurrentProfile()]);
   const canView = hasPermission(profile, "comunicacion", "view");
   const canCreate = hasPermission(profile, "comunicacion", "create");
   const canDelete = hasPermission(profile, "comunicacion", "delete");
@@ -53,7 +53,7 @@ export default async function CommunicationPage({ searchParams }: CommunicationP
         postCount={posts.length}
         createPanel={
           <section className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_21rem]">
-            <CommunicationComposer tags={tags} users={users} canCreate={canCreate} />
+            <CommunicationComposer tags={tags} users={users} documents={documents} canCreate={canCreate} />
             <MentionPanel users={users} />
           </section>
         }
@@ -143,6 +143,7 @@ function PostCard({ post, canCreate, canDelete }: { post: CommunicationPost; can
       </div>
 
       <RichText className="mt-4 whitespace-pre-wrap text-sm leading-7 text-slate-700" text={post.body} />
+      <DocumentLinkList documents={post.documentLinks} />
       <AttachmentList attachments={post.attachments} />
 
       <div className="mt-4 rounded-2xl bg-ink/5 p-3.5">
@@ -206,6 +207,40 @@ function CommentForm({ postId, canCreate }: { postId: string; canCreate: boolean
         </div>
       </fieldset>
     </form>
+  );
+}
+
+function DocumentLinkList({ documents }: { documents: CommunicationDocumentLink[] }) {
+  if (documents.length === 0) return null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-blueprint/15 bg-blueprint/7 p-3">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-blueprint">
+          <FileText className="h-3.5 w-3.5" />
+          Documentos vinculados
+        </p>
+        <Badge tone="blue">{documents.length}</Badge>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {documents.map((document) => (
+          <div key={document.id} className="flex items-center justify-between gap-3 rounded-xl bg-white/78 p-3 ring-1 ring-white/80">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-ink">{document.name}</p>
+              <p className="mt-0.5 truncate text-xs font-medium text-slate-500">{document.folder} · {document.type}</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <a href={document.previewUrl} target="_blank" rel="noopener noreferrer" className="focus-ring grid h-8 w-8 place-items-center rounded-full bg-white/70 text-blueprint ring-1 ring-blueprint/10" aria-label={`Ver ${document.name}`}>
+                <Eye className="h-3.5 w-3.5" />
+              </a>
+              <a href={document.downloadUrl} className="focus-ring grid h-8 w-8 place-items-center rounded-full bg-white/70 text-ink ring-1 ring-ink/10" aria-label={`Descargar ${document.name}`}>
+                <Download className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

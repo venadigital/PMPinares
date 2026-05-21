@@ -1,6 +1,6 @@
 "use client";
 
-import { Paperclip, Send, Sparkles, UploadCloud, X } from "lucide-react";
+import { FileText, Paperclip, Search, Send, Sparkles, UploadCloud, X } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { createPostAction } from "@/app/(dashboard)/comunicacion/actions";
 import { Badge } from "@/components/ui/badge";
@@ -8,20 +8,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Input, Textarea } from "@/components/ui/input";
 import { getMentionHandle, normalizeHandle } from "@/lib/communication-utils";
+import type { DocumentFile } from "@/lib/documents";
 import type { UserProfile } from "@/lib/types";
 
 interface CommunicationComposerProps {
   tags: { id: string; name: string }[];
   users: Pick<UserProfile, "id" | "name" | "email">[];
+  documents: DocumentFile[];
   canCreate: boolean;
 }
 
-export function CommunicationComposer({ tags, users, canCreate }: CommunicationComposerProps) {
+export function CommunicationComposer({ tags, users, documents, canCreate }: CommunicationComposerProps) {
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [documentQuery, setDocumentQuery] = useState("");
+  const [selectedDocumentIds, setSelectedDocumentIds] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const knownHandles = useMemo(() => new Set(users.map((user) => getMentionHandle(user))), [users]);
   const detectedMentions = useMemo(() => getDetectedMentions(message, knownHandles), [message, knownHandles]);
+  const filteredDocuments = useMemo(() => {
+    const query = normalizeHandle(documentQuery);
+    if (!query) return documents.slice(0, 8);
+    return documents
+      .filter((document) => `${document.name} ${document.folder} ${document.type}`.toLowerCase().includes(query))
+      .slice(0, 8);
+  }, [documents, documentQuery]);
 
   return (
     <Card className="overflow-hidden border-white/80 bg-white/75 p-0">
@@ -79,6 +90,65 @@ export function CommunicationComposer({ tags, users, canCreate }: CommunicationC
             </label>
           </section>
 
+          <section className="rounded-[1.35rem] border border-blueprint/15 bg-white/65 p-4">
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-ink">Vincular documentos existentes</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">Selecciona archivos ya cargados en el modulo de documentos para que queden enlazados al mensaje.</p>
+              </div>
+              <FileText className="h-4 w-4 text-blueprint" />
+            </div>
+
+            {documents.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-blueprint/20 bg-blueprint/5 p-4 text-xs leading-5 text-slate-500">Aun no hay documentos cargados para vincular.</p>
+            ) : (
+              <>
+                <label className="focus-within:ring-blueprint/20 flex items-center gap-2 rounded-2xl bg-white/85 px-3 py-2 ring-1 ring-ink/5">
+                  <Search className="h-4 w-4 text-blueprint" />
+                  <input
+                    value={documentQuery}
+                    onChange={(event) => setDocumentQuery(event.target.value)}
+                    placeholder="Buscar por nombre, carpeta o tipo..."
+                    className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-slate-400"
+                  />
+                </label>
+
+                <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
+                  {filteredDocuments.length === 0 ? (
+                    <p className="rounded-xl bg-white/70 p-3 text-xs font-medium text-slate-500">No se encontraron documentos con esa busqueda.</p>
+                  ) : filteredDocuments.map((document) => {
+                    const checked = selectedDocumentIds.has(document.id);
+                    return (
+                      <label key={document.id} className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/78 p-3 ring-1 ring-white/80 transition hover:bg-white">
+                        <input
+                          name="documentIds"
+                          value={document.id}
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(event) => {
+                            const next = new Set(selectedDocumentIds);
+                            if (event.target.checked) next.add(document.id);
+                            else next.delete(document.id);
+                            setSelectedDocumentIds(next);
+                          }}
+                          className="mt-1 h-4 w-4 rounded border-slate-300 accent-blueprint"
+                        />
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-semibold text-ink">{document.name}</span>
+                          <span className="mt-0.5 block truncate text-xs font-medium text-slate-500">{document.folder} · {document.type}</span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <p className="mt-3 text-xs font-medium text-slate-500">
+                  {selectedDocumentIds.size > 0 ? `${selectedDocumentIds.size} documento(s) seleccionado(s).` : "No has vinculado documentos existentes."}
+                </p>
+              </>
+            )}
+          </section>
+
           <section className="rounded-[1.35rem] border border-dashed border-blueprint/25 bg-blueprint/7 p-4">
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
@@ -128,6 +198,8 @@ export function CommunicationComposer({ tags, users, canCreate }: CommunicationC
               onClick={() => {
                 setFiles([]);
                 setMessage("");
+                setDocumentQuery("");
+                setSelectedDocumentIds(new Set());
                 if (fileInputRef.current) fileInputRef.current.value = "";
               }}
               className="focus-ring inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-ink/10 transition hover:bg-white"

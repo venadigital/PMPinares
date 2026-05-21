@@ -1,6 +1,6 @@
 import { wallPosts as demoWallPosts, users as demoUsers } from "@/lib/data";
 import { getMentionHandle, normalizeHandle } from "@/lib/communication-utils";
-import { formatFileSize, getFileKind } from "@/lib/documents";
+import { formatFileSize, getDocumentData, getFileKind, type DocumentFile } from "@/lib/documents";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import type { UserProfile } from "@/lib/types";
@@ -15,6 +15,15 @@ export interface CommunicationAttachment {
   name: string;
   type: string;
   size: string;
+  previewUrl: string;
+  downloadUrl: string;
+}
+
+export interface CommunicationDocumentLink {
+  id: string;
+  name: string;
+  type: string;
+  folder: string;
   previewUrl: string;
   downloadUrl: string;
 }
@@ -37,6 +46,7 @@ export interface CommunicationPost {
   tags: CommunicationTag[];
   comments: CommunicationComment[];
   attachments: CommunicationAttachment[];
+  documentLinks: CommunicationDocumentLink[];
 }
 
 interface PostRow {
@@ -75,12 +85,20 @@ interface AttachmentRow {
   size_bytes: number;
 }
 
+interface LinkRow {
+  id: string;
+  source_id: string;
+  target_id: string;
+  target_type: string;
+}
+
 type ProfileRelation = { full_name: string; email: string } | { full_name: string; email: string }[] | null;
 
 export async function getCommunicationData(): Promise<{
   posts: CommunicationPost[];
   tags: CommunicationTag[];
   users: UserProfile[];
+  documents: DocumentFile[];
 }> {
   if (!isSupabaseConfigured()) {
     return {
@@ -92,6 +110,7 @@ export async function getCommunicationData(): Promise<{
         createdAt: post.time,
         tags: [{ id: post.label, name: post.label }],
         comments: [],
+        documentLinks: [],
         attachments: Array.from({ length: post.attachments }).map((_, index) => ({
           id: `${post.id}-${index}`,
           name: `Adjunto ${index + 1}`,
@@ -102,17 +121,20 @@ export async function getCommunicationData(): Promise<{
         }))
       })),
       tags: ["Urgente", "Pregunta", "Pendiente Pinares", "Decision", "Riesgo"].map((name) => ({ id: name, name })),
-      users: demoUsers
+      users: demoUsers,
+      documents: []
     };
   }
 
   const supabase = await createClient();
-  const [postsResult, commentsResult, tagsResult, postTagsResult, attachmentsResult, usersResult] = await Promise.all([
+  const [documentData, postsResult, commentsResult, tagsResult, postTagsResult, attachmentsResult, linksResult, usersResult] = await Promise.all([
+    getDocumentData(),
     supabase.from("wall_posts").select("id, author_id, body, created_at, profiles:author_id(full_name, email)").order("created_at", { ascending: false }),
     supabase.from("wall_comments").select("id, post_id, author_id, body, created_at, profiles:author_id(full_name, email)").order("created_at", { ascending: true }),
     supabase.from("tags").select("id, name").order("name"),
     supabase.from("wall_post_tags").select("post_id, tag_id"),
     supabase.from("wall_attachments").select("id, post_id, comment_id, name, mime_type, size_bytes").order("created_at", { ascending: true }),
+    supabase.from("entity_links").select("id, source_id, target_type, target_id").eq("source_type", "wall_post").eq("target_type", "file"),
     supabase.from("profiles").select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)").eq("status", "Activo").order("full_name")
   ]);
 
@@ -120,6 +142,8 @@ export async function getCommunicationData(): Promise<{
   const postTags = (postTagsResult.data ?? []) as PostTagRow[];
   const comments = (commentsResult.data ?? []) as unknown as CommentRow[];
   const attachments = (attachmentsResult.data ?? []) as AttachmentRow[];
+  const links = (linksResult.data ?? []) as LinkRow[];
+  const documentsById = new Map(documentData.files.map((document) => [document.id, document]));
 
   const users = (usersResult.data ?? []).map((profile) => ({
     id: profile.id,
@@ -147,6 +171,7 @@ export async function getCommunicationData(): Promise<{
         createdAt: formatCommunicationDate(post.created_at),
         tags: tags.filter((tag) => linkedTagIds.includes(tag.id)),
         attachments: attachments.filter((attachment) => attachment.post_id === post.id).map(mapAttachment),
+        documentLinks: mapDocumentLinks(post.id, links, documentsById),
         comments: postComments.map((comment) => {
           const commentProfile = firstRelation(comment.profiles);
           return {
@@ -161,7 +186,8 @@ export async function getCommunicationData(): Promise<{
       };
     }),
     tags,
-    users
+    users,
+    documents: documentData.files
   };
 }
 
@@ -176,6 +202,21 @@ function mapAttachment(attachment: AttachmentRow): CommunicationAttachment {
     previewUrl: `/comunicacion/attachments/${attachment.id}/preview`,
     downloadUrl: `/comunicacion/attachments/${attachment.id}/download`
   };
+}
+
+function mapDocumentLinks(postId: string, links: LinkRow[], documents: Map<string, DocumentFile>): CommunicationDocumentLink[] {
+  return links
+    .filter((link) => link.source_id === postId)
+    .map((link) => documents.get(link.target_id))
+    .filter((document): document is DocumentFile => Boolean(document))
+    .map((document) => ({
+      id: document.id,
+      name: document.name,
+      type: document.type,
+      folder: document.folder,
+      previewUrl: `/documentos/files/${document.id}/preview`,
+      downloadUrl: `/documentos/files/${document.id}/download`
+    }));
 }
 
 function formatCommunicationDate(value: string) {

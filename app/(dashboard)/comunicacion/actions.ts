@@ -30,6 +30,7 @@ export async function createPostAction(formData: FormData) {
   if (error || !post) redirect(`/comunicacion?error=${encodeURIComponent(error?.message ?? "No se pudo publicar")}`);
 
   await syncPostTags(formData, post.id);
+  await syncPostDocuments(formData, post.id, profile);
   await uploadAttachments(formData.getAll("attachments"), { postId: post.id, uploadedBy: profile.id });
   await notifyMentions({ body, author: profile, source: "post", postId: post.id });
 
@@ -72,6 +73,7 @@ export async function deletePostAction(formData: FormData) {
 
   const admin = getAdminOrRedirect();
   await removeAttachmentsForPost(postId);
+  await admin.from("entity_links").delete().eq("source_type", "wall_post").eq("source_id", postId);
 
   const { error } = await admin.from("wall_posts").delete().eq("id", postId);
   if (error) redirect(`/comunicacion?error=${encodeURIComponent("No se pudo eliminar la publicacion")}`);
@@ -125,6 +127,34 @@ async function syncPostTags(formData: FormData, postId: string) {
 
   const { error } = await admin.from("wall_post_tags").insert(uniqueTagIds.map((tagId) => ({ post_id: postId, tag_id: tagId })));
   if (error) redirect(`/comunicacion?error=${encodeURIComponent("No se pudieron asociar las etiquetas")}`);
+}
+
+async function syncPostDocuments(formData: FormData, postId: string, profile: UserProfile) {
+  const documentIds = formData.getAll("documentIds").map((value) => String(value).trim()).filter(Boolean);
+  const uniqueDocumentIds = [...new Set(documentIds)];
+
+  if (uniqueDocumentIds.length === 0) return;
+  if (!hasPermission(profile, "documentos", "view")) {
+    redirect(`/comunicacion?error=${encodeURIComponent("No tienes permiso para vincular documentos")}`);
+  }
+
+  const admin = getAdminOrRedirect();
+  const { data, error: documentsError } = await admin.from("files").select("id").in("id", uniqueDocumentIds);
+  if (documentsError) redirect(`/comunicacion?error=${encodeURIComponent("No se pudieron validar los documentos vinculados")}`);
+
+  const validDocumentIds = new Set((data ?? []).map((document) => document.id));
+  const invalidSelection = uniqueDocumentIds.some((documentId) => !validDocumentIds.has(documentId));
+  if (invalidSelection) redirect(`/comunicacion?error=${encodeURIComponent("Uno o mas documentos seleccionados no existen")}`);
+
+  const rows = uniqueDocumentIds.map((documentId) => ({
+    source_type: "wall_post",
+    source_id: postId,
+    target_type: "file",
+    target_id: documentId
+  }));
+
+  const { error } = await admin.from("entity_links").insert(rows);
+  if (error) redirect(`/comunicacion?error=${encodeURIComponent("No se pudieron vincular los documentos")}`);
 }
 
 async function uploadAttachments(files: FormDataEntryValue[], parent: { postId?: string; commentId?: string; uploadedBy: string }) {
