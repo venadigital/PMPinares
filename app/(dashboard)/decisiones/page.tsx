@@ -278,23 +278,24 @@ function DecisionForm({
 
   return (
     <form action={action} className="grid gap-0">
-      <fieldset disabled={!canSubmit} className="grid gap-0 disabled:opacity-55">
+      <fieldset disabled={!canSubmit} className="grid gap-4 p-5 disabled:opacity-55">
         {decision ? <input type="hidden" name="decisionId" value={decision.id} /> : null}
-        <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="rounded-[1.4rem] bg-white/60 p-4 ring-1 ring-white/80">
+
+        <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.45fr)]">
+          <div className="rounded-[1.25rem] bg-white/68 p-4 ring-1 ring-white/80">
             <SectionTitle icon={<Lightbulb className="h-4 w-4" />} eyebrow="Datos base" title="Que se decide" />
             <div className="mt-4 grid gap-4">
               <Field label="Titulo">
                 <Input name="title" defaultValue={decision?.title} placeholder="Ej. Teams sera canal oficial de entrevistas" required />
               </Field>
               <Field label="Descripcion">
-                <Textarea name="description" defaultValue={decision?.description} placeholder="Resume la decision o pendiente ejecutivo." className="min-h-28" />
+                <Textarea name="description" defaultValue={decision?.description} placeholder="Resume la decision o pendiente ejecutivo." className="min-h-36 resize-y" />
               </Field>
             </div>
           </div>
 
           <div className="grid gap-4">
-            <div className="rounded-[1.4rem] bg-white/60 p-4 ring-1 ring-white/80">
+            <div className="rounded-[1.25rem] bg-blueprint/6 p-4 ring-1 ring-blueprint/10">
               <SectionTitle icon={<CalendarCheck className="h-4 w-4" />} eyebrow="Seguimiento" title="Estado y fecha" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                 <SelectField label="Estado" name="status" defaultValue={decision?.status ?? "Pendiente"}>
@@ -306,7 +307,7 @@ function DecisionForm({
               </div>
             </div>
 
-            <div className="rounded-[1.4rem] bg-white/60 p-4 ring-1 ring-white/80">
+            <div className="rounded-[1.25rem] bg-white/68 p-4 ring-1 ring-white/80">
               <SectionTitle icon={<UserRound className="h-4 w-4" />} eyebrow="Responsables" title="Quienes participan" />
               <div className="mt-4 grid gap-4">
                 <SelectField label="Responsable" name="ownerId" defaultValue={decision?.ownerId ?? ""}>
@@ -319,33 +320,32 @@ function DecisionForm({
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="border-t border-white/70 bg-white/35 p-5">
-          <div className="rounded-[1.4rem] bg-white/60 p-4 ring-1 ring-white/80">
+        <section className="rounded-[1.25rem] bg-white/68 p-4 ring-1 ring-white/80">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <SectionTitle icon={<ClipboardList className="h-4 w-4" />} eyebrow="Analisis" title="Contexto, alternativas y acuerdo" />
-            <div className="mt-4 grid gap-4 lg:grid-cols-3">
-              <Field label="Contexto">
-                <Textarea name="context" defaultValue={decision?.context} placeholder="Explica el contexto que origina la decision." className="min-h-32" />
-              </Field>
-              <Field label="Alternativas">
-                <Textarea name="alternatives" defaultValue={decision?.alternatives} placeholder="Opciones evaluadas antes de tomar la decision." className="min-h-32" />
-              </Field>
-              <Field label="Decision tomada">
-                <Textarea name="decisionTaken" defaultValue={decision?.decisionTaken} placeholder="Describe la decision final o el acuerdo alcanzado." className="min-h-32" />
-              </Field>
-            </div>
+            <p className="max-w-xl text-xs leading-5 text-slate-500">Documenta el razonamiento para que la decision sea entendible despues, incluso fuera de la reunion.</p>
           </div>
-        </div>
+          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            <Field label="Contexto">
+              <Textarea name="context" defaultValue={decision?.context} placeholder="Explica el contexto que origina la decision." className="min-h-36 resize-y" />
+            </Field>
+            <Field label="Alternativas">
+              <Textarea name="alternatives" defaultValue={decision?.alternatives} placeholder="Opciones evaluadas antes de tomar la decision." className="min-h-36 resize-y" />
+            </Field>
+            <Field label="Decision tomada">
+              <Textarea name="decisionTaken" defaultValue={decision?.decisionTaken} placeholder="Describe la decision final o el acuerdo alcanzado." className="min-h-36 resize-y" />
+            </Field>
+          </div>
+        </section>
 
-        <div className="border-t border-white/70 bg-white/35 p-5">
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <section className="rounded-[1.25rem] border border-dashed border-blueprint/20 bg-blueprint/6 p-4">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
             <DocumentPicker documents={documents} selectedDocuments={selectedDocuments} />
-            <div className="flex justify-end">
-              <Button type="submit" variant="accent" className="min-w-40 shadow-lg shadow-sun/25">{submitLabel}</Button>
-            </div>
+            <Button type="submit" variant="accent" className="min-w-40 justify-center shadow-lg shadow-sun/25">{submitLabel}</Button>
           </div>
-        </div>
+        </section>
       </fieldset>
       {!canSubmit ? <p className="rounded-xl bg-blueprint/10 p-3 text-sm font-medium leading-6 text-slate-600">Tu usuario puede consultar decisiones, pero no tiene permiso para modificarlas.</p> : null}
     </form>
@@ -366,7 +366,7 @@ function SectionTitle({ icon, eyebrow, title }: { icon: React.ReactNode; eyebrow
 
 function DocumentPicker({ documents, selectedDocuments }: { documents: DocumentFile[]; selectedDocuments: Set<string> }) {
   return (
-    <div className="rounded-[1.4rem] bg-white/60 p-4 ring-1 ring-white/80">
+    <div className="rounded-[1.2rem] bg-white/70 p-4 ring-1 ring-white/80">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <SectionTitle icon={<FileText className="h-4 w-4" />} eyebrow="Soporte" title="Documentos relacionados" />
         <span className="rounded-full bg-blueprint/10 px-3 py-1 text-xs font-semibold text-blueprint">{documents.length} disponibles</span>
@@ -377,12 +377,12 @@ function DocumentPicker({ documents, selectedDocuments }: { documents: DocumentF
           Aun no hay documentos cargados para vincular.
         </div>
       ) : (
-        <div className="mt-3 max-h-52 space-y-2 overflow-y-auto pr-1">
+        <div className="mt-4 grid max-h-64 gap-2 overflow-y-auto pr-1 md:grid-cols-2 xl:grid-cols-3">
           {documents.map((document) => (
-            <label key={document.id} className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/70 p-3 text-sm text-slate-700 ring-1 ring-white/80 transition hover:bg-white">
+            <label key={document.id} className="flex min-w-0 cursor-pointer items-start gap-3 rounded-xl bg-white/78 p-3 text-sm text-slate-700 ring-1 ring-white/80 transition hover:bg-white hover:ring-blueprint/20">
               <input type="checkbox" name="documentIds" value={document.id} defaultChecked={selectedDocuments.has(document.id)} className="mt-1 h-4 w-4 rounded border-ink/20 accent-blueprint" />
               <span className="min-w-0">
-                <span className="block truncate font-semibold text-ink">{document.name}</span>
+                <span className="block break-words font-semibold leading-5 text-ink">{document.name}</span>
                 <span className="mt-0.5 block text-xs text-slate-500">{document.type} · {document.folder}</span>
               </span>
             </label>
