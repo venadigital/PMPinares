@@ -256,110 +256,107 @@ function TaskRow({ task, phases, users, areas, findings, risks, canEdit, canDele
         <span className="rounded-full bg-blueprint/10 px-3 py-1.5 text-center text-xs font-semibold uppercase tracking-[0.12em] text-blueprint ring-1 ring-blueprint/15">Detalle</span>
       </summary>
 
-      <div className="mt-5 grid gap-5 border-t border-white/80 pt-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="grid gap-4">
-          <div className="rounded-2xl bg-white/65 p-4 ring-1 ring-white/80">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-blueprint">Descripcion</p>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{task.description || "Sin descripcion registrada."}</p>
+      <div className="mt-5 grid gap-4 border-t border-white/80 pt-5">
+        <section className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+          <div className="rounded-[1.2rem] bg-white/65 p-4 ring-1 ring-white/80">
+            <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Descripcion actual</p>
+            <p className="mt-2 max-w-5xl whitespace-pre-wrap text-sm leading-6 text-slate-700">{task.description || "Sin descripcion registrada."}</p>
           </div>
 
-          <form action={updateProjectTaskAction} className="overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/72 shadow-sm shadow-ink/5">
-            <input type="hidden" name="taskId" value={task.id} />
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/80 bg-white/45 p-4">
-              <SectionTitle title="Editar tarea" eyebrow="Gestion" compact />
-              <Badge tone={canEdit ? "blue" : "neutral"}>{canEdit ? "Editable" : "Solo lectura"}</Badge>
-            </div>
-            <fieldset disabled={!canEdit} className="grid gap-4 p-4 disabled:opacity-60">
-              <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-                <div className="rounded-[1.15rem] bg-white/68 p-4 ring-1 ring-white/80">
-                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Datos base</p>
-                  <h4 className="mt-1 font-display text-lg font-bold text-ink">Que se debe resolver</h4>
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    <div className="md:col-span-2">
-                      <Field label="Titulo"><Input name="title" defaultValue={task.title} required className="h-10" /></Field>
-                    </div>
-                    <Field label="Fase"><Select name="phaseId" defaultValue={task.phaseId ?? ""} className="h-10"><option value="">Sin fase</option>{phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}</Select></Field>
-                    <Field label="Prioridad"><Select name="priority" defaultValue={task.priority} className="h-10">{projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}</Select></Field>
-                    <div className="md:col-span-2">
-                      <Field label="Descripcion"><Textarea name="description" defaultValue={task.description} className="min-h-28" /></Field>
-                    </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <InfoPanel title="Actividad" icon={<CalendarDays className="h-4 w-4" />}>
+              <p className="text-sm text-slate-600">Creada por {task.createdBy}</p>
+              <p className="text-sm text-slate-500">Creado: {task.createdAt}</p>
+              <p className="text-sm text-slate-500">Actualizado: {task.updatedAt}</p>
+            </InfoPanel>
+            {canDelete ? (
+              <form action={deleteProjectTaskAction}>
+                <input type="hidden" name="taskId" value={task.id} />
+                <button className="focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-coral/10 px-4 py-3 text-sm font-semibold text-coral ring-1 ring-coral/20 transition hover:bg-coral hover:text-white">
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar tarea
+                </button>
+              </form>
+            ) : null}
+          </div>
+        </section>
+
+        <form action={updateProjectTaskAction} className="overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/72 shadow-sm shadow-ink/5">
+          <input type="hidden" name="taskId" value={task.id} />
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/80 bg-white/45 p-4">
+            <SectionTitle title="Editar tarea" eyebrow="Gestion" compact />
+            <Badge tone={canEdit ? "blue" : "neutral"}>{canEdit ? "Editable" : "Solo lectura"}</Badge>
+          </div>
+          <fieldset disabled={!canEdit} className="grid gap-4 p-4 disabled:opacity-60">
+            <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.42fr)]">
+              <div className="rounded-[1.15rem] bg-white/68 p-4 ring-1 ring-white/80">
+                <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Datos base</p>
+                <h4 className="mt-1 font-display text-lg font-bold text-ink">Que se debe resolver</h4>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <div className="md:col-span-2">
+                    <Field label="Titulo"><Input name="title" defaultValue={task.title} required className="h-10" /></Field>
+                  </div>
+                  <Field label="Fase"><Select name="phaseId" defaultValue={task.phaseId ?? ""} className="h-10"><option value="">Sin fase</option>{phases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}</Select></Field>
+                  <Field label="Prioridad"><Select name="priority" defaultValue={task.priority} className="h-10">{projectTaskPriorities.map((priority) => <option key={priority}>{priority}</option>)}</Select></Field>
+                  <div className="md:col-span-2">
+                    <Field label="Descripcion"><Textarea name="description" defaultValue={task.description} className="min-h-36 resize-y" /></Field>
                   </div>
                 </div>
+              </div>
 
-                <div className="rounded-[1.15rem] bg-blueprint/6 p-4 ring-1 ring-blueprint/10">
-                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Gestion</p>
-                  <h4 className="mt-1 font-display text-lg font-bold text-ink">Estado y fechas</h4>
-                  <div className="mt-4 grid gap-3">
-                    <Field label="Estado"><Select name="status" defaultValue={task.status} className="h-10">{projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}</Select></Field>
-                    <Field label="Fecha inicio"><Input name="startDate" type="date" defaultValue={task.startDate ?? ""} className="h-10" /></Field>
-                    <Field label="Fecha finalizacion"><Input name="dueDate" type="date" defaultValue={task.dueDate ?? ""} className="h-10" /></Field>
-                  </div>
+              <div className="rounded-[1.15rem] bg-blueprint/6 p-4 ring-1 ring-blueprint/10">
+                <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Gestion</p>
+                <h4 className="mt-1 font-display text-lg font-bold text-ink">Estado y fechas</h4>
+                <div className="mt-4 grid gap-3">
+                  <Field label="Estado"><Select name="status" defaultValue={task.status} className="h-10">{projectTaskStatuses.map((status) => <option key={status}>{status}</option>)}</Select></Field>
+                  <Field label="Fecha inicio"><Input name="startDate" type="date" defaultValue={task.startDate ?? ""} className="h-10" /></Field>
+                  <Field label="Fecha finalizacion"><Input name="dueDate" type="date" defaultValue={task.dueDate ?? ""} className="h-10" /></Field>
                 </div>
-              </section>
+              </div>
+            </section>
 
-              <section className="rounded-[1.15rem] bg-white/68 p-4 ring-1 ring-white/80">
-                <div className="flex flex-wrap items-start justify-between gap-3">
+            <section className="rounded-[1.15rem] bg-white/68 p-4 ring-1 ring-white/80">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Responsables y vinculos</p>
+                  <h4 className="mt-1 font-display text-lg font-bold text-ink">Trazabilidad de la tarea</h4>
+                </div>
+                <p className="max-w-xl text-xs leading-5 text-slate-500">Selecciona responsables, areas relacionadas y conexiones opcionales con hallazgos o riesgos.</p>
+              </div>
+              <div className="mt-4 grid gap-3 xl:grid-cols-2">
+                <CompactChecks title="Asignados" count={users.length}>{users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} description={user.area || user.role} defaultChecked={assignedIds.has(user.id)} />)}</CompactChecks>
+                <CompactChecks title="Areas" count={areas.length}>{areas.map((area) => <CheckboxPill key={area.id} name="areaIds" value={area.id} title={area.label} defaultChecked={linkedAreaIds.includes(area.id)} />)}</CompactChecks>
+                <CompactChecks title="Hallazgos" count={findings.length}>{findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} defaultChecked={linkedFindingIds.includes(finding.id)} />)}</CompactChecks>
+                <CompactChecks title="Riesgos" count={risks.length}>{risks.map((risk) => <CheckboxPill key={risk.id} name="riskIds" value={risk.id} title={risk.label} defaultChecked={linkedRiskIds.includes(risk.id)} />)}</CompactChecks>
+              </div>
+            </section>
+
+            <section className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]">
+              <InfoPanel title="Vinculos actuales" icon={<Link2 className="h-4 w-4" />}>
+                {task.links.length === 0 ? <p className="text-sm text-slate-500">Sin areas, hallazgos o riesgos vinculados.</p> : task.links.map((link) => <Badge key={link.id} tone={link.type === "risk" ? "red" : link.type === "area" ? "green" : "blue"}>{link.type === "risk" ? "Riesgo" : link.type === "area" ? "Area" : "Hallazgo"}: {link.label}</Badge>)}
+              </InfoPanel>
+              <InfoPanel title="Adjuntos actuales" icon={<Paperclip className="h-4 w-4" />}>
+                <AttachmentList attachments={task.attachments} />
+              </InfoPanel>
+            </section>
+
+            <section className="rounded-[1.15rem] border border-dashed border-blueprint/25 bg-blueprint/6 p-4">
+              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)_auto] xl:items-center">
+                <div className="flex items-start gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint"><Paperclip className="h-4 w-4" /></span>
                   <div>
-                    <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Responsables y vinculos</p>
-                    <h4 className="mt-1 font-display text-lg font-bold text-ink">Trazabilidad de la tarea</h4>
-                  </div>
-                  <p className="max-w-md text-xs leading-5 text-slate-500">Selecciona responsables, areas relacionadas y conexiones opcionales con hallazgos o riesgos.</p>
-                </div>
-                <div className="mt-4 grid gap-3 lg:grid-cols-2">
-                  <CompactChecks title="Asignados" count={users.length}>{users.map((user) => <CheckboxPill key={user.id} name="assigneeIds" value={user.id} title={user.name} description={user.area || user.role} defaultChecked={assignedIds.has(user.id)} />)}</CompactChecks>
-                  <CompactChecks title="Areas" count={areas.length}>{areas.map((area) => <CheckboxPill key={area.id} name="areaIds" value={area.id} title={area.label} defaultChecked={linkedAreaIds.includes(area.id)} />)}</CompactChecks>
-                  <CompactChecks title="Hallazgos" count={findings.length}>{findings.map((finding) => <CheckboxPill key={finding.id} name="findingIds" value={finding.id} title={finding.label} defaultChecked={linkedFindingIds.includes(finding.id)} />)}</CompactChecks>
-                  <CompactChecks title="Riesgos" count={risks.length}>{risks.map((risk) => <CheckboxPill key={risk.id} name="riskIds" value={risk.id} title={risk.label} defaultChecked={linkedRiskIds.includes(risk.id)} />)}</CompactChecks>
-                </div>
-              </section>
-
-              <section className="rounded-[1.15rem] border border-dashed border-blueprint/25 bg-blueprint/6 p-4">
-                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] xl:items-end">
-                  <div className="flex items-start gap-3">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-blueprint/10 text-blueprint"><Paperclip className="h-4 w-4" /></span>
-                    <div>
-                      <p className="text-sm font-semibold text-ink">Agregar adjuntos</p>
-                      <p className="mt-1 max-w-xl text-xs leading-5 text-slate-500">Adjunta soportes nuevos sin perder los archivos ya cargados.</p>
-                    </div>
-                  </div>
-                  <div>
-                    <Input name="attachments" type="file" multiple className="h-10 bg-white/90" />
+                    <p className="text-sm font-semibold text-ink">Agregar adjuntos</p>
+                    <p className="mt-1 max-w-xl text-xs leading-5 text-slate-500">Adjunta soportes nuevos sin perder los archivos ya cargados.</p>
                   </div>
                 </div>
-                {canEdit ? (
-                  <div className="mt-4 flex justify-end border-t border-blueprint/10 pt-4">
-                    <Button type="submit" variant="primary" className="h-10 whitespace-nowrap px-5">Guardar cambios</Button>
-                  </div>
-                ) : null}
-              </section>
-            </fieldset>
-          </form>
+                <Input name="attachments" type="file" multiple className="h-10 bg-white/90" />
+                {canEdit ? <Button type="submit" variant="primary" className="h-10 whitespace-nowrap px-5">Guardar cambios</Button> : null}
+              </div>
+            </section>
+          </fieldset>
+        </form>
 
-          <CommentBox task={task} canEdit={canEdit} />
-        </div>
-
-        <aside className="grid content-start gap-4">
-          <InfoPanel title="Trazabilidad" icon={<Link2 className="h-4 w-4" />}>
-            {task.links.length === 0 ? <p className="text-sm text-slate-500">Sin areas, hallazgos o riesgos vinculados.</p> : task.links.map((link) => <Badge key={link.id} tone={link.type === "risk" ? "red" : link.type === "area" ? "green" : "blue"}>{link.type === "risk" ? "Riesgo" : link.type === "area" ? "Area" : "Hallazgo"}: {link.label}</Badge>)}
-          </InfoPanel>
-          <InfoPanel title="Adjuntos" icon={<Paperclip className="h-4 w-4" />}>
-            <AttachmentList attachments={task.attachments} />
-          </InfoPanel>
-          <InfoPanel title="Actividad" icon={<CalendarDays className="h-4 w-4" />}>
-            <p className="text-sm text-slate-600">Creada por {task.createdBy}</p>
-            <p className="text-sm text-slate-500">Creado: {task.createdAt}</p>
-            <p className="text-sm text-slate-500">Actualizado: {task.updatedAt}</p>
-          </InfoPanel>
-          {canDelete ? (
-            <form action={deleteProjectTaskAction}>
-              <input type="hidden" name="taskId" value={task.id} />
-              <button className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full bg-coral/10 px-4 py-2 text-sm font-semibold text-coral ring-1 ring-coral/20 transition hover:bg-coral hover:text-white">
-                <Trash2 className="h-4 w-4" />
-                Eliminar tarea
-              </button>
-            </form>
-          ) : null}
-        </aside>
+        <CommentBox task={task} canEdit={canEdit} />
       </div>
     </details>
   );
@@ -458,22 +455,22 @@ function CollapsibleOptionPanel({ title, icon, empty, count, children }: { title
 
 function CompactChecks({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
   return (
-    <div className="rounded-[1.05rem] border border-white/80 bg-white/70 p-3 shadow-sm shadow-ink/5">
+    <div className="min-w-0 rounded-[1.05rem] border border-white/80 bg-white/70 p-3 shadow-sm shadow-ink/5">
       <div className="mb-3 flex items-center justify-between gap-3">
         <p className="text-[0.64rem] font-semibold uppercase tracking-[0.14em] text-blueprint">{title}</p>
         {typeof count === "number" ? <span className="rounded-full bg-blueprint/8 px-2 py-0.5 text-[0.68rem] font-semibold text-blueprint">{count}</span> : null}
       </div>
-      <div className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">{children}</div>
+      <div className="grid max-h-64 gap-2 overflow-y-auto pr-1 md:grid-cols-2">{children}</div>
     </div>
   );
 }
 
 function CheckboxPill({ name, value, title, description, defaultChecked = false }: { name: string; value: string; title: string; description?: string; defaultChecked?: boolean }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/76 p-2.5 text-sm ring-1 ring-white/80 transition hover:bg-white hover:ring-blueprint/20">
+    <label className="flex min-w-0 cursor-pointer items-start gap-3 rounded-xl bg-white/76 p-2.5 text-sm ring-1 ring-white/80 transition hover:bg-white hover:ring-blueprint/20">
       <input name={name} value={value} type="checkbox" defaultChecked={defaultChecked} className="mt-1 h-4 w-4 rounded border-slate-300 accent-blueprint" />
       <span className="min-w-0">
-        <span className="block text-sm font-semibold leading-5 text-ink">{title}</span>
+        <span className="block break-words text-sm font-semibold leading-5 text-ink">{title}</span>
         {description ? <span className="mt-0.5 block text-xs leading-4 text-slate-500">{description}</span> : null}
       </span>
     </label>
