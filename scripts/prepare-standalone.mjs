@@ -35,4 +35,18 @@ writeFileSync(
   ].join("\n")
 );
 
+writeFileSync(
+  join(root, ".next", "package.json"),
+  JSON.stringify(
+    {
+      type: "commonjs",
+      scripts: {
+        start: "node server.js"
+      }
+    },
+    null,
+    2
+  ) + "\n"
+);
+
 console.log("Standalone assets ready.");
