@@ -18,6 +18,7 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
   const params = searchParams ? await searchParams : {};
   const [{ phases, folders, files }, profile] = await Promise.all([getDocumentData(), getCurrentProfile()]);
   const canView = hasPermission(profile, "documentos", "view");
+  const canUpload = hasPermission(profile, "documentos", "create");
   const canManage = profile.role === "Administrador Vena Digital" || profile.role === "Administrador Pinares";
   const canDeleteFolders = profile.role === "Administrador Vena Digital";
   const error = typeof params.error === "string" ? params.error : null;
@@ -50,7 +51,7 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
       <StatusMessages error={error} uploaded={uploaded} deleted={deleted} folderCreated={folderCreated} folderDeleted={folderDeleted} />
 
       <section className="mb-5 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <UploadPanel folders={folders} canManage={canManage} />
+        <UploadPanel folders={folders} canUpload={canUpload} />
         <FolderPanel phases={phases} folders={folders} canManage={canManage} />
       </section>
 
@@ -135,7 +136,7 @@ function StatusMessages({ error, uploaded, deleted, folderCreated, folderDeleted
   );
 }
 
-function UploadPanel({ folders, canManage }: { folders: DocumentFolder[]; canManage: boolean }) {
+function UploadPanel({ folders, canUpload }: { folders: DocumentFolder[]; canUpload: boolean }) {
   return (
     <Card className="overflow-hidden border-white/80 bg-white/75 p-0">
       <div className="border-b border-white/70 p-5">
@@ -145,7 +146,7 @@ function UploadPanel({ folders, canManage }: { folders: DocumentFolder[]; canMan
         </p>
       </div>
       <form action={uploadDocumentAction} className="grid gap-4 p-5 sm:p-6">
-        <fieldset disabled={!canManage} className="grid gap-4 disabled:opacity-55">
+        <fieldset disabled={!canUpload} className="grid gap-4 disabled:opacity-55">
           <Field label="Nombre">
             <Input name="documentName" placeholder="Ej. Acta final fase 1" required />
           </Field>
@@ -168,7 +169,7 @@ function UploadPanel({ folders, canManage }: { folders: DocumentFolder[]; canMan
             Subir archivo
           </Button>
         </fieldset>
-        {!canManage ? <p className="rounded-xl bg-blueprint/10 p-3.5 text-sm font-medium leading-6 text-slate-600">Tu usuario puede consultar documentos, pero solo los administradores pueden subir archivos.</p> : null}
+        {!canUpload ? <p className="rounded-xl bg-blueprint/10 p-3.5 text-sm font-medium leading-6 text-slate-600">Tu usuario puede consultar documentos, pero no tiene permiso para subir archivos.</p> : null}
       </form>
     </Card>
   );

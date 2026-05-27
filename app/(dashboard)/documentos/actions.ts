@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/config";
-import { getCurrentProfile } from "@/lib/auth";
+import { getCurrentProfile, hasPermission } from "@/lib/auth";
 
 const BUCKET = "project-files";
 const MAX_FILE_SIZE = 250 * 1024 * 1024;
@@ -34,7 +34,7 @@ export async function createFolderAction(formData: FormData) {
 
 export async function uploadDocumentAction(formData: FormData) {
   const profile = await getCurrentProfile();
-  if (!isDocumentAdmin(profile.role)) redirect("/documentos?error=No tienes permisos para subir archivos");
+  if (!hasPermission(profile, "documentos", "create")) redirect("/documentos?error=No tienes permisos para subir archivos");
   if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) redirect("/documentos?error=Supabase no esta configurado");
 
   const file = formData.get("file");
