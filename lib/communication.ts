@@ -1,7 +1,8 @@
 import { wallPosts as demoWallPosts, users as demoUsers } from "@/lib/data";
 import { getMentionHandle, normalizeHandle } from "@/lib/communication-utils";
 import { formatFileSize, getDocumentData, getFileKind, type DocumentFile } from "@/lib/documents";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import type { UserProfile } from "@/lib/types";
 
@@ -127,6 +128,7 @@ export async function getCommunicationData(): Promise<{
   }
 
   const supabase = await createClient();
+  const profilesClient = isSupabaseAdminConfigured() ? createAdminClient() : supabase;
   const [documentData, postsResult, commentsResult, tagsResult, postTagsResult, attachmentsResult, linksResult, usersResult] = await Promise.all([
     getDocumentData(),
     supabase.from("wall_posts").select("id, author_id, body, created_at, profiles:author_id(full_name, email)").order("created_at", { ascending: false }),
@@ -135,7 +137,7 @@ export async function getCommunicationData(): Promise<{
     supabase.from("wall_post_tags").select("post_id, tag_id"),
     supabase.from("wall_attachments").select("id, post_id, comment_id, name, mime_type, size_bytes").order("created_at", { ascending: true }),
     supabase.from("entity_links").select("id, source_id, target_type, target_id").eq("source_type", "wall_post").eq("target_type", "file"),
-    supabase.from("profiles").select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)").eq("status", "Activo").order("full_name")
+    profilesClient.from("profiles").select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)").eq("status", "Activo").order("full_name")
   ]);
 
   const tags = ((tagsResult.data ?? []) as TagRow[]).map((tag) => ({ id: tag.id, name: tag.name }));
