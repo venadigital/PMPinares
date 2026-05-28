@@ -1,6 +1,7 @@
 import { areas as demoAreas, phases as demoPhases, users as demoUsers } from "@/lib/data";
 import { formatFileSize, getFileKind } from "@/lib/documents";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseAdminConfigured, isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import type { Phase, Priority, UserProfile } from "@/lib/types";
 
@@ -132,17 +133,18 @@ export async function getProjectTasksData(): Promise<{
   }
 
   const supabase = await createClient();
+  const profileClient = isSupabaseAdminConfigured() ? createAdminClient() : supabase;
   const [tasksResult, assigneesResult, commentsResult, attachmentsResult, linksResult, phasesResult, usersResult, findingsResult, risksResult, areasResult] = await Promise.all([
     supabase
       .from("project_tasks")
       .select("id, title, description, phase_id, priority, status, start_date, due_date, created_at, updated_at, phases:phase_id(name), profiles:created_by(full_name)")
       .order("created_at", { ascending: false }),
-    supabase.from("project_task_assignees").select("task_id, profile_id, profiles:profile_id(id, full_name, email, role, area)"),
+    profileClient.from("project_task_assignees").select("task_id, profile_id, profiles:profile_id(id, full_name, email, role, area)"),
     supabase.from("project_task_comments").select("id, task_id, body, created_at, profiles:author_id(full_name, email)").order("created_at", { ascending: true }),
     supabase.from("project_task_attachments").select("id, task_id, name, mime_type, size_bytes").order("created_at", { ascending: true }),
     supabase.from("project_task_links").select("id, task_id, target_type, target_id"),
     supabase.from("phases").select("id, code, name, week_range, progress").order("code"),
-    supabase.from("profiles").select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)").eq("status", "Activo").order("full_name"),
+    profileClient.from("profiles").select("id, full_name, email, role, organization, position, area, status, module_permissions(module_key, can_view)").eq("status", "Activo").order("full_name"),
     supabase.from("findings").select("id, title").order("created_at", { ascending: false }),
     supabase.from("risks").select("id, title").order("created_at", { ascending: false }),
     supabase.from("areas").select("id, name").order("name")

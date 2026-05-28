@@ -74,6 +74,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           findings={findings}
           risks={risks}
           activeStatus={activeStatus}
+          activeUser={activeUser}
           currentUserId={profile.id}
           canEdit={canEdit}
           canDelete={canDelete}
@@ -191,11 +192,12 @@ function TaskMatrix(props: {
   findings: { id: string; label: string }[];
   risks: { id: string; label: string }[];
   activeStatus: FilterKey;
+  activeUser: string;
   currentUserId: string;
   canEdit: boolean;
   canDelete: boolean;
 }) {
-  const { tasks, allTasks, phases, users, areas, findings, risks, activeStatus, currentUserId, canEdit, canDelete } = props;
+  const { tasks, allTasks, phases, users, areas, findings, risks, activeStatus, activeUser, currentUserId, canEdit, canDelete } = props;
   const statusCounts = Object.fromEntries(projectTaskStatuses.map((status) => [status, allTasks.filter((task) => task.status === status).length])) as Record<ProjectTaskStatus, number>;
   const assignedToMeCount = allTasks.filter((task) => task.assignees.some((assignee) => assignee.id === currentUserId)).length;
   const visibleStatusCards = projectTaskStatuses.filter((status) => status !== "Cerrada");
@@ -220,9 +222,44 @@ function TaskMatrix(props: {
           ))}
         </div>
 
+        <AssigneeFilter users={users} activeUser={activeUser} activeStatus={activeStatus} />
+
         {tasks.length === 0 ? <EmptyTasks /> : <div className="grid gap-3">{tasks.map((task) => <TaskRow key={task.id} task={task} phases={phases} users={users} areas={areas} findings={findings} risks={risks} canEdit={canEdit} canDelete={canDelete} />)}</div>}
       </div>
     </Card>
+  );
+}
+
+function AssigneeFilter({ users, activeUser, activeStatus }: { users: UserProfile[]; activeUser: string; activeStatus: FilterKey }) {
+  const selectedUser = users.find((user) => user.id === activeUser);
+  const clearHref = activeStatus === "all" ? "/tareas" : `/tareas?status=${encodeURIComponent(activeStatus)}`;
+
+  return (
+    <form action="/tareas" className="rounded-[1.25rem] border border-white/80 bg-white/62 p-4 shadow-sm shadow-ink/5">
+      <input type="hidden" name="status" value={activeStatus} disabled={activeStatus === "all"} />
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)_auto_auto] lg:items-end">
+        <div>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-blueprint">Filtrar por responsable</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            {selectedUser ? `Mostrando tareas asignadas a ${selectedUser.name}.` : "Selecciona un usuario para ver solo sus tareas asignadas."}
+          </p>
+        </div>
+        <Field label="Usuario asignado">
+          <Select name="user" defaultValue={activeUser} className="h-10 bg-white/90">
+            <option value="all">Todos los usuarios</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>{user.name}</option>
+            ))}
+          </Select>
+        </Field>
+        <Button type="submit" variant="primary" className="h-10 whitespace-nowrap px-5">Aplicar filtro</Button>
+        {activeUser !== "all" ? (
+          <a href={clearHref} className="focus-ring inline-flex h-10 items-center justify-center rounded-full bg-white/75 px-4 text-sm font-semibold text-slate-600 ring-1 ring-ink/10 transition hover:bg-white">
+            Limpiar
+          </a>
+        ) : null}
+      </div>
+    </form>
   );
 }
 
