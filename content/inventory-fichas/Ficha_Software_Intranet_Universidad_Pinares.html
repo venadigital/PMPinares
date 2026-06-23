@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de software — Intranet y Universidad Pinares</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+:root{--navy:#0A2142;--coral:#FF6B5E;--yellow:#F5C935;--muted:#5B6675;--line:#E4E7EC;--green:#1D9E75;--amber:#EF9F27;--red:#E24B4A;--blue:#185FA5;--purple:#534AB7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy);line-height:1.5;padding:24px}
+.wrap{max-width:880px;margin:0 auto}
+.fp-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.fp-head{background:var(--navy);color:#fff;padding:24px 26px;display:flex;justify-content:space-between;align-items:flex-start;gap:22px;flex-wrap:wrap}
+.fp-head-main{flex:1 1 360px;min-width:280px}
+.fp-eyebrow{font-size:11px;letter-spacing:.14em;color:#9FB2CC}
+.fp-name{font-size:30px;font-weight:bold;line-height:1.12;margin-top:5px}
+.fp-sub{font-size:12.5px;color:#C7D3E4;margin-top:9px;max-width:480px;line-height:1.55}
+.fp-meta{flex:0 0 auto;min-width:212px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:13px 15px;font-size:11.5px;color:#C7D3E4;line-height:1.75}
+.fp-meta .mk{display:inline-block;min-width:64px;color:#8FA3BE}
+.fp-tag{display:inline-block;background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:bold;letter-spacing:.06em;padding:3px 10px;border-radius:6px;margin-bottom:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chip{font-size:12px;font-weight:bold;padding:6px 13px;border-radius:20px;display:inline-flex;align-items:center;gap:6px}
+.chip i{font-size:14px}
+.chip-coral{background:var(--coral);color:#fff}
+.chip-ghost{background:transparent;color:#C7D3E4;border:1px solid rgba(255,255,255,.24)}
+.body{padding:22px 26px 8px}
+.tablero{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ind{border:1px solid var(--line);border-radius:12px;padding:14px}
+.ind-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:bold;letter-spacing:.03em}
+.ind-top i{font-size:18px}
+.meter{display:flex;gap:5px;margin:11px 0 8px}
+.seg{height:9px;flex:1;border-radius:5px;background:var(--line)}
+.seg.g{background:var(--green)}.seg.r{background:var(--red)}.seg.a{background:var(--amber)}
+.ind-val{font-size:19px;font-weight:bold}
+.ind-note{font-size:11px;color:var(--muted);margin-top:2px}
+.sens{display:flex;gap:12px;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;margin-top:18px}
+.sens i{font-size:26px;color:var(--yellow)}
+.sens b{display:block;font-size:13px;margin-bottom:3px}
+.sens span{font-size:12px;color:#C7D3E4}
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:9px;border-left:4px solid var(--coral);padding-left:11px;margin-bottom:13px}
+.sec-h .ti{font-size:20px;color:var(--coral)}
+.sec-h b{font-size:16px;letter-spacing:.02em}
+.sec-h span{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-left:2px}
+.compose{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.comp{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:#F7F9FB}
+.comp-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:bold;margin-bottom:6px}
+.comp-h i{font-size:18px;color:var(--coral)}
+.comp-h .badge2{font-size:10px;font-weight:bold;padding:2px 7px;border-radius:5px;margin-left:auto}
+.b-on{background:#FBE6D8;color:#993C1D}.b-off{background:#E4E7EC;color:#5B6675}
+.comp p{font-size:11.5px;color:var(--muted);line-height:1.45}
+.panel-a{background:#FCF6F4;border:1px solid #F3D9CF;border-radius:14px;padding:16px}
+.purpose{margin-bottom:14px}
+.purpose-h{font-size:12.5px;font-weight:bold;color:var(--coral);margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.purpose-h i{font-size:15px}
+.purpose-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px}
+.purpose-list li{font-size:12.5px;display:flex;gap:8px;align-items:flex-start}
+.purpose-list li i{color:var(--coral);font-size:15px;flex:none;margin-top:1px}
+.purpose-tag{font-size:12px;font-weight:bold;margin-top:11px;color:var(--navy)}
+.map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.map-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#F7F9FB;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:bold;color:var(--navy)}
+.map-h .ti{color:var(--coral);margin-right:5px}
+.map-leg{font-weight:normal;color:var(--muted);display:flex;align-items:center;gap:12px}
+.map-leg span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:11px;height:11px;border-radius:3px;display:inline-block}
+.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}
+.map-band{padding:11px 14px}
+.map-band+.map-band{border-top:1px dashed var(--line)}
+.band-t{font-size:11px;font-weight:bold;letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.room{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:bold;padding:9px 11px;border-radius:9px;border:1px solid}
+.room i{font-size:15px;flex:none}
+.room.on{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.room.off{background:#F4F3EE;border-color:#D3D1C7;color:#7d7c75}
+.idrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.icard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.ic-h{font-size:11.5px;font-weight:bold;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.ic-h i{font-size:16px;color:var(--coral)}
+.person{display:flex;align-items:center;gap:11px}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;flex:none}
+.pn{font-size:13px;font-weight:bold}
+.pr{font-size:11.5px;color:var(--muted)}
+.kp{display:inline-flex;align-items:center;gap:5px;background:#FCEBEB;color:#A32D2D;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:6px;margin-top:11px}
+.ucount{font-size:18px;font-weight:bold;color:var(--navy)}
+.ucap{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+.metric{background:#F7F9FB;border-radius:10px;padding:12px}
+.metric-k{font-size:11px;color:var(--muted);font-weight:bold}
+.metric-v{font-size:16px;font-weight:bold;margin-top:3px}
+.metric-v small{font-size:11px;color:var(--muted);font-weight:normal}
+.note{font-size:11px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.note b{color:var(--navy)}
+.dl{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dl-row{display:grid;grid-template-columns:160px 1fr;border-top:1px solid var(--line)}
+.dl-row:first-child{border-top:none}
+.dl-k{background:#F7F9FB;padding:11px 14px;font-size:12px;font-weight:bold;color:var(--muted)}
+.dl-v{padding:11px 14px;font-size:13px}
+.pill{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;display:inline-block}
+.pill-y{background:#FBF1CF;color:#7a5b00}
+.pill-r{background:#FCEBEB;color:#A32D2D}
+.pill-g{background:#E1F5EE;color:#0F6E56}
+.lbl{font-size:12px;font-weight:bold;color:var(--muted)}
+.gh{font-size:11.5px;font-weight:bold;color:var(--muted);margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.gh .num{width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.box{border:1px solid var(--line);border-radius:12px;padding:4px 14px}
+.intg-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.intg-row:first-child{border-top:none}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.g{background:var(--green)}.dot.a{background:var(--amber)}
+.intg-row .nm{font-weight:bold;min-width:170px}
+.intg-row .ds{color:var(--muted)}
+.conv{display:flex;flex-direction:column;gap:7px}
+.conv div{font-size:12.5px;display:flex;gap:8px}
+.conv i{color:var(--coral);font-size:16px;flex:none;margin-top:1px}
+.conv b{color:var(--navy)}
+.pend-panel{border:1px solid #F6D98A;background:#FFFAED;border-radius:14px;padding:14px 16px;margin-top:16px}
+.pend-h{font-size:13px;font-weight:bold;color:#7a5b00;display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.pend-h i{font-size:19px;color:var(--amber)}
+.pend-items{display:flex;flex-direction:column;gap:8px}
+.pend-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #F6E3B0;border-radius:10px;padding:10px 12px;font-size:12.5px}
+.pend-item i{font-size:16px;color:var(--amber);flex:none;margin-top:1px}
+.pend-item span b{color:var(--navy)}
+.usepanel{border:1px solid #F0997B;background:#FFFAF8;border-radius:14px;padding:16px;margin-top:18px}
+.usepanel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.uh-left{display:flex;align-items:center;gap:11px}
+.uh-left>i{font-size:27px;color:var(--coral)}
+.uh-title{font-size:14px;font-weight:bold}
+.uh-sub{font-size:11.5px;color:var(--muted)}
+.uh-stat{text-align:right}
+.uh-num{font-size:30px;font-weight:bold;color:var(--coral);line-height:1}
+.uh-num-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.use-bar{display:flex;height:24px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.use-bar .u{background:var(--green)}
+.use-bar .n{background:var(--coral)}
+.use-leg{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.use-leg span{display:inline-flex;align-items:center;gap:6px}
+.use-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.use-col{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.use-col.lost{background:#FCF1EE;border-color:#F3D9CF}
+.uc-h{font-size:12px;font-weight:bold;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.uc-h.good{color:var(--green)}.uc-h.bad{color:#993C1D}
+.uc-h i{font-size:16px}
+.uc-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.uc-list li{font-size:12px;display:flex;gap:7px;align-items:flex-start}
+.uc-list li i{font-size:15px;flex:none;margin-top:1px;color:var(--green)}
+.uc-list.bad li i{color:var(--coral)}
+.uc-list.bad b{color:#993C1D}
+.usenote{font-size:11px;color:var(--muted);margin-top:11px;font-style:italic}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.col h4{font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.col.good h4{color:var(--green)}.col.bad h4{color:var(--red)}
+.col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.col li{font-size:12px;display:flex;gap:7px;line-height:1.45}
+.col li i{font-size:15px;flex:none;margin-top:1px}
+.col.good li i{color:var(--green)}.col.bad li i{color:var(--red)}
+.risks{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.risk{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;line-height:1.45}
+.sev{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;flex:none;white-space:nowrap}
+.sev.r{background:#FCEBEB;color:#A32D2D}
+.sev.o{background:#FBE6D8;color:#993C1D}
+.sev.s{background:#E6F1FB;color:#0C447C}
+.sev.op{background:#EEEDFE;color:#3C3489}
+.sev.y{background:#FBF1CF;color:#7a5b00}
+.reco{display:flex;gap:13px;background:#FFF6E9;border:1px solid var(--yellow);border-radius:12px;padding:15px 17px;margin-top:6px}
+.reco>i{font-size:26px;color:var(--amber)}
+.reco .badge{display:inline-block;background:var(--navy);color:#fff;font-size:12px;font-weight:bold;padding:3px 11px;border-radius:7px;margin-bottom:9px}
+.reco p{font-size:12.5px}
+.reco .rh{font-size:12px;font-weight:bold;margin:9px 0 3px;display:flex;align-items:center;gap:6px}
+.reco .rh.now{color:var(--green)}
+.reco .rh.mid{color:var(--coral)}
+.reco .warn-line{font-size:11.5px;color:#993C1D;background:#FCF1EE;border-radius:8px;padding:8px 10px;margin-top:9px}
+.reco-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin:7px 0 0}
+.reco-list li{display:flex;gap:9px;align-items:flex-start}
+.reco-list li>i{color:var(--amber);font-size:15px;flex:none;margin-top:2px}
+.reco-list .rl-t{font-size:12px;font-weight:bold;line-height:1.4}
+.reco-list .rl-d{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:24px;padding:16px 26px;color:var(--muted);font-size:11px}
+.foot b{color:var(--navy)}
+@media(max-width:640px){.tablero,.metrics,.twocol,.idrow,.use-cols,.purpose-list,.dl-row,.compose{grid-template-columns:1fr}}
+@media print{.fp-card{break-inside:auto}.ind,.room,.icard,.col,.risk,.reco,.sens,.map,.usepanel,.use-col,.pend-panel,.pend-item,.comp{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fp-card">
+
+  <!-- ENCABEZADO -->
+  <div class="fp-head">
+    <div class="fp-head-main">
+      <div class="fp-eyebrow">FICHA DE SOFTWARE</div>
+      <div class="fp-name">Intranet &amp; Universidad Pinares</div>
+      <div class="fp-sub">Portal interno corporativo desarrollado a la medida sobre SharePoint (Microsoft 365), con la "Universidad Pinares" como módulo de formación (LMS). Centraliza comunicación, accesos a software, calendario, formularios e inducción. Fase 1 entregada en marzo 2026; aún sin lanzamiento masivo y con la formación desactivada.</div>
+      <div class="chips">
+        <span class="chip chip-coral"><i class="ti ti-layout-dashboard"></i> Comunicación interna / Portal</span>
+        <span class="chip chip-ghost"><i class="ti ti-school"></i> Formación / LMS</span>
+      </div>
+    </div>
+    <div class="fp-meta">
+      <div class="fp-tag">F1 · INVENTARIO</div>
+      <div><span class="mk">Ficha</span> INT-01</div>
+      <div><span class="mk">Fecha</span> 11 jun 2026</div>
+      <div><span class="mk">Consultora</span> Laura Salazar · Vena Digital</div>
+      <div><span class="mk">Proveedor</span> David Giraldo</div>
+      <div><span class="mk">Fuentes</span> Propuesta David + 3 actas</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- TABLERO VISUAL -->
+    <div class="tablero">
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-trending-up"></i> Adopción</div>
+        <div class="meter"><span class="seg r"></span><span class="seg"></span><span class="seg"></span></div>
+        <div class="ind-val">Muy baja / nula</div>
+        <div class="ind-note">Intranet: solo administradores. Universidad: módulo desactivado, cero cursos completados. Sin lanzamiento masivo a 2+ meses de la entrega.</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-activity-heartbeat"></i> Criticidad operativa</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg"></span><span class="seg"></span></div>
+        <div class="ind-val">Media (proyectada)</div>
+        <div class="ind-note">Hoy no detiene la operación (la comunicación sigue en WhatsApp). La inducción/reinducción sí tiene peso normativo de habilitación.</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-alert-triangle"></i> Nivel de riesgo</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg a"></span><span class="seg"></span></div>
+        <div class="ind-val">Alto</div>
+        <div class="ind-note">Gestión manual de accesos, proyecto estancado y desaprovechado, y formación poco dinámica.</div>
+      </div>
+    </div>
+
+    <!-- DATOS SENSIBLES -->
+    <div class="sens">
+      <i class="ti ti-shield-lock"></i>
+      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Perfil sociodemográfico de colaboradores (nombre, cargo, correo, cumpleaños, fecha de ingreso). Marco: Ley 1581 de 2012 (datos personales de empleados). La trazabilidad de la formación tiene además valor probatorio ante auditorías de habilitación.</span></div>
+    </div>
+
+    <!-- A · IDENTIFICACIÓN -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-id"></i><b>Identificación y propósito</b><span>BLOQUE A</span></div>
+      <div class="panel-a">
+
+        <!-- COMPONENTES -->
+        <div class="compose">
+          <div class="comp">
+            <div class="comp-h"><i class="ti ti-layout-dashboard"></i> Intranet (portal) <span class="badge2 b-on">En prueba</span></div>
+            <p>Capa de comunicación y accesos: portal de inicio, noticias, calendario, formularios y enlaces a software. Operativa solo para administradores.</p>
+          </div>
+          <div class="comp">
+            <div class="comp-h"><i class="ti ti-school"></i> Universidad Pinares (LMS) <span class="badge2 b-off">Inactivo</span></div>
+            <p>Módulo de formación dentro del mismo SharePoint: repositorio de cursos de inducción/reinducción con registro de avance. Construido pero desactivado al público.</p>
+          </div>
+        </div>
+
+        <div class="purpose">
+          <div class="purpose-h"><i class="ti ti-layout-dashboard"></i> Para qué se usa — Intranet (portal)</div>
+          <ul class="purpose-list">
+            <li><i class="ti ti-chevron-right"></i> Portal de inicio con enlaces rápidos a Luxflow, SIIS, gestor documental y link fijo de Teams ("Café Pinares").</li>
+            <li><i class="ti ti-chevron-right"></i> Sección de noticias y boletines institucionales.</li>
+            <li><i class="ti ti-chevron-right"></i> Calendario de cumpleaños, aniversarios y fechas institucionales.</li>
+            <li><i class="ti ti-chevron-right"></i> Formularios de reporte (eventos adversos, incidentes, actos inseguros) — hoy hipervínculos, no integración de datos.</li>
+          </ul>
+        </div>
+
+        <div class="purpose">
+          <div class="purpose-h"><i class="ti ti-school"></i> Para qué se usa — Universidad Pinares (formación)</div>
+          <ul class="purpose-list">
+            <li><i class="ti ti-chevron-right"></i> Repositorio de cursos de inducción corporativa (Calidad, TH, CST) con PDFs y formularios.</li>
+            <li><i class="ti ti-chevron-right"></i> Registro en Microsoft Lists del correo y la fecha de "completado" por colaborador.</li>
+            <li><i class="ti ti-chevron-right"></i> Asignación de contenidos por cargo; reinducción y capacitación especializada (contempladas, no desarrolladas).</li>
+          </ul>
+          <div class="purpose-tag">Objetivo común: reemplazar la dispersión por WhatsApp y la gestión 100% manual de la formación con un punto único, centralizado y trazable.</div>
+        </div>
+
+        <!-- MAPA DE USO -->
+        <div class="map">
+          <div class="map-h">
+            <span><i class="ti ti-map-2"></i>Mapa de uso — Clínica Pinares</span>
+            <span class="map-leg"><span><span class="lg coral"></span> Usa hoy</span><span><span class="lg gray"></span> Diseñado para usar (inactivo)</span></span>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Áreas administrativas / soporte</div>
+            <div class="rooms">
+              <div class="room on"><i class="ti ti-check"></i> Talento Humano (admin)</div>
+              <div class="room on"><i class="ti ti-check"></i> Comunicaciones (admin)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Coordinación Admin.</div>
+              <div class="room off"><i class="ti ti-minus"></i> Calidad</div>
+              <div class="room off"><i class="ti ti-minus"></i> SST / Mantenimiento</div>
+              <div class="room off"><i class="ti ti-minus"></i> Recepción / Facturación</div>
+            </div>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona asistencial</div>
+            <div class="rooms">
+              <div class="room off"><i class="ti ti-minus"></i> Enfermería</div>
+              <div class="room off"><i class="ti ti-minus"></i> Médicos / Especialistas</div>
+              <div class="room off"><i class="ti ti-minus"></i> Farmacia</div>
+              <div class="room off"><i class="ti ti-minus"></i> Servicios Generales</div>
+            </div>
+          </div>
+          <div class="map-band">
+            <div class="band-t" style="color:#993C1D">Nota</div>
+            <div style="font-size:11.5px;color:var(--muted)">Diseñadas para toda la organización: hoy solo dos áreas usan la Intranet (como administradores) y <b>ninguna usa la Universidad</b>. El despliegue masivo está previsto para el "Café Pinares" del 2.º martes de junio 2026. Los colaboradores sin correo corporativo pueden acceder con su correo personal, siempre que se les asignen los permisos correspondientes.</div>
+          </div>
+        </div>
+
+        <div class="idrow">
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-user-cog"></i> Doliente interno</div>
+            <div class="person">
+              <div class="avatar">SD</div>
+              <div><div class="pn">Sin dueño de producto definido</div><div class="pr">Admins: J. E. Román (TH — altas/bajas y carga de cursos) · M. Villegas (Comunicaciones — contenido)</div></div>
+            </div>
+            <div class="kp"><i class="ti ti-alert-triangle"></i> No hay "product owner" interno — causa raíz del estancamiento</div>
+          </div>
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-users"></i> Usuarios activos vigentes</div>
+            <div class="ucount">Intranet: 3 admins · Universidad: 0</div>
+            <div class="ucap">Base de colaboradores cargada pero <b>desactualizada +2 meses</b> (se acordó borrar y recargar). Registro de avance de cursos vacío. Sin protocolo de baja, un retirado puede conservar acceso.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · PROVEEDOR, CONTRATO Y COSTO -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-businessplan"></i><b>Proveedor, contrato y costo</b><span>BLOQUE B</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-k">Infraestructura</div><div class="metric-v">$0 <small>incremental (M365)</small></div></div>
+        <div class="metric"><div class="metric-k">Inversión desarrollo</div><div class="metric-v">$4.500.000 <small>COP</small></div></div>
+        <div class="metric"><div class="metric-k">Plazo / forma</div><div class="metric-v">3 meses <small>($1.5M/mes)</small></div></div>
+        <div class="metric"><div class="metric-k">Modalidad</div><div class="metric-v">SaaS (SharePoint)</div></div>
+      </div>
+      <div class="note"><b>La infraestructura no cuesta extra:</b> ambas corren sobre SharePoint Online, ya incluido en las licencias M365 de Pinares (~$2.8M COP/mes en total, gestionadas por Octus). Según la propuesta de David Giraldo (PPT), la inversión de <b>$1.500.000 COP/mes × 3 meses = $4.500.000 COP</b> corresponde a la <b>implementación de la Fase 1 de la Intranet y de la funcionalidad de Universidad Pinares</b>, e incluye desarrollo completo, documentación, capacitación a Talento Humano y 3 semanas de soporte post-lanzamiento.</div>
+      <div class="dl">
+        <div class="dl-row"><div class="dl-k">Proveedor</div><div class="dl-v">David Giraldo — mismo proveedor para la Intranet y la Universidad. <span class="pill pill-y">Razón social / NIT por confirmar</span></div></div>
+        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v">Desarrollo a la medida (código) sobre SharePoint Online (M365). Acceso previsto: solo desde computador.</div></div>
+        <div class="dl-row"><div class="dl-k">Tipo de licencia</div><div class="dl-v">Usa las licencias M365 de Pinares (Business Basic / Standard / Premium, mixtas por área).</div></div>
+        <div class="dl-row"><div class="dl-k">Vigencia / entrega</div><div class="dl-v">Intranet Fase 1 entregada en marzo 2026. La propuesta (3 meses) cubre la implementación de la Fase 1 de la Intranet y de Universidad Pinares.</div></div>
+        <div class="dl-row"><div class="dl-k">Soporte</div><div class="dl-v">Todo el soporte se canaliza a través de David Giraldo e <b>incluido en lo pagado</b> durante 3 semanas post-lanzamiento. En caso de requerir soporte posterior, debe cotizarse de forma adicional.</div></div>
+      </div>
+    </div>
+
+    <!-- C · CONFIGURACIÓN TÉCNICA Y DATOS -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-settings-cog"></i><b>Configuración técnica y datos</b><span>BLOQUE C</span></div>
+      <div class="dl" style="margin-bottom:6px">
+        <div class="dl-row"><div class="dl-k">Roles y permisos</div><div class="dl-v">Tres roles en la Intranet: <b>M. Villegas</b> (Comunicaciones, publicación) · <b>J. E. Román</b> (TH, altas/bajas y cursos) · <b>L. Salazar</b> (Vena Digital, Miembro temporal). La Universidad suma gestión diferenciada por cargo y vistas filtradas por área/responsable/estado. <b>Sin protocolo de baja automatizado.</b></div></div>
+      </div>
+
+      <div class="gh"><span class="num">1</span> ¿Permite integraciones?</div>
+      <div class="box" style="padding:11px 14px;font-size:12.5px">
+        <span class="pill pill-g">Sí</span> &nbsp;<span style="color:var(--muted)">Por estar sobre M365 integra de forma nativa con Lists, Forms, Power Automate, Power Apps y Teams. La automatización requiere desarrollo/configuración (hoy ausente), no licencias nuevas — <b>salvo Power BI, que no está incluido en M365 Business y requiere licencia adicional (~$10 USD/usuario/mes)</b>.</span>
+      </div>
+
+      <div class="gh"><span class="num">2</span> Integraciones activas y vigentes</div>
+      <div class="box">
+        <div class="intg-row"><span class="dot g"></span><span class="nm">Microsoft Lists</span><span class="ds">Backend de colaboradores y registro de cursos (carga manual; avance vacío).</span></div>
+        <div class="intg-row"><span class="dot a"></span><span class="nm">Microsoft Forms</span><span class="ds">Reportes y exámenes enlazados (hipervínculos; calificación manual).</span></div>
+        <div class="intg-row"><span class="dot a"></span><span class="nm">Teams</span><span class="ds">Link fijo a "Café Pinares" anclado en el portal.</span></div>
+        <div class="intg-row"><span class="dot a"></span><span class="nm">Luxflow / SIIS</span><span class="ds">Solo accesos directos (links), no integración funcional.</span></div>
+      </div>
+
+      <div class="gh"><span class="num">3</span> Integraciones convenientes (recomendadas)</div>
+      <div class="conv">
+        <div><i class="ti ti-plug-connected"></i> <span><b>Power Automate ↔ fuente única de TH</b> — automatizar altas/bajas desde el Excel de perfil sociodemográfico y notificar vencimientos de reinducción; cierra el riesgo de seguridad. Sin costo.</span></div>
+        <div><i class="ti ti-plug-connected"></i> <span><b>Power Apps</b> — solicitudes de permisos/vacaciones y mantenimiento desde el portal.</span></div>
+        <div><i class="ti ti-plug-connected"></i> <span><b>Power BI</b> — dashboards de indicadores y de cumplimiento de formación; reemplaza el flujo Google Sheets + Looker Studio (Luxflow). Requiere licencia adicional.</span></div>
+      </div>
+
+      <!-- PAGADO VS USADO -->
+      <div class="usepanel">
+        <div class="usepanel-h">
+          <div class="uh-left"><i class="ti ti-coin"></i><div><div class="uh-title">Pagado / construido vs. realmente usado</div><div class="uh-sub">Capacidad M365 ya licenciada + desarrollo ya pagado, sin aprovechar</div></div></div>
+          <div class="uh-stat"><div class="uh-num">2 / 7</div><div class="uh-num-lbl">capacidades en uso</div></div>
+        </div>
+        <div class="use-bar"><div class="u" style="width:29%"></div><div class="n" style="width:71%"></div></div>
+        <div class="use-leg"><span><span class="lg" style="background:var(--green)"></span> En uso</span><span><span class="lg" style="background:var(--coral)"></span> Disponible/construido y sin aprovechar</span></div>
+        <div class="use-cols">
+          <div class="use-col">
+            <div class="uc-h good"><i class="ti ti-circle-check"></i> En uso</div>
+            <ul class="uc-list">
+              <li><i class="ti ti-check"></i> Portal SharePoint (en prueba, solo admins)</li>
+              <li><i class="ti ti-check"></i> Microsoft Lists (backend manual)</li>
+            </ul>
+          </div>
+          <div class="use-col lost">
+            <div class="uc-h bad"><i class="ti ti-circle-x"></i> Disponible/construido, pagado y sin usar</div>
+            <ul class="uc-list bad">
+              <li><i class="ti ti-x"></i> <b>Universidad Pinares</b> — inducción construida, desactivada.</li>
+              <li><i class="ti ti-x"></i> <b>Power Automate</b> — automatización de usuarios.</li>
+              <li><i class="ti ti-x"></i> <b>Power Apps</b> — solicitudes/permisos.</li>
+              <li><i class="ti ti-x"></i> <b>Microsoft To Do</b> — tareas de comités.</li>
+              <li><i class="ti ti-x"></i> <b>Exámenes y asignación por cargo</b> — sin uso productivo.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="usenote">El argumento de fondo: la clínica paga ~$2.8M COP/mes de M365 cuyas capacidades de automatización podrían absorber funciones por las que hoy se paga aparte a Luxflow (~$1.35M COP/mes), y ya invirtió en un desarrollo de comunicación y formación que sigue sin estrenarse. Conviene activar y validar lo construido antes de seguir ampliando el alcance.</div>
+      </div>
+    </div>
+
+    <!-- D · DIAGNÓSTICO DEL CONSULTOR -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-stethoscope"></i><b>Diagnóstico del consultor</b><span>BLOQUE D</span></div>
+      <div class="twocol">
+        <div class="col good">
+          <h4><i class="ti ti-thumb-up"></i> Fortalezas</h4>
+          <ul>
+            <li><i class="ti ti-check"></i> Decisión estratégica correcta: centralizar comunicación y formación sobre infraestructura M365 ya pagada (costo incremental nulo).</li>
+            <li><i class="ti ti-check"></i> La plataforma funciona; la Fase 1 está entregada y operativa en prueba.</li>
+            <li><i class="ti ti-check"></i> 100% personalizable por código (salvo la barra superior nativa de SharePoint).</li>
+            <li><i class="ti ti-check"></i> La Universidad resuelve un dolor real: la gestión manual de inducciones (pico de mayo, sin trazabilidad).</li>
+            <li><i class="ti ti-check"></i> Potencial de absorber funciones de Luxflow y escalar a dashboards y evaluaciones de clima.</li>
+          </ul>
+        </div>
+        <div class="col bad">
+          <h4><i class="ti ti-thumb-down"></i> Debilidades</h4>
+          <ul>
+            <li><i class="ti ti-x"></i> Sin dueño de producto interno: nadie responsable de la hoja de ruta.</li>
+            <li><i class="ti ti-x"></i> Gestión de usuarios 100% manual (Excel → carga del proveedor).</li>
+            <li><i class="ti ti-x"></i> Aunque se construyó sobre SharePoint, el diseño y la experiencia de usuario (UI/UX) no están lo suficientemente desarrollados para que la plataforma sea amigable y favorezca su adopción.</li>
+            <li><i class="ti ti-x"></i> Los formatos de formación actuales (PDF + examen) no son los más atractivos para los colaboradores ni los más eficientes para transmitir los mensajes.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lbl" style="margin:16px 0 0">Riesgos y alertas asociadas</div>
+      <div class="risks">
+        <div class="risk"><span class="sev s">🔵 Seguridad</span><span><b>Gestión manual de accesos sin protocolo de baja</b> — un colaborador retirado puede conservar acceso a la plataforma y a datos sensibles si la baja no se notifica y ejecuta a tiempo.</span></div>
+        <div class="risk"><span class="sev y">🟡 Estratégica</span><span><b>Proyecto estancado: construido, pagado y sin estrenar</b> — 2+ meses desde la entrega sin lanzamiento masivo, sin contenido visible y con la base de usuarios desactualizada. La inversión ya realizada en comunicación y formación permanece inactiva, con riesgo de obsolescencia antes del primer uso.</span></div>
+        <div class="risk"><span class="sev op">🟣 Operatividad</span><span><b>UI/UX insuficiente y formación poco dinámica</b> — sin un diseño y una experiencia de usuario suficientemente desarrollados, y con formatos de formación poco atractivos (PDF + examen), se dificulta construir hábito de uso y adopción.</span></div>
+      </div>
+
+      <div class="pend-panel">
+        <div class="pend-h"><i class="ti ti-clipboard-list"></i> Pendientes por revisar</div>
+        <div class="pend-items">
+          <div class="pend-item"><i class="ti ti-search"></i><span>Realizar el <b>balance entre el alcance comprado en la propuesta y lo realmente implementado</b>, para verificar el cumplimiento de todo el proyecto.</span></div>
+          <div class="pend-item"><i class="ti ti-search"></i><span>Definir <b>quién es el owner o dueño del producto a nivel interno</b>.</span></div>
+          <div class="pend-item"><i class="ti ti-search"></i><span>Definir el <b>plan de lanzamiento y de mantenimiento a nivel interno</b>.</span></div>
+        </div>
+      </div>
+
+      <div class="lbl" style="margin:18px 0 8px">Recomendación</div>
+      <div class="reco">
+        <i class="ti ti-bulb"></i>
+        <div>
+          <span class="badge">Conservar · asignar un owner y concebirlo como proyecto antes de seguir ampliando</span>
+          <div class="rh now"><i class="ti ti-bolt"></i> Ahora</div>
+          <p>La apuesta es correcta sobre la infraestructura correcta. Antes de seguir construyendo, hay que ponerle gobierno y visión de proyecto:</p>
+          <ul class="reco-list">
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Definir el owner o dueño del producto a nivel interno.</div><div class="rl-d">Que esta persona se encargue de revisar el producto recibido frente a lo contratado, identificar los ajustes necesarios sobre lo recibido, y gestionar y dirigir el lanzamiento y el plan de adopción de la plataforma.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Identificar qué se hace hoy en Luxflow que podría hacerse dentro de la Intranet.</div><div class="rl-d">Levantar esas funcionalidades para, más adelante, decidir si Luxflow continúa o si conviene migrarlas al ecosistema pago de Microsoft. Concebirlo como proyecto: identificar necesidades, posibles soluciones y validar hasta dónde se llega con las herramientas incluidas de Microsoft frente a las que incurren en licencias adicionales.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Montar las inducciones y capacitaciones dentro de Universidad Pinares.</div><div class="rl-d">Subir a la plataforma el contenido de inducción y capacitación, construyendo formatos más dinámicos e interactivos que el PDF + examen actual.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Definir el escalamiento de la Intranet y de Universidad Pinares.</div><div class="rl-d">Establecer a nivel de proyecto hasta dónde deben crecer ambas plataformas. Hacer la iniciativa más macro, sin limitarla a las funcionalidades actuales.</div></div></li>
+          </ul>
+          <div class="rh mid"><i class="ti ti-route"></i> Mediano plazo</div>
+          <p>Implementar las decisiones que se tomen a nivel de compañía respecto a absorber las funcionalidades actuales de Luxflow dentro del ecosistema de Microsoft, y ejecutar el proyecto de escalabilidad de la Intranet y de Universidad Pinares.</p>
+          <div class="warn-line"><b>Advertencia del consultor:</b> hoy es un proyecto descuidado: se entregó hace tiempo, no se puso en producción y sigue el patrón de Pinares de desarrollar soluciones sin asignar un owner, lo que genera desaprovechamiento y desalineamiento de lo construido. Falta además mayor gestión en la vigilancia y validación de que el proyecto tenga un plan real para ser adoptado de manera positiva por los colaboradores; actualmente hay issues por resolver que van a complicar su adopción y sostenimiento.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>Vena Digital</b> · Diagnóstico tecnológico — Clínica Pinares</span>
+    <span>Ficha de software · F1 Inventario · fuentes: Propuesta David Giraldo (PPT), Acta Intranet 15-may, Acta M365 14-may, Acta Luxflow 1-jun</span>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

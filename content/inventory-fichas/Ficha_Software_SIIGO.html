@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de software — SIIGO</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+:root{--navy:#0A2142;--coral:#FF6B5E;--yellow:#F5C935;--muted:#5B6675;--line:#E4E7EC;--green:#1D9E75;--amber:#EF9F27;--red:#E24B4A;--blue:#185FA5;--purple:#534AB7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy);line-height:1.5;padding:24px}
+.wrap{max-width:880px;margin:0 auto}
+.fp-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.fp-head{background:var(--navy);color:#fff;padding:22px 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.fp-eyebrow{font-size:11px;letter-spacing:.14em;color:#9FB2CC}
+.fp-name{font-size:34px;font-weight:bold;line-height:1.1;margin-top:4px}
+.fp-sub{font-size:13px;color:#C7D3E4;margin-top:6px;max-width:470px}
+.fp-meta{text-align:right;font-size:12px;color:#C7D3E4;line-height:1.7}
+.fp-tag{display:inline-block;background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:bold;letter-spacing:.06em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:12px;font-weight:bold;padding:5px 11px;border-radius:20px}
+.chip-coral{background:var(--coral);color:#fff}
+.body{padding:22px 26px 8px}
+.tablero{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ind{border:1px solid var(--line);border-radius:12px;padding:14px}
+.ind-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:bold;letter-spacing:.03em}
+.ind-top i{font-size:18px}
+.meter{display:flex;gap:5px;margin:11px 0 8px}
+.seg{height:9px;flex:1;border-radius:5px;background:var(--line)}
+.seg.g{background:var(--green)}.seg.r{background:var(--red)}.seg.a{background:var(--amber)}
+.ind-val{font-size:19px;font-weight:bold}
+.ind-note{font-size:11px;color:var(--muted);margin-top:2px}
+.sens{display:flex;gap:12px;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;margin-top:18px}
+.sens i{font-size:26px;color:var(--yellow)}
+.sens b{display:block;font-size:13px;margin-bottom:3px}
+.sens span{font-size:12px;color:#C7D3E4}
+.modbar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.mod{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:#F7F9FB}
+.mod-t{font-size:13px;font-weight:bold;display:flex;align-items:center;gap:7px}
+.mod-t i{color:var(--coral);font-size:17px}
+.mod-d{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+.mod-tag{font-size:10.5px;font-weight:bold;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:8px}
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:9px;border-left:4px solid var(--coral);padding-left:11px;margin-bottom:13px}
+.sec-h .ti{font-size:20px;color:var(--coral)}
+.sec-h b{font-size:16px;letter-spacing:.02em}
+.sec-h span{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-left:2px}
+.panel-a{background:#FCF6F4;border:1px solid #F3D9CF;border-radius:14px;padding:16px}
+.purpose{margin-bottom:14px}
+.purpose-h{font-size:12.5px;font-weight:bold;color:var(--coral);margin-bottom:9px}
+.purpose-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px}
+.purpose-list li{font-size:12.5px;display:flex;gap:8px;align-items:flex-start}
+.purpose-list li i{color:var(--coral);font-size:15px;flex:none;margin-top:1px}
+.purpose-tag{font-size:12px;font-weight:bold;margin-top:11px;color:var(--navy)}
+.map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.map-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#F7F9FB;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:bold;color:var(--navy)}
+.map-h .ti{color:var(--coral);margin-right:5px}
+.map-leg{font-weight:normal;color:var(--muted);display:flex;align-items:center;gap:12px}
+.map-leg span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:11px;height:11px;border-radius:3px;display:inline-block}
+.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}
+.map-band{padding:11px 14px}
+.map-band+.map-band{border-top:1px dashed var(--line)}
+.band-t{font-size:11px;font-weight:bold;letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.room{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:bold;padding:9px 11px;border-radius:9px;border:1px solid}
+.room i{font-size:15px;flex:none}
+.room.on{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.room.off{background:#F4F3EE;border-color:#D3D1C7;color:#7d7c75}
+.idrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.icard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.ic-h{font-size:11.5px;font-weight:bold;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.ic-h i{font-size:16px;color:var(--coral)}
+.person{display:flex;align-items:flex-start;gap:11px;margin-bottom:9px}
+.person:last-child{margin-bottom:0}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex:none}
+.pn{font-size:12.5px;font-weight:bold}
+.pr{font-size:11px;color:var(--muted)}
+.kp{display:inline-flex;align-items:center;gap:5px;background:#FCEBEB;color:#A32D2D;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:6px;margin-top:9px}
+.ucount{font-size:16px;font-weight:bold;color:var(--navy)}
+.ucap{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+.metric{background:#F7F9FB;border-radius:10px;padding:12px}
+.metric-k{font-size:11px;color:var(--muted);font-weight:bold}
+.metric-v{font-size:17px;font-weight:bold;margin-top:3px}
+.metric-v small{font-size:11px;color:var(--muted);font-weight:normal}
+.note{font-size:11px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.note b{color:var(--navy)}
+.dl{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dl-row{display:grid;grid-template-columns:160px 1fr;border-top:1px solid var(--line)}
+.dl-row:first-child{border-top:none}
+.dl-k{background:#F7F9FB;padding:11px 14px;font-size:12px;font-weight:bold;color:var(--muted)}
+.dl-v{padding:11px 14px;font-size:13px}
+.pill{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;display:inline-block}
+.pill-y{background:#FBF1CF;color:#7a5b00}
+.pill-r{background:#FCEBEB;color:#A32D2D}
+.pill-g{background:#E1F5EE;color:#0F6E56}
+.lbl{font-size:12px;font-weight:bold;color:var(--muted)}
+.gh{font-size:11.5px;font-weight:bold;color:var(--muted);margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.gh .num{width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.box{border:1px solid var(--line);border-radius:12px;padding:4px 14px}
+.intg-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.intg-row:first-child{border-top:none}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.g{background:var(--green)}.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+.intg-row .nm{font-weight:bold;min-width:205px}
+.intg-row .ds{color:var(--muted)}
+.conv{display:flex;flex-direction:column;gap:7px}
+.conv div{font-size:12.5px;display:flex;gap:8px}
+.conv i{color:var(--coral);font-size:16px;flex:none;margin-top:1px}
+.conv b{color:var(--navy)}
+.pend-panel{border:1px solid #F6D98A;background:#FFFAED;border-radius:14px;padding:14px 16px;margin-top:16px}
+.pend-h{font-size:13px;font-weight:bold;color:#7a5b00;display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.pend-h i{font-size:19px;color:var(--amber)}
+.pend-items{display:flex;flex-direction:column;gap:8px}
+.pend-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #F6E3B0;border-radius:10px;padding:10px 12px;font-size:12.5px}
+.pend-item i{font-size:16px;color:var(--amber);flex:none;margin-top:1px}
+.pend-item span b{color:var(--navy)}
+.usepanel{border:1px solid #F0997B;background:#FFFAF8;border-radius:14px;padding:16px;margin-top:18px}
+.usepanel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.uh-left{display:flex;align-items:center;gap:11px}
+.uh-left>i{font-size:27px;color:var(--coral)}
+.uh-title{font-size:14px;font-weight:bold}
+.uh-sub{font-size:11.5px;color:var(--muted)}
+.uh-stat{text-align:right}
+.uh-num{font-size:30px;font-weight:bold;color:var(--coral);line-height:1}
+.uh-num-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.use-bar{display:flex;height:24px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.use-bar .u{background:var(--green)}
+.use-bar .n{background:var(--coral)}
+.use-leg{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.use-leg span{display:inline-flex;align-items:center;gap:6px}
+.use-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.use-col{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.use-col.lost{background:#FCF1EE;border-color:#F3D9CF}
+.uc-h{font-size:12px;font-weight:bold;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.uc-h.good{color:var(--green)}.uc-h.bad{color:#993C1D}
+.uc-h i{font-size:16px}
+.uc-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.uc-list li{font-size:12px;display:flex;gap:7px;align-items:flex-start}
+.uc-list li i{font-size:15px;flex:none;margin-top:1px;color:var(--green)}
+.uc-list.bad li i{color:var(--coral)}
+.uc-list.bad b{color:#993C1D}
+.usenote{font-size:11px;color:var(--muted);margin-top:11px;font-style:italic}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.col h4{font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.col.good h4{color:var(--green)}.col.bad h4{color:var(--red)}
+.col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.col li{font-size:12px;display:flex;gap:7px;line-height:1.45}
+.col li i{font-size:15px;flex:none;margin-top:1px}
+.col.good li i{color:var(--green)}.col.bad li i{color:var(--red)}
+.risks{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.risk{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;line-height:1.45}
+.sev{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;flex:none;white-space:nowrap}
+.sev.r{background:#FCEBEB;color:#A32D2D}
+.sev.o{background:#FBE6D8;color:#993C1D}
+.sev.s{background:#E6F1FB;color:#0C447C}
+.sev.op{background:#EEEDFE;color:#3C3489}
+.sev.y{background:#FBF1CF;color:#7a5b00}
+.reco{display:flex;gap:13px;background:#FFF6E9;border:1px solid var(--yellow);border-radius:12px;padding:15px 17px;margin-top:6px}
+.reco>i{font-size:26px;color:var(--amber)}
+.reco .badge{display:inline-block;background:var(--navy);color:#fff;font-size:12px;font-weight:bold;padding:3px 11px;border-radius:7px;margin-bottom:9px}
+.reco p{font-size:12.5px}
+.reco .rh{font-size:12px;font-weight:bold;margin:9px 0 3px;display:flex;align-items:center;gap:6px}
+.reco .rh.now{color:var(--green)}
+.reco .rh.mid{color:var(--coral)}
+.reco .warn-line{font-size:11.5px;color:#993C1D;background:#FCF1EE;border-radius:8px;padding:8px 10px;margin-top:9px}
+.reco-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin:7px 0 0}
+.reco-list li{display:flex;gap:9px;align-items:flex-start}
+.reco-list li>i{color:var(--amber);font-size:15px;flex:none;margin-top:2px}
+.reco-list .rl-t{font-size:12px;font-weight:bold;line-height:1.4}
+.reco-list .rl-d{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:24px;padding:16px 26px;color:var(--muted);font-size:11px}
+.foot b{color:var(--navy)}
+@media(max-width:640px){.tablero,.metrics,.twocol,.idrow,.opp-grid,.use-cols,.purpose-list,.dl-row,.modbar{grid-template-columns:1fr}}
+@media print{.fp-card{break-inside:auto}.ind,.mod,.room,.icard,.col,.risk,.opp-card,.reco,.sens,.map,.usepanel,.use-col,.pend-panel,.pend-item{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fp-card">
+
+  <div class="fp-head">
+    <div>
+      <div class="fp-eyebrow">FICHA DE SOFTWARE</div>
+      <div class="fp-name">SIIGO</div>
+      <div class="fp-sub">Ecosistema contable, de facturación y nómina. Tres módulos que el proveedor vende por separado y que <b>no están integrados entre sí</b>: Contai (contabilidad), Facturación (extras sin CUPS + documentos soporte DIAN) y Nómina-i. Proveedor: SIIGO. Modelo local "Ilimitada" (propiedad de Pinares).</div>
+      <div class="chips">
+        <span class="chip chip-coral">ERP contable · administrativo (modular)</span>
+      </div>
+    </div>
+    <div class="fp-meta">
+      <div class="fp-tag">F1 · INVENTARIO</div>
+      <div>Ficha FP-02</div>
+      <div>9 jun 2026</div>
+      <div>Laura Salazar — Vena Digital</div>
+      <div>Base: 5 actas + inventario</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- TABLERO VISUAL -->
+    <div class="tablero">
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-trending-up"></i> Adopción</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg"></span></div>
+        <div class="ind-val">Media</div>
+        <div class="ind-note">Los 3 módulos se usan, pero como transcriptores; Tesorería y recibos sin implementar</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-activity-heartbeat"></i> Criticidad operativa</div>
+        <div class="meter"><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span></div>
+        <div class="ind-val">Crítica</div>
+        <div class="ind-note">Sin SIIGO no hay contabilidad, nómina electrónica ni soporte DIAN</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-alert-triangle"></i> Nivel de riesgo</div>
+        <div class="meter"><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span><span class="seg"></span></div>
+        <div class="ind-val">Alto</div>
+        <div class="ind-note">Riesgo tributario, licencia que vence y silos entre módulos</div>
+      </div>
+    </div>
+
+    <!-- DATOS SENSIBLES -->
+    <div class="sens">
+      <i class="ti ti-shield-lock"></i>
+      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Contabilidad y finanzas de la clínica · nómina y datos laborales/salariales de los empleados (dato personal, Ley 1581/2012) · facturación electrónica e información exógena DIAN · retención en la fuente y obligaciones tributarias · Circular 016 (Supersalud).</span></div>
+    </div>
+
+    <!-- MÓDULOS -->
+    <div class="modbar">
+      <div class="mod">
+        <div class="mod-t"><i class="ti ti-calculator"></i> Contai</div>
+        <div class="mod-d">Contabilidad central, cierres, balances, exógena, Circular 016 y retenciones. Operado por outsourcing (firma Nazar) + Estefanía.</div>
+        <div class="mod-tag pill-r">On-premise (VPN)</div>
+      </div>
+      <div class="mod">
+        <div class="mod-t"><i class="ti ti-receipt"></i> Facturación</div>
+        <div class="mod-d">Factura los extras sin CUPS (alimentación, terapias no médicas, peluquería) y emite documentos soporte/equivalentes a la DIAN. Cuentas por pagar a proveedores.</div>
+        <div class="mod-tag pill-r">On-premise (VPN)</div>
+      </div>
+      <div class="mod">
+        <div class="mod-t"><i class="ti ti-users-group"></i> Nómina-i</div>
+        <div class="mod-d">Nómina quincenal, liquidaciones y nómina electrónica a la DIAN. Usado como transcriptor: la verdad real vive en un Excel maestro.</div>
+        <div class="mod-tag pill-r">On-premise (VPN)</div>
+      </div>
+    </div>
+
+    <!-- A · IDENTIFICACIÓN -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-id"></i><b>Identificación y propósito</b><span>BLOQUE A</span></div>
+      <div class="panel-a">
+        <div class="purpose">
+          <div class="purpose-h">Para qué se usa</div>
+          <ul class="purpose-list">
+            <li><i class="ti ti-chevron-right"></i> Contabilidad central, cierres y balances (Contai)</li>
+            <li><i class="ti ti-chevron-right"></i> Información exógena y Circular 016 Supersalud</li>
+            <li><i class="ti ti-chevron-right"></i> Generación y reporte de retenciones</li>
+            <li><i class="ti ti-chevron-right"></i> Facturación de extras sin CUPS (Facturación)</li>
+            <li><i class="ti ti-chevron-right"></i> Documentos soporte / equivalentes a la DIAN</li>
+            <li><i class="ti ti-chevron-right"></i> Registro y pago a proveedores (cuentas por pagar)</li>
+            <li><i class="ti ti-chevron-right"></i> Nómina quincenal y liquidaciones (Nómina-i)</li>
+            <li><i class="ti ti-chevron-right"></i> Nómina electrónica a la DIAN</li>
+          </ul>
+          <div class="purpose-tag">Es el consolidador contable, tributario y de nómina de la clínica — pero solo del lado administrativo.</div>
+        </div>
+
+        <div class="map">
+          <div class="map-h">
+            <span><i class="ti ti-map-2"></i>Mapa de uso — Clínica Pinares</span>
+            <span class="map-leg"><span><span class="lg coral"></span> Usa SIIGO</span><span><span class="lg gray"></span> No usa</span></span>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona administrativa</div>
+            <div class="rooms">
+              <div class="room on"><i class="ti ti-check"></i> Contabilidad</div>
+              <div class="room on"><i class="ti ti-check"></i> Compras / Cuentas por pagar</div>
+              <div class="room on"><i class="ti ti-check"></i> Talento Humano / Nómina</div>
+              <div class="room on"><i class="ti ti-check"></i> Recepción (facturación y recibos manuales)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Tesorería (módulo sin implementar)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Gerencia</div>
+            </div>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona asistencial</div>
+            <div class="rooms">
+              <div class="room off"><i class="ti ti-minus"></i> Consulta externa (SIIS)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Hospitalización (SIIS)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Enfermería</div>
+              <div class="room off"><i class="ti ti-minus"></i> Farmacia</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="idrow">
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-user-cog"></i> Doliente interno — un dueño por módulo</div>
+            <div class="person">
+              <div class="avatar">EA</div>
+              <div><div class="pn">Estefanía + firma Nazar</div><div class="pr">Contai — auxiliar de campo + outsourcing · supervisa Claudia Lema</div></div>
+            </div>
+            <div class="person">
+              <div class="avatar">NP</div>
+              <div><div class="pn">Naudy Pérez / Linda</div><div class="pr">Facturación — extras y cuentas por pagar</div></div>
+            </div>
+            <div class="person">
+              <div class="avatar">JE</div>
+              <div><div class="pn">Juan Esteban Román</div><div class="pr">Nómina-i — usuario exclusivo (vía VPN)</div></div>
+            </div>
+            <div class="kp"><i class="ti ti-alert-triangle"></i> No hay doliente contable único que lleve las integraciones a producción</div>
+          </div>
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-users"></i> Usuarios activos vigentes</div>
+            <div class="ucount">3 servicios comerciales · 1 Nómina-i</div>
+            <div class="ucap"><b>3 usuarios activos para los servicios comerciales</b> (Contai / SCI / RHI / sistema comercial), confirmados en la factura FV951954540: Estefanía, Vanessa López (contadora remota en Canadá, acceso inestable) y Daniel González (revisor fiscal) — en revisión si los tres son necesarios. <b>1 usuario en Nómina-i.</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · PROVEEDOR / CONTRATO / COSTO -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-businessplan"></i><b>Proveedor, contrato y costo</b><span>BLOQUE B</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-k">Costo anual</div><div class="metric-v">~$5.848.964 <small>COP</small></div></div>
+        <div class="metric"><div class="metric-k">Costo mensual</div><div class="metric-v">~$487.414 <small>COP</small></div></div>
+        <div class="metric"><div class="metric-k">Modalidad</div><div class="metric-v">Local <small>on-premise (VPN)</small></div></div>
+        <div class="metric"><div class="metric-k">Usuarios</div><div class="metric-v">3 <small>comerciales</small></div></div>
+      </div>
+      <div class="note"><b>Costo validado contra factura FV951954540 (1 jun 2026).</b> El anual suma tres conceptos que el proveedor cobra por separado: <b>(1) Servicios comerciales</b> SIIGO — Contai, SCI, RHI y sistema comercial, 3 usuarios — <b>$3.433.269/año</b> (IVA incluido; base $2.885.184 + IVA $548.086); <b>(2) Nómina-i $2.070.695/año</b> (no incluida en la factura comercial); <b>(3) Facturación electrónica DIAN</b>, que <b>se paga según se gastan los consecutivos</b> (documentos electrónicos + certificado digital ~$1.000/año), con renovación del 13 may 2026 por <b>$345.000</b>. Total aproximado: <b>$5.848.964/año</b>.</div>
+      <div class="dl">
+        <div class="dl-row"><div class="dl-k">Proveedor</div><div class="dl-v"><b>SIIGO S.A.S</b> (facturación electrónica DIAN operada bajo SiigoPT). Comerciales del caso: Wendy (administrativo) y Hansel (especialista SIIGO Nube).</div></div>
+        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v">Modelo local <b>"Ilimitada"</b> — propiedad de Pinares, multiempresa. Los tres módulos <b>requieren mantener un servidor activo</b> para su disponibilidad.</div></div>
+        <div class="dl-row"><div class="dl-k">Tipo de licencia</div><div class="dl-v">Tres productos licenciados por separado (comercial, Nómina-i y facturación electrónica DIAN). La facturación electrónica se paga por consumo de consecutivos.</div></div>
+        <div class="dl-row"><div class="dl-k">Vigencia / terminación</div><div class="dl-v">Modelo local perpetuo (propiedad de la clínica). Renovación del servicio comercial anual; facturación electrónica DIAN renovada el 13 may 2026.</div></div>
+        <div class="dl-row"><div class="dl-k">Soporte y dependencia</div><div class="dl-v"><span class="pill pill-r">Contraseñas del servidor cambian sin aviso</span> los usuarios se enteran al quedar bloqueados; la reactivación depende de <b>OCTUS</b> (proveedor TI externo), que <b>cobra por ticket</b> — un costo oculto del esquema actual.</div></div>
+      </div>
+    </div>
+
+    <!-- C · CONFIGURACIÓN TÉCNICA Y DATOS -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-settings-cog"></i><b>Configuración técnica y datos</b><span>BLOQUE C</span></div>
+      <div class="dl" style="margin-bottom:6px">
+        <div class="dl-row"><div class="dl-k">Roles y permisos</div><div class="dl-v"><span class="pill pill-y">Un usuario por módulo</span> <span class="pill pill-r">Módulos no integrados entre sí</span> &nbsp;Cada módulo opera de forma aislada con su propio usuario; no hay administración unificada ni vista transversal.</div></div>
+      </div>
+
+      <div class="gh"><span class="num">1</span> ¿Permite integraciones?</div>
+      <div class="box" style="padding:11px 14px;font-size:12.5px">
+        <span class="pill pill-g">Sí</span> &nbsp;<span style="color:var(--muted)">Entre los propios módulos de SIIGO la integración nativa <b>existe pero no está activada</b> en el modelo local (en la nube vienen integrados de fábrica). La integración con el HIS (SIIS) es posible vía <b>API bidireccional</b>, pero el desarrollo lo asume y contrata Pinares — no viene incluido.</span>
+      </div>
+
+      <div class="gh"><span class="num">2</span> Integraciones activas y vigentes</div>
+      <div class="box">
+        <div class="intg-row"><span class="dot a"></span><span class="nm">Nómina-i → Contai</span><span class="ds">Manual — se descarga un archivo plano y se carga en Contai</span></div>
+        <div class="intg-row"><span class="dot a"></span><span class="nm">SIIS → Contai (ventas)</span><span class="ds">Manual — carga mensual de archivo plano (TXT) con ajustes a mano</span></div>
+        <div class="intg-row"><span class="dot g"></span><span class="nm">Facturación → DIAN</span><span class="ds">Factura electrónica de extras sin CUPS (SiigoPT)</span></div>
+        <div class="intg-row"><span class="dot g"></span><span class="nm">Nómina-i → DIAN</span><span class="ds">Nómina electrónica</span></div>
+        <div class="intg-row"><span class="dot r"></span><span class="nm">Facturación → Contai</span><span class="ds">Sin integración nativa activada — Estefanía exporta a Excel, convierte a TXT y carga manual</span></div>
+      </div>
+
+      <div class="gh"><span class="num">3</span> Integraciones convenientes (recomendadas)</div>
+      <div class="conv">
+        <div><i class="ti ti-plug-connected"></i> <span><b>Facturación ↔ Contai (nativa)</b> — mismo proveedor; con alta probabilidad disponible en el contrato y sin activar. Elimina el exportar a Excel → TXT → cargar manual.</span></div>
+        <div><i class="ti ti-plug-connected"></i> <span><b>Mapeo proveedores ↔ cuentas contables</b> — parametrización estándar que elimina la redigitación de los documentos equivalentes que hoy llegan a una cuenta genérica.</span></div>
+        <div><i class="ti ti-plug-connected"></i> <span><b>API SIIGO Nube ↔ SIIS</b> — elimina la doble digitación con el HIS; es un proyecto de desarrollo propio (contratar ingeniero), no incluido en la migración.</span></div>
+        <div><i class="ti ti-plug-connected"></i> <span><b>SIIS inventarios ↔ Contai</b> — automatizar el cierre de inventarios hoy manual (triple manipulación humana).</span></div>
+      </div>
+
+      <!-- PAGADO VS USADO -->
+      <div class="usepanel">
+        <div class="usepanel-h">
+          <div class="uh-left"><i class="ti ti-coin"></i><div><div class="uh-title">Pagado vs. realmente usado</div><div class="uh-sub">Capacidad contratada que la clínica no aprovecha</div></div></div>
+          <div class="uh-stat"><div class="uh-num">5 / 9</div><div class="uh-num-lbl">funciones clave en uso pleno</div></div>
+        </div>
+        <div class="use-bar"><div class="u" style="width:56%"></div><div class="n" style="width:44%"></div></div>
+        <div class="use-leg"><span><span class="lg" style="background:var(--green)"></span> En uso (5)</span><span><span class="lg" style="background:var(--coral)"></span> Disponible sin aprovechar (4)</span></div>
+        <div class="use-cols">
+          <div class="use-col">
+            <div class="uc-h good"><i class="ti ti-circle-check"></i> En uso</div>
+            <ul class="uc-list">
+              <li><i class="ti ti-check"></i> Contabilidad, cierres y balances (Contai)</li>
+              <li><i class="ti ti-check"></i> Facturación de extras sin CUPS</li>
+              <li><i class="ti ti-check"></i> Documentos soporte / retenciones DIAN</li>
+              <li><i class="ti ti-check"></i> Nómina electrónica a la DIAN</li>
+              <li><i class="ti ti-check"></i> Cuentas por pagar a proveedores</li>
+            </ul>
+          </div>
+          <div class="use-col lost">
+            <div class="uc-h bad"><i class="ti ti-circle-x"></i> Disponible, pagado y sin aprovechar</div>
+            <ul class="uc-list bad">
+              <li><i class="ti ti-x"></i> <b>Tesorería (Contai)</b> — sin implementar; resolvería el FO-389</li>
+              <li><i class="ti ti-x"></i> <b>Integración nativa Facturación → Contai</b> — sin activar</li>
+              <li><i class="ti ti-x"></i> <b>Módulo de recibos (Facturación)</b> — no operativo; recibos a mano</li>
+              <li><i class="ti ti-x"></i> <b>Parametrización plena de Nómina-i</b> — horas extras, recargos, comisiones, retenciones</li>
+            </ul>
+          </div>
+        </div>
+        <div class="usenote">El mayor desperdicio no es un módulo apagado, sino la no-integración entre tres productos del mismo proveedor: obliga a archivos planos manuales y a dos Excel sombra (FO-389 y Excel maestro de nómina) que sostienen la operación real.</div>
+      </div>
+    </div>
+
+    <!-- D · DIAGNÓSTICO DEL CONSULTOR -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-stethoscope"></i><b>Diagnóstico del consultor</b><span>BLOQUE D</span></div>
+      <div class="twocol">
+        <div class="col good">
+          <h4><i class="ti ti-thumb-up"></i> Fortalezas</h4>
+          <ul>
+            <li><i class="ti ti-check"></i> Cubre el cumplimiento normativo crítico: factura electrónica DIAN, nómina electrónica, exógena y Circular 016 (Supersalud)</li>
+            <li><i class="ti ti-check"></i> Proveedor único para los tres módulos: la versión nube los integra de fábrica, sin necesidad de comprar una herramienta distinta</li>
+          </ul>
+        </div>
+        <div class="col bad">
+          <h4><i class="ti ti-thumb-down"></i> Debilidades</h4>
+          <ul>
+            <li><i class="ti ti-x"></i> Tres módulos vendidos por separado y <b>no integrados entre sí</b> → archivos planos manuales y reprocesos</li>
+            <li><i class="ti ti-x"></i> Nómina-i funciona como transcriptor, no como motor de cálculo: la verdad real vive en un Excel maestro frágil</li>
+            <li><i class="ti ti-x"></i> On-premise: la contadora remota (Canadá) accede vía VPN de forma inestable</li>
+            <li><i class="ti ti-x"></i> Al ser on-premise, su disponibilidad depende de un servidor que debe mantenerse activo; un servidor local puede fallar e implica costos adicionales ocultos (infraestructura, soporte y tickets)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lbl" style="margin:16px 0 0">Riesgos y alertas asociadas</div>
+      <div class="risks">
+        <div class="risk"><span class="sev r">🔴 Urgente</span><span><b>Retención en la fuente mal calculada en Nómina-i</b> — para 5 a 8 empleados con salarios variables o condiciones especiales, obligando a ajustes manuales mensuales en Contai. Es un riesgo tributario directo; un proceso de liquidación manual análogo ya derivó en un pago retroactivo de ~$23.000.000 COP el año anterior.</span></div>
+        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>Integración nativa Facturación → Contai sin activar</b> — siendo el mismo proveedor. Estefanía exporta a Excel, convierte a TXT y carga manual; además los documentos equivalentes llegan a una cuenta contable genérica y deben eliminarse y redigitarse uno a uno.</span></div>
+        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>Sin vista consolidada del paciente</b> — los tres módulos no se integran entre sí ni con SIIS; el total real facturado por paciente solo existe en un Excel de estado de cuenta alimentado a mano.</span></div>
+        <div class="risk"><span class="sev s">🔵 Seguridad</span><span><b>Credenciales y custodia en poder de un tercero (OCTUS)</b> — las contraseñas del servidor cambian sin notificar y la reactivación depende de <b>OCTUS</b>, que cobra por ticket (costo oculto del esquema actual). Además, debe definirse la estrategia de preservación y acceso al histórico contable 2024–2025 antes de cualquier migración, ya que la nube no carga histórico.</span></div>
+        <div class="risk"><span class="sev op">🟣 Operatividad</span><span><b>Nómina-i no parametrizado y doble digitación de seguridad social</b> — horas extras, recargos, comisiones y retenciones especiales se calculan a mano, y el módulo de Seguridad Social no está integrado con el de Nómina, obligando a digitar las novedades dos veces.</span></div>
+        <div class="risk"><span class="sev y">🟡 Estratégica</span><span><b>Tesorería (Contai) disponible y sin implementar</b> — pondría orden a la conciliación bancaria y al seguimiento de pagos, reemplazando el FO-389; no se ha activado por falta de un doliente contable que lo lleve a producción.</span></div>
+      </div>
+
+      <div class="pend-panel">
+        <div class="pend-h"><i class="ti ti-clipboard-list"></i> Pendientes por revisar</div>
+        <div class="pend-items">
+          <div class="pend-item"><i class="ti ti-search"></i><span>Evaluar la <b>migración al servicio en nube</b> de SIIGO: condiciones, cotización comparativa, estrategia de preservación del histórico y plan de corte</span></div>
+          <div class="pend-item"><i class="ti ti-search"></i><span>Revisar la necesidad real de los 3 usuarios comerciales (Vanessa López, Daniel González) para optimizar el licenciamiento</span></div>
+        </div>
+      </div>
+
+      <div class="lbl" style="margin:18px 0 8px">Recomendación</div>
+      <div class="reco">
+        <i class="ti ti-bulb"></i>
+        <div>
+          <span class="badge">Migrar a SIIGO Nube ahora · integrar con SIIS a mediano plazo</span>
+          <div class="rh now"><i class="ti ti-bolt"></i> Ahora — migrar a SIIGO Nube</div>
+          <p>La ruta recomendada es <b>migrar el ecosistema contable a SIIGO Nube</b>. Resuelve de raíz los dolores del esquema local: integra los tres módulos de fábrica, calcula la retención en la fuente de forma automática, da acceso en línea multidispositivo y seguridad de datos, y elimina la dependencia de un servidor local y sus costos ocultos (infraestructura y tickets a OCTUS). Pasos para ejecutarla bien:</p>
+          <ul class="reco-list">
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Cerrar la cotización comparativa local vs. nube</div><div class="rl-d">Con alcance de contabilidad, facturación, nómina y centros de costos, para dimensionar el TCO real.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Definir la estrategia del histórico contable 2024–2025</div><div class="rl-d">La nube no carga histórico: planear el corte de saldos iniciales y el acceso de consulta al sistema local antes de migrar.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Asignar un doliente contable de la migración</div><div class="rl-d">Una persona que lleve la implementación a producción y administre la nueva plataforma.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Renovar las licencias comerciales por un periodo corto</div><div class="rl-d">Negociar ~3 meses en vez de la anualidad para no amarrarse mientras se ejecuta la migración.</div></div></li>
+          </ul>
+          <div class="rh mid"><i class="ti ti-route"></i> Mediano plazo — integración con SIIS</div>
+          <p>Una vez en la nube, abordar la <b>integración con el HIS (SIIS) vía API</b> para eliminar la doble digitación entre el sistema clínico y el contable. Es un proyecto de desarrollo propio que SIIGO habilita (abre la API y da soporte) pero que Pinares debe contratar aparte — <b>no viene incluido en la migración</b>. Conviene dimensionarlo y priorizarlo dentro del roadmap (F4/F5), no asumir que la integración con SIIS "sale gratis" al migrar.</p>
+          <div class="warn-line"><b>Advertencia del consultor:</b> migrar a la nube sin asignar primero un doliente contable que lleve las integraciones a producción reproduce el mismo patrón de Excel sombra (FO-389, Excel maestro de nómina) en un sistema arrendado y recurrente más caro. La causa raíz es organizacional, no de versión del software: sin dueño, la nube heredará los mismos silos.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>Vena Digital</b> · Diagnóstico tecnológico — Clínica Pinares</span>
+    <span>Ficha de software · Fase 1 — Inventario · fuentes: 5 actas + inventario</span>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

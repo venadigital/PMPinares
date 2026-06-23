@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de software — Luxflow</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+:root{--navy:#0A2142;--coral:#FF6B5E;--yellow:#F5C935;--muted:#5B6675;--line:#E4E7EC;--green:#1D9E75;--amber:#EF9F27;--red:#E24B4A;--blue:#185FA5;--purple:#534AB7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy);line-height:1.5;padding:24px}
+.wrap{max-width:880px;margin:0 auto}
+.fp-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.fp-head{background:var(--navy);color:#fff;padding:22px 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.fp-eyebrow{font-size:11px;letter-spacing:.14em;color:#9FB2CC}
+.fp-name{font-size:34px;font-weight:bold;line-height:1.1;margin-top:4px}
+.fp-sub{font-size:13px;color:#C7D3E4;margin-top:6px;max-width:470px}
+.fp-meta{text-align:right;font-size:12px;color:#C7D3E4;line-height:1.7}
+.fp-tag{display:inline-block;background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:bold;letter-spacing:.06em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:12px;font-weight:bold;padding:5px 11px;border-radius:20px}
+.chip-coral{background:var(--coral);color:#fff}
+.body{padding:22px 26px 8px}
+.tablero{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ind{border:1px solid var(--line);border-radius:12px;padding:14px}
+.ind-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:bold;letter-spacing:.03em}
+.ind-top i{font-size:18px}
+.meter{display:flex;gap:5px;margin:11px 0 8px}
+.seg{height:9px;flex:1;border-radius:5px;background:var(--line)}
+.seg.g{background:var(--green)}.seg.r{background:var(--red)}.seg.a{background:var(--amber)}
+.ind-val{font-size:19px;font-weight:bold}
+.ind-note{font-size:11px;color:var(--muted);margin-top:2px}
+.sens{display:flex;gap:12px;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;margin-top:18px}
+.sens i{font-size:26px;color:var(--yellow)}
+.sens b{display:block;font-size:13px;margin-bottom:3px}
+.sens span{font-size:12px;color:#C7D3E4}
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:9px;border-left:4px solid var(--coral);padding-left:11px;margin-bottom:13px}
+.sec-h .ti{font-size:20px;color:var(--coral)}
+.sec-h b{font-size:16px;letter-spacing:.02em}
+.sec-h span{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-left:2px}
+.panel-a{background:#FCF6F4;border:1px solid #F3D9CF;border-radius:14px;padding:16px}
+.purpose{margin-bottom:14px}
+.purpose-h{font-size:12.5px;font-weight:bold;color:var(--coral);margin-bottom:9px}
+.purpose-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px}
+.purpose-list li{font-size:12.5px;display:flex;gap:8px;align-items:flex-start}
+.purpose-list li i{color:var(--coral);font-size:15px;flex:none;margin-top:1px}
+.purpose-tag{font-size:12px;font-weight:bold;margin-top:11px;color:var(--navy)}
+.map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.map-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#F7F9FB;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:bold;color:var(--navy)}
+.map-h .ti{color:var(--coral);margin-right:5px}
+.map-leg{font-weight:normal;color:var(--muted);display:flex;align-items:center;gap:12px}
+.map-leg span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:11px;height:11px;border-radius:3px;display:inline-block}
+.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}
+.map-band{padding:11px 14px}
+.map-band+.map-band{border-top:1px dashed var(--line)}
+.band-t{font-size:11px;font-weight:bold;letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.room{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:bold;padding:9px 11px;border-radius:9px;border:1px solid}
+.room i{font-size:15px;flex:none}
+.room.on{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.room.off{background:#F4F3EE;border-color:#D3D1C7;color:#7d7c75}
+.idrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.icard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.ic-h{font-size:11.5px;font-weight:bold;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.ic-h i{font-size:16px;color:var(--coral)}
+.person{display:flex;align-items:center;gap:11px;margin-bottom:9px}
+.person:last-child{margin-bottom:0}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;flex:none}
+.pn{font-size:13px;font-weight:bold}
+.pr{font-size:11.5px;color:var(--muted)}
+.kp{display:inline-flex;align-items:center;gap:5px;background:#FCEBEB;color:#A32D2D;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:6px;margin-top:6px}
+.ucount{font-size:18px;font-weight:bold;color:var(--navy)}
+.ucap{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+.metric{background:#F7F9FB;border-radius:10px;padding:12px}
+.metric-k{font-size:11px;color:var(--muted);font-weight:bold}
+.metric-v{font-size:17px;font-weight:bold;margin-top:3px}
+.metric-v small{font-size:11px;color:var(--muted);font-weight:normal}
+.note{font-size:11px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.note b{color:var(--navy)}
+.dl{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dl-row{display:grid;grid-template-columns:160px 1fr;border-top:1px solid var(--line)}
+.dl-row:first-child{border-top:none}
+.dl-k{background:#F7F9FB;padding:11px 14px;font-size:12px;font-weight:bold;color:var(--muted)}
+.dl-v{padding:11px 14px;font-size:13px}
+.pill{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;display:inline-block}
+.pill-y{background:#FBF1CF;color:#7a5b00}
+.pill-r{background:#FCEBEB;color:#A32D2D}
+.pill-g{background:#E1F5EE;color:#0F6E56}
+.lbl{font-size:12px;font-weight:bold;color:var(--muted)}
+.gh{font-size:11.5px;font-weight:bold;color:var(--muted);margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.gh .num{width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.box{border:1px solid var(--line);border-radius:12px;padding:4px 14px}
+.intg-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.intg-row:first-child{border-top:none}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.g{background:var(--green)}.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+.intg-row .nm{font-weight:bold;min-width:215px}
+.intg-row .ds{color:var(--muted)}
+.conv{display:flex;flex-direction:column;gap:7px}
+.conv div{font-size:12.5px;display:flex;gap:8px}
+.conv i{color:var(--coral);font-size:16px;flex:none;margin-top:1px}
+.conv b{color:var(--navy)}
+.pend-panel{border:1px solid #F6D98A;background:#FFFAED;border-radius:14px;padding:14px 16px;margin-top:16px}
+.pend-h{font-size:13px;font-weight:bold;color:#7a5b00;display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.pend-h i{font-size:19px;color:var(--amber)}
+.pend-items{display:flex;flex-direction:column;gap:8px}
+.pend-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #F6E3B0;border-radius:10px;padding:10px 12px;font-size:12.5px}
+.pend-item i{font-size:16px;color:var(--amber);flex:none;margin-top:1px}
+.pend-item span b{color:var(--navy)}
+.usepanel{border:1px solid #F0997B;background:#FFFAF8;border-radius:14px;padding:16px;margin-top:18px}
+.usepanel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.uh-left{display:flex;align-items:center;gap:11px}
+.uh-left>i{font-size:27px;color:var(--coral)}
+.uh-title{font-size:14px;font-weight:bold}
+.uh-sub{font-size:11.5px;color:var(--muted)}
+.uh-stat{text-align:right}
+.uh-num{font-size:30px;font-weight:bold;color:var(--coral);line-height:1}
+.uh-num-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.use-bar{display:flex;height:24px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.use-bar .u{background:var(--green)}
+.use-bar .n{background:var(--coral)}
+.use-leg{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.use-leg span{display:inline-flex;align-items:center;gap:6px}
+.use-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.use-col{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.use-col.lost{background:#FCF1EE;border-color:#F3D9CF}
+.uc-h{font-size:12px;font-weight:bold;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.uc-h.good{color:var(--green)}.uc-h.bad{color:#993C1D}
+.uc-h i{font-size:16px}
+.uc-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.uc-list li{font-size:12px;display:flex;gap:7px;align-items:flex-start}
+.uc-list li i{font-size:15px;flex:none;margin-top:1px;color:var(--green)}
+.uc-list.bad li i{color:var(--coral)}
+.uc-list.bad b{color:#993C1D}
+.usenote{font-size:11px;color:var(--muted);margin-top:11px;font-style:italic}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.col h4{font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.col.good h4{color:var(--green)}.col.bad h4{color:var(--red)}
+.col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.col li{font-size:12px;display:flex;gap:7px;line-height:1.45}
+.col li i{font-size:15px;flex:none;margin-top:1px}
+.col.good li i{color:var(--green)}.col.bad li i{color:var(--red)}
+.risks{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.risk{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;line-height:1.45}
+.risk span b{color:var(--navy)}
+.sev{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;flex:none;white-space:nowrap}
+.sev.r{background:#FCEBEB;color:#A32D2D}
+.sev.o{background:#FBE6D8;color:#993C1D}
+.sev.s{background:#E6F1FB;color:#0C447C}
+.sev.op{background:#EEEDFE;color:#3C3489}
+.sev.y{background:#FBF1CF;color:#7a5b00}
+.reco{display:flex;gap:13px;background:#FFF6E9;border:1px solid var(--yellow);border-radius:12px;padding:15px 17px;margin-top:6px}
+.reco>i{font-size:26px;color:var(--amber)}
+.reco .badge{display:inline-block;background:var(--navy);color:#fff;font-size:12px;font-weight:bold;padding:3px 11px;border-radius:7px;margin-bottom:9px}
+.reco p{font-size:12.5px}
+.reco .rh{font-size:12px;font-weight:bold;margin:9px 0 3px;display:flex;align-items:center;gap:6px}
+.reco .rh.now{color:var(--green)}
+.reco .rh.mid{color:var(--coral)}
+.reco .warn-line{font-size:11.5px;color:#993C1D;background:#FCF1EE;border-radius:8px;padding:8px 10px;margin-top:9px}
+.reco-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin:7px 0 0}
+.reco-list li{display:flex;gap:9px;align-items:flex-start}
+.reco-list li>i{color:var(--amber);font-size:15px;flex:none;margin-top:2px}
+.reco-list .rl-t{font-size:12px;font-weight:bold;line-height:1.4}
+.reco-list .rl-d{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:24px;padding:16px 26px;color:var(--muted);font-size:11px}
+.foot b{color:var(--navy)}
+@media(max-width:640px){.tablero,.metrics,.twocol,.idrow,.opp-grid,.use-cols,.purpose-list,.dl-row{grid-template-columns:1fr}}
+@media print{.fp-card{break-inside:auto}.ind,.room,.icard,.col,.risk,.opp-card,.reco,.sens,.map,.usepanel,.use-col,.pend-panel,.pend-item{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fp-card">
+
+  <div class="fp-head">
+    <div>
+      <div class="fp-eyebrow">FICHA DE SOFTWARE</div>
+      <div class="fp-name">Luxflow</div>
+      <div class="fp-sub">Plataforma BPM en la nube (gestión de procesos e indicadores), implementada a la medida de Pinares. Proveedor: Apropia Open Source S.A.S. (Medellín). SaaS administrado desde sep 2021.</div>
+      <div class="chips">
+        <span class="chip chip-coral">Gestión de procesos · BPM e indicadores</span>
+      </div>
+    </div>
+    <div class="fp-meta">
+      <div class="fp-tag">F1 · INVENTARIO</div>
+      <div>Ficha FP-02</div>
+      <div>10 jun 2026</div>
+      <div>Laura Salazar — Vena Digital</div>
+      <div>Base: 4 actas + 4 docs contractuales</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- TABLERO VISUAL -->
+    <div class="tablero">
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-trending-up"></i> Adopción</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg"></span></div>
+        <div class="ind-val">Media</div>
+        <div class="ind-note">Transversal pero desigual; varios módulos sin usar</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-activity-heartbeat"></i> Criticidad operativa</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg a"></span><span class="seg"></span></div>
+        <div class="ind-val">Alta</div>
+        <div class="ind-note">Sostiene TH, calidad, mantenimiento, compras e indicadores</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-alert-triangle"></i> Nivel de riesgo</div>
+        <div class="meter"><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span><span class="seg"></span></div>
+        <div class="ind-val">Alto</div>
+        <div class="ind-note">Gobierno de datos, dependencia del proveedor y desalineación de ecosistema</div>
+      </div>
+    </div>
+
+    <!-- DATOS SENSIBLES -->
+    <div class="sens">
+      <i class="ti ti-shield-lock"></i>
+      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Vida laboral completa del colaborador: contrato, afiliaciones (EPS/ARL/caja), hoja de vida, exámenes médicos y pruebas psicotécnicas, certificado bancario, perfil sociodemográfico (D-066) · datos personales bajo habeas data (Ley 1581/2012) · indicadores institucionales y financieros (EBITDA, márgenes). Hoy alojados en un Drive del proveedor con enlace abierto y sobre correos personales de los colaboradores.</span></div>
+    </div>
+
+    <!-- A · IDENTIFICACIÓN -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-id"></i><b>Identificación y propósito</b><span>BLOQUE A</span></div>
+      <div class="panel-a">
+        <div class="purpose">
+          <div class="purpose-h">Para qué se usa</div>
+          <ul class="purpose-list">
+            <li><i class="ti ti-chevron-right"></i> Gestión de colaboradores y estructura organizacional (reservorio de la vida laboral)</li>
+            <li><i class="ti ti-chevron-right"></i> Reportes de novedades de TH (vacaciones, licencias, permisos, incapacidades)</li>
+            <li><i class="ti ti-chevron-right"></i> Indicadores manuales: institucionales, financieros y comerciales</li>
+            <li><i class="ti ti-chevron-right"></i> Indicadores automáticos derivados de los flujos</li>
+            <li><i class="ti ti-chevron-right"></i> Flujo de Mejora Continua (PAMEC, planes de mejoramiento, tareas de comité)</li>
+            <li><i class="ti ti-chevron-right"></i> Flujo de Mantenimiento (preventivo, correctivo, biomédico)</li>
+            <li><i class="ti ti-chevron-right"></i> Flujo de Compras (solicitud, aprobación por monto)</li>
+            <li><i class="ti ti-chevron-right"></i> Flujo de Talento Humano (solo requisición en la práctica)</li>
+          </ul>
+          <div class="purpose-tag">Es la columna vertebral de procesos administrativos y de indicadores de gestión de la clínica.</div>
+        </div>
+
+        <div class="map">
+          <div class="map-h">
+            <span><i class="ti ti-map-2"></i>Mapa de uso — Clínica Pinares</span>
+            <span class="map-leg"><span><span class="lg coral"></span> Usa Luxflow</span><span><span class="lg gray"></span> No usa</span></span>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona administrativa / gestión</div>
+            <div class="rooms">
+              <div class="room on"><i class="ti ti-check"></i> Talento Humano</div>
+              <div class="room on"><i class="ti ti-check"></i> Calidad</div>
+              <div class="room on"><i class="ti ti-check"></i> Subgerencia Administrativa</div>
+              <div class="room on"><i class="ti ti-check"></i> Compras / Inventario</div>
+              <div class="room on"><i class="ti ti-check"></i> Mantenimiento / SST</div>
+              <div class="room on"><i class="ti ti-check"></i> Contabilidad (ind. financieros)</div>
+              <div class="room on"><i class="ti ti-check"></i> Gerencia / Comités</div>
+              <div class="room off"><i class="ti ti-minus"></i> Comercial (sin diligenciar desde feb-2025)</div>
+            </div>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona asistencial</div>
+            <div class="rooms">
+              <div class="room on"><i class="ti ti-check"></i> Servicio Farmacéutico (equipo biomédico)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Hospitalización</div>
+              <div class="room off"><i class="ti ti-minus"></i> Consulta externa</div>
+              <div class="room off"><i class="ti ti-minus"></i> Enfermería</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="idrow">
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-user-cog"></i> Doliente interno</div>
+            <div class="person">
+              <div class="avatar">CL</div>
+              <div><div class="pn">Claudia Lema</div><div class="pr">Subgerente Administrativa · superadmin (usuarios facturables)</div></div>
+            </div>
+            <div class="person">
+              <div class="avatar">JR</div>
+              <div><div class="pn">Juan Esteban Román</div><div class="pr">Talento Humano · superadmin (colaboradores)</div></div>
+            </div>
+            <div class="kp"><i class="ti ti-alert-triangle"></i> Conocimiento concentrado + dependencia del proveedor</div>
+          </div>
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-users"></i> Usuarios activos vigentes</div>
+            <div class="ucount">13 usuarios <small style="font-size:11px;font-weight:normal;color:var(--muted)">(10 base + 3 adicionales)</small></div>
+            <div class="ucap">Confirmado por contrato: la mensualidad base incluye 10 usuarios y en may-2024 se adquirieron 3 adicionales ($25.932 c/u). Coincide con los ~13 líderes con usuario activo reportados en la entrevista. El alta y la baja son 100% manuales (sin cargue masivo). Además, los flujos admiten usuarios externos solo por correo (con token), sin licencia.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · PROVEEDOR / CONTRATO / COSTO -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-businessplan"></i><b>Proveedor, contrato y costo</b><span>BLOQUE B</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-k">Costo mensual (contrato)</div><div class="metric-v">$925.407 <small>COP + IVA</small></div></div>
+        <div class="metric"><div class="metric-k">Inversión única histórica</div><div class="metric-v">≈ $10,2M <small>COP</small></div></div>
+        <div class="metric"><div class="metric-k">Modalidad</div><div class="metric-v">SaaS <small>nube adm.</small></div></div>
+        <div class="metric"><div class="metric-k">Vigencia desde</div><div class="metric-v">Sep 2021</div></div>
+      </div>
+      <div class="note"><b>Costo validado contra contrato — corrige el inventario.</b> La mensualidad documentada (anexo AOS240415, may-2024) es <b>$847.611 por 10 usuarios + 1 GB</b>, más <b>$77.796 por 3 usuarios adicionales</b> = <b>$925.407/mes</b>, sin IVA ni gigas extra. El inventario registraba $1.354.000/mes: la diferencia (≈ $428.593) está <b>por conciliar</b> — probablemente IVA (19%), almacenamiento adicional (1 GB de base es muy poco para hojas de vida con adjuntos y exámenes) y/o ajustes de IPC 2025–2026. <b>Inversión única acumulada ≈ $10.200.000:</b> implementación del flujo principal ($800.000), dashboard de 53 indicadores en Google Data Studio ($5.600.000) y 5 flujos a la medida —planes de mejora, novedades, mantenimiento, compras y eventos adversos— ($3.800.000).</div>
+      <div class="dl">
+        <div class="dl-row"><div class="dl-k">Proveedor</div><div class="dl-v"><b>Apropia Open Source S.A.S.</b> (Medellín; partner de AWS, miembro de FEDESOFT). Contratado por <b>Promotora Pinares S.A.</b> — NIT 900.551.957, firma Oscar Andrés Correa Rico. Contactos: <b>Ana María Rojas Molina</b> (Gerente General — la "ing. Ana" de las actas) y Ludwig David Zuluaga Botero (Fundador/CEO).</div></div>
+        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v"><b>SaaS en nube administrada por el proveedor</b> (partner AWS), uptime garantizado 99.9%, backups automáticos de los últimos 30 días + mensuales. <b>Matiz clave:</b> la app corre en nube administrada, pero la <b>capa de indicadores se montó aparte en Google Sheets + Looker/Data Studio</b> (proyecto AOS211116). <span class="pill pill-r">Esa capa, desalineada con M365</span></div></div>
+        <div class="dl-row"><div class="dl-k">Tipo de licencia</div><div class="dl-v">Mensualidad SaaS por 10 usuarios base + $25.932/usuario adicional/mes + $4.000/GB adicional/mes. Pagos 100% anticipados, facturas a 30 días, exento de IVA en propuesta (se adiciona aparte). <b>Incluye flujos ilimitados creados por el cliente</b> (ver Bloque D).</div></div>
+        <div class="dl-row"><div class="dl-k">Vigencia / terminación</div><div class="dl-v">Servicio activo desde sep 2021 (AOS211008), con ampliaciones en nov-2021, ene-2022 y may-2024. <span class="pill pill-y">Cláusula de terminación y portabilidad de datos: por confirmar</span> — los anexos revisados son propuestas comerciales aceptadas, no el contrato marco firmado.</div></div>
+        <div class="dl-row"><div class="dl-k">Soporte y SLA</div><div class="dl-v">Tickets vía email con respuesta máx. <b>48 h hábiles</b>, solo <b>2 contactos autorizados</b> (mismo cuello de botella de Doctus). Gerente de cuenta con <b>hasta 5 h/semana</b> para implementar flujos y asesorar. SLA: compensación del 10–30% del pago mensual si la disponibilidad baja del 99.89%. 2FA opcional para admins + huella de auditoría.</div></div>
+      </div>
+    </div>
+
+    <!-- C · CONFIGURACIÓN TÉCNICA Y DATOS -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-settings-cog"></i><b>Configuración técnica y datos</b><span>BLOQUE C</span></div>
+      <div class="dl" style="margin-bottom:6px">
+        <div class="dl-row"><div class="dl-k">Roles y permisos</div><div class="dl-v"><span class="pill pill-g">Superadmins definidos</span> <span class="pill pill-r">Gobierno de datos débil</span> &nbsp;Dos superadministradores (Claudia Lema y Juan Esteban Román) más el admin externo del proveedor. Según la <b>matriz de responsabilidades del contrato</b>, la gestión de usuarios, autenticación, perfiles y permisos es <b>responsabilidad del cliente</b> (Apropia responde por software, BD, servidores e infraestructura). La capa de indicadores en el Drive con <b>enlace abierto sin controles</b> es, por tanto, una falla de gobierno interna — no del proveedor.</div></div>
+      </div>
+
+      <div class="gh"><span class="num">1</span> ¿Permite integraciones?</div>
+      <div class="box" style="padding:11px 14px;font-size:12.5px">
+        <span class="pill pill-g">Sí — API extensible</span> &nbsp;<span style="color:var(--muted)">El contrato confirma una <b>API extensible para enviar/recibir datos de sistemas externos (ERP, CRM, etc.)</b>. PERO las integraciones a terceros y los desarrollos a la medida están <b>explícitamente excluidos</b> del alcance contratado: se cotizan y pagan aparte. No hay integración con M365 hoy.</span>
+      </div>
+
+      <div class="gh"><span class="num">2</span> Integraciones activas y vigentes</div>
+      <div class="box">
+        <div class="intg-row"><span class="dot a"></span><span class="nm">Luxflow → Google Sheets → Looker Studio</span><span class="ds">Los datos de los indicadores se cargan manualmente en tablas de Google Sheets y se grafican en Looker Studio; esas hojas se diligencian a mano, solo para los indicadores</span></div>
+        <div class="intg-row"><span class="dot r"></span><span class="nm">Luxflow ✗ Microsoft 365</span><span class="ds">Sin integración — la clínica ya migró a M365 pero la capa de indicadores sigue en Google</span></div>
+      </div>
+
+      <div class="gh"><span class="num">3</span> Integraciones convenientes (recomendadas)</div>
+      <div class="conv">
+        <div><i class="ti ti-plug-connected"></i> <span><b>Datos y tableros → Excel/SharePoint + Power BI</b> — mover la capa de datos e indicadores al ecosistema Microsoft ya pagado; victoria de bajo riesgo que recupera gobierno y elimina las cuentas Google no corporativas.</span></div>
+        <div><i class="ti ti-plug-connected"></i> <span><b>Base madre única de colaboradores</b> — sincronizar el perfil sociodemográfico (D-066) con Luxflow para eliminar la doble digitación y homologar campos.</span></div>
+      </div>
+
+      <!-- PAGADO VS USADO -->
+      <div class="usepanel">
+        <div class="usepanel-h">
+          <div class="uh-left"><i class="ti ti-coin"></i><div><div class="uh-title">Pagado vs. realmente usado</div><div class="uh-sub">Capacidad de la plataforma que la clínica no aprovecha</div></div></div>
+          <div class="uh-stat"><div class="uh-num">7 / 13</div><div class="uh-num-lbl">módulos en uso real</div></div>
+        </div>
+        <div class="use-bar"><div class="u" style="width:54%"></div><div class="n" style="width:46%"></div></div>
+        <div class="use-leg"><span><span class="lg" style="background:var(--green)"></span> En uso (7)</span><span><span class="lg" style="background:var(--coral)"></span> Pagado y sin aprovechar (6)</span></div>
+        <div class="use-cols">
+          <div class="use-col">
+            <div class="uc-h good"><i class="ti ti-circle-check"></i> En uso</div>
+            <ul class="uc-list">
+              <li><i class="ti ti-check"></i><span>Gestión de colaboradores y estructura organizacional</span></li>
+              <li><i class="ti ti-check"></i><span>Reportes de novedades de TH (vacaciones, permisos, incapacidades)</span></li>
+              <li><i class="ti ti-check"></i><span>Indicadores institucionales y financieros que sí se diligencian (tablas en Google Sheets → Looker Studio)</span></li>
+              <li><i class="ti ti-check"></i><span>Indicadores automáticos (derivados de los flujos)</span></li>
+              <li><i class="ti ti-check"></i><span>Flujo de Mejora Continua / planes de mejora</span></li>
+              <li><i class="ti ti-check"></i><span>Flujo de Mantenimiento</span></li>
+              <li><i class="ti ti-check"></i><span>Flujo de Compras</span></li>
+            </ul>
+          </div>
+          <div class="use-col lost">
+            <div class="uc-h bad"><i class="ti ti-circle-x"></i> Pagado y sin aprovechar</div>
+            <ul class="uc-list bad">
+              <li><i class="ti ti-x"></i><span><b>Indicadores comerciales</b> — parte del dashboard pagado ($5.600.000), pero sin diligenciar desde feb-2025</span></li>
+              <li><i class="ti ti-x"></i><span><b>Flujo de eventos adversos e incidentes</b> (protocolo de Londres) — pagado $600.000 en 2022, sin rastro de uso</span></li>
+              <li><i class="ti ti-x"></i><span><b>Flujo de Talento Humano completo</b> — solo se usa la requisición; el resto de la cadena no se conoce</span></li>
+              <li><i class="ti ti-x"></i><span><b>Módulo de terceros / proveedores</b> — quedó en beta, sin aprobar</span></li>
+              <li><i class="ti ti-x"></i><span><b>Subflujo 'pendientes entre líderes'</b> — reemplazado por correo y WhatsApp</span></li>
+              <li><i class="ti ti-x"></i><span><b>Creación de flujos por el cliente</b> — incluida en contrato (ilimitada), pero nadie en la clínica la ejerce</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="usenote">Más de $10M en pagos únicos invertidos; el dashboard se usa a medias (los indicadores comerciales llevan sin diligenciar desde feb-2025) y varios módulos pagados —eventos adversos, cadena de TH, módulo de terceros— no se aprovechan. El problema es de adopción, conocimiento y gobierno, no de capacidad técnica.</div>
+      </div>
+    </div>
+
+    <!-- D · DIAGNÓSTICO DEL CONSULTOR -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-stethoscope"></i><b>Diagnóstico del consultor</b><span>BLOQUE D</span></div>
+      <div class="twocol">
+        <div class="col good">
+          <h4><i class="ti ti-thumb-up"></i> Fortalezas</h4>
+          <ul>
+            <li><i class="ti ti-check"></i> Cumple para lo que está pensada y funciona correctamente</li>
+            <li><i class="ti ti-check"></i> Reunió en un solo lugar necesidades que antes vivían dispersas: indicadores, compras, requisición, flujos de mejora, vacaciones y comités</li>
+            <li><i class="ti ti-check"></i> Lo que de verdad usan los empleados sí aporta: solicitud de compras, solicitud de vacaciones y pendientes de comité</li>
+            <li><i class="ti ti-check"></i> Base técnica sólida: nube administrada con SLA y backups, API extensible y operación desde el móvil</li>
+          </ul>
+        </div>
+        <div class="col bad">
+          <h4><i class="ti ti-thumb-down"></i> Debilidades</h4>
+          <ul>
+            <li><i class="ti ti-x"></i> Plataforma "de retazos": se fue construyendo en el tiempo para resolver necesidades aisladas, sin un diseño integral</li>
+            <li><i class="ti ti-x"></i> Se construyó cuando Pinares operaba en Google y, al migrar a Microsoft, no se hizo nada para realinearla</li>
+            <li><i class="ti ti-x"></i> No es fácil de operar; la usabilidad falla en puntos clave (ej. la reactivación manual de tareas que hace Calidad)</li>
+            <li><i class="ti ti-x"></i> Nadie en la clínica domina la herramienta → flujos y funcionalidades sin aprovechar (problema compartido: tampoco hay dolientes/owners definidos, patrón de todos los software de Pinares)</li>
+            <li><i class="ti ti-x"></i> Los indicadores automáticos son gerenciales; las áreas no los usan y no existen indicadores de seguimiento operativos para que los líderes operen con datos</li>
+            <li><i class="ti ti-x"></i> Cara para lo que ofrece (~$1M/mes) con una interfaz y experiencia UI pobres; por ese precio hay opciones bastante mejores</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lbl" style="margin:16px 0 0">Riesgos y alertas asociadas</div>
+      <div class="risks">
+        <div class="risk"><span class="sev s">🔵 Seguridad</span><span><b>Gobierno de datos débil — repositorios con enlace abierto</b> — los datos que alimentan los indicadores residen en un Drive del proveedor con enlace abierto 'sin controles': cualquiera con el vínculo puede editar, sin permisos, versionado ni trazabilidad de cambios.</span></div>
+        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>Desalineación de ecosistema — la capa de indicadores sobre Google, la clínica sobre Microsoft</b> — el dashboard de 53 indicadores se construyó en Google Sheets + Looker/Data Studio porque ese es el stack que el proveedor domina (propuesta AOS211116), no porque Pinares lo eligiera. Hoy esa columna de analítica vive fuera del entorno corporativo, de su gobierno y de las herramientas M365 ya pagadas. Power BI ni siquiera conecta con esos datos y obliga a replicar manualmente la información.</span></div>
+        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>El control de planes y pendientes no cumple su propósito — 337 tareas cerradas por vigencia</b> — una de las funciones centrales de la plataforma es llevar el control exhaustivo de planes de mejora, pendientes de comité, etc. Hoy hay más de 337 tareas cerradas <b>por vencimiento, no por cumplimiento ni cancelación</b>. Pasa porque solo están visibles para la Líder de Calidad y porque hay un claro incumplimiento de tareas asignadas. Es en parte un problema del personal que no cumple, pero también evidencia una falla de la plataforma: no tiene una función/proceso que evite la pérdida de accountability ni que mitigue, desde su propio funcionamiento, el riesgo de incumplimiento de planes de mejoramiento y compromisos de habilitación.</span></div>
+        <div class="risk"><span class="sev op">🟣 Operatividad</span><span><b>Pérdida de conocimiento operativo (dependencia autoinfligida)</b> — la cadena de traspaso (Yunai → Juliana → Juan Esteban) se rompió sin transferencia. El flujo de TH no está validado, el módulo de terceros quedó en beta y no hay documentación del paso a paso. El matiz que revela el contrato: la dependencia <b>no es contractual</b> — incluye capacitación y creación de flujos ilimitada por el cliente, más 5 h/semana de gerente de cuenta; simplemente nadie en la clínica ejerce ese derecho.</span></div>
+        <div class="risk"><span class="sev op">🟣 Operatividad</span><span><b>Doble digitación y aprobaciones mal enrutadas</b> — sin cargue masivo, las altas, bajas y cambios se registran una a una en Luxflow y en paralelo en una hoja externa (perfil D-066) con campos que no coinciden. Si la relación colaborador–líder no se actualiza, las aprobaciones de permisos llegan al jefe equivocado.</span></div>
+        <div class="risk"><span class="sev y">🟡 Estratégica</span><span><b>Capacidad y derechos contratados sin ejercer — ≈ $10M invertidos a media máquina</b> — Pinares pagó ~$10,2M en desarrollos únicos (dashboard de 53 indicadores, 5 flujos, implementación) y una mensualidad que ya incluye flujos ilimitados, capacitación, 5 h/semana de gerente de cuenta y backups. En la práctica: el flujo de TH solo usa la requisición, el de eventos adversos no se usa, el módulo de terceros quedó en beta, el subflujo 'pendientes entre líderes' se reemplaza por correo/WhatsApp, los indicadores comerciales no se diligencian desde feb-2025 y nadie crea flujos. Se paga por autonomía y capacidad que no se aprovechan.</span></div>
+      </div>
+
+      <div class="lbl" style="margin:18px 0 8px">Recomendación</div>
+      <div class="reco">
+        <i class="ti ti-bulb"></i>
+        <div>
+          <span class="badge">Validar la integración a Microsoft y depurar módulos · evaluar reemplazo si la migración no amerita</span>
+          <div class="rh now"><i class="ti ti-bolt"></i> Corto plazo</div>
+          <p>Antes de cualquier decisión grande, entender bien qué tan viable y costosa es la realineación al ecosistema actual:</p>
+          <ul class="reco-list">
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Validar con el proveedor la integración a Microsoft</div><div class="rl-d">Preguntar si es posible que los datos no vivan en Google Sheets sino en Excel, y que no se grafiquen en Looker Studio sino en Power BI. Entender la complejidad real de esa necesidad antes de cotizar.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Auditar y depurar los módulos desarrollados que no se usan</div><div class="rl-d">Entender el estado y el porqué de cada uno (cadena de TH, eventos adversos, módulo de terceros) y tomar a nivel gerencial la decisión de activarlos o descartarlos definitivamente.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Definir un plan de capacitación</div><div class="rl-d">Como medida de corto y mediano plazo, para que la clínica gane dominio de la herramienta y deje de depender del proveedor por desconocimiento.</div></div></li>
+          </ul>
+          <div class="rh mid"><i class="ti ti-route"></i> Mediano plazo</div>
+          <p>Si el costo de migrar los datos a Excel/Power BI resulta alto y no amerita seguir invirtiendo en una plataforma con interfaz y experiencia limitadas, <b>sí podría ser conveniente construir o migrar a algo más moderno</b>, mucho más útil visual y funcionalmente. Implicaría un costo inicial adicional, pero manteniendo un costo mensual similar se obtendría una plataforma más estructurada y mejor pensada, a partir de las necesidades y hallazgos ya identificados en esta consultoría.</p>
+          <div class="warn-line"><b>Advertencia del consultor:</b> la dependencia del proveedor por no saber usar la herramienta es injustificable. Cualquier reemplazo que se haga sin antes definir un doliente/owner interno y un plan de capacitación reproducirá exactamente el mismo problema en una plataforma nueva y, probablemente, más cara.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>Vena Digital</b> · Diagnóstico tecnológico — Clínica Pinares</span>
+    <span>Ficha de software · Fase 1 — Inventario · fuentes: actas Luxflow (01-jun), SST (14-may), Calidad (20-may), Comercial (14-may) + propuestas/anexos Apropia AOS211008, AOS211116, AOS220127_1, AOS240415</span>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

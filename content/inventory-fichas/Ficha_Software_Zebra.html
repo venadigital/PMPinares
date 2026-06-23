@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de software — Zebra · Clínica Pinares</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+:root{--navy:#0A2142;--coral:#FF6B5E;--yellow:#F5C935;--muted:#5B6675;--line:#E4E7EC;--green:#1D9E75;--amber:#EF9F27;--red:#E24B4A;--blue:#185FA5;--purple:#534AB7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy);line-height:1.5;padding:24px}
+.wrap{max-width:880px;margin:0 auto}
+.fp-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.fp-head{background:var(--navy);color:#fff;padding:22px 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.fp-eyebrow{font-size:11px;letter-spacing:.14em;color:#9FB2CC}
+.fp-name{font-size:34px;font-weight:bold;line-height:1.1;margin-top:4px}
+.fp-sub{font-size:13px;color:#C7D3E4;margin-top:6px;max-width:450px}
+.fp-meta{text-align:right;font-size:12px;color:#C7D3E4;line-height:1.7}
+.fp-tag{display:inline-block;background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:bold;letter-spacing:.06em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:12px;font-weight:bold;padding:5px 11px;border-radius:20px}
+.chip-coral{background:var(--coral);color:#fff}
+.body{padding:22px 26px 8px}
+.tablero{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ind{border:1px solid var(--line);border-radius:12px;padding:14px}
+.ind-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:bold;letter-spacing:.03em}
+.ind-top i{font-size:18px}
+.meter{display:flex;gap:5px;margin:11px 0 8px}
+.seg{height:9px;flex:1;border-radius:5px;background:var(--line)}
+.seg.g{background:var(--green)}.seg.r{background:var(--red)}.seg.a{background:var(--amber)}
+.ind-val{font-size:19px;font-weight:bold}
+.ind-note{font-size:11px;color:var(--muted);margin-top:2px}
+.sens{display:flex;gap:12px;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;margin-top:18px}
+.sens i{font-size:26px;color:var(--yellow)}
+.sens b{display:block;font-size:13px;margin-bottom:3px}
+.sens span{font-size:12px;color:#C7D3E4}
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:9px;border-left:4px solid var(--coral);padding-left:11px;margin-bottom:13px}
+.sec-h .ti{font-size:20px;color:var(--coral)}
+.sec-h b{font-size:16px;letter-spacing:.02em}
+.sec-h span{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-left:2px}
+.panel-a{background:#FCF6F4;border:1px solid #F3D9CF;border-radius:14px;padding:16px}
+.purpose{margin-bottom:14px}
+.purpose-h{font-size:12.5px;font-weight:bold;color:var(--coral);margin-bottom:9px}
+.purpose-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px}
+.purpose-list li{font-size:12.5px;display:flex;gap:8px;align-items:flex-start}
+.purpose-list li i{color:var(--coral);font-size:15px;flex:none;margin-top:1px}
+.purpose-tag{font-size:12px;font-weight:bold;margin-top:11px;color:var(--navy)}
+.map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.map-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#F7F9FB;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:bold;color:var(--navy)}
+.map-h .ti{color:var(--coral);margin-right:5px}
+.map-leg{font-weight:normal;color:var(--muted);display:flex;align-items:center;gap:12px}
+.map-leg span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:11px;height:11px;border-radius:3px;display:inline-block}
+.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}
+.map-band{padding:11px 14px}
+.map-band+.map-band{border-top:1px dashed var(--line)}
+.band-t{font-size:11px;font-weight:bold;letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.room{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:bold;padding:9px 11px;border-radius:9px;border:1px solid}
+.room i{font-size:15px;flex:none}
+.room.on{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.room.off{background:#F4F3EE;border-color:#D3D1C7;color:#7d7c75}
+.idrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.icard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.ic-h{font-size:11.5px;font-weight:bold;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.ic-h i{font-size:16px;color:var(--coral)}
+.person{display:flex;align-items:center;gap:11px}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;flex:none}
+.pn{font-size:13px;font-weight:bold}
+.pr{font-size:11.5px;color:var(--muted)}
+.kp{display:inline-flex;align-items:center;gap:5px;background:#FCEBEB;color:#A32D2D;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:6px;margin-top:11px}
+.ucount{font-size:18px;font-weight:bold;color:var(--navy)}
+.ucap{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+.metric{background:#F7F9FB;border-radius:10px;padding:12px}
+.metric-k{font-size:11px;color:var(--muted);font-weight:bold}
+.metric-v{font-size:17px;font-weight:bold;margin-top:3px}
+.metric-v small{font-size:11px;color:var(--muted);font-weight:normal}
+.note{font-size:11px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.note b{color:var(--navy)}
+.dl{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dl-row{display:grid;grid-template-columns:160px 1fr;border-top:1px solid var(--line)}
+.dl-row:first-child{border-top:none}
+.dl-k{background:#F7F9FB;padding:11px 14px;font-size:12px;font-weight:bold;color:var(--muted)}
+.dl-v{padding:11px 14px;font-size:13px}
+.pill{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;display:inline-block}
+.pill-y{background:#FBF1CF;color:#7a5b00}
+.pill-r{background:#FCEBEB;color:#A32D2D}
+.pill-g{background:#E1F5EE;color:#0F6E56}
+.lbl{font-size:12px;font-weight:bold;color:var(--muted)}
+.gh{font-size:11.5px;font-weight:bold;color:var(--muted);margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.gh .num{width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.box{border:1px solid var(--line);border-radius:12px;padding:4px 14px}
+.intg-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.intg-row:first-child{border-top:none}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.g{background:var(--green)}.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+.intg-row .nm{font-weight:bold;min-width:185px}
+.intg-row .ds{color:var(--muted)}
+.conv{display:flex;flex-direction:column;gap:7px}
+.conv div{font-size:12.5px;display:flex;gap:8px}
+.conv i{color:var(--coral);font-size:16px;flex:none;margin-top:1px}
+.conv b{color:var(--navy)}
+.pend-panel{border:1px solid #F6D98A;background:#FFFAED;border-radius:14px;padding:14px 16px;margin-top:16px}
+.pend-h{font-size:13px;font-weight:bold;color:#7a5b00;display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.pend-h i{font-size:19px;color:var(--amber)}
+.pend-items{display:flex;flex-direction:column;gap:8px}
+.pend-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #F6E3B0;border-radius:10px;padding:10px 12px;font-size:12.5px}
+.pend-item i{font-size:16px;color:var(--amber);flex:none;margin-top:1px}
+.pend-item span b{color:var(--navy)}
+.usepanel{border:1px solid #F0997B;background:#FFFAF8;border-radius:14px;padding:16px;margin-top:18px}
+.usepanel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.uh-left{display:flex;align-items:center;gap:11px}
+.uh-left>i{font-size:27px;color:var(--coral)}
+.uh-title{font-size:14px;font-weight:bold}
+.uh-sub{font-size:11.5px;color:var(--muted)}
+.uh-stat{text-align:right}
+.uh-num{font-size:30px;font-weight:bold;color:var(--coral);line-height:1}
+.uh-num-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.use-bar{display:flex;height:24px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.use-bar .u{background:var(--green)}
+.use-bar .n{background:var(--coral)}
+.use-leg{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.use-leg span{display:inline-flex;align-items:center;gap:6px}
+.use-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.use-col{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.use-col.lost{background:#FCF1EE;border-color:#F3D9CF}
+.uc-h{font-size:12px;font-weight:bold;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.uc-h.good{color:var(--green)}.uc-h.bad{color:#993C1D}
+.uc-h i{font-size:16px}
+.uc-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.uc-list li{font-size:12px;display:flex;gap:7px;align-items:flex-start}
+.uc-list li i{font-size:15px;flex:none;margin-top:1px;color:var(--green)}
+.uc-list.bad li i{color:var(--coral)}
+.uc-list.bad b{color:#993C1D}
+.usenote{font-size:11px;color:var(--muted);margin-top:11px;font-style:italic}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.col h4{font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.col.good h4{color:var(--green)}.col.bad h4{color:var(--red)}
+.col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.col li{font-size:12px;display:flex;gap:7px;line-height:1.45}
+.col li i{font-size:15px;flex:none;margin-top:1px}
+.col.good li i{color:var(--green)}.col.bad li i{color:var(--red)}
+.risks{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.risk{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;line-height:1.45}
+.sev{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;flex:none;white-space:nowrap}
+.sev.r{background:#FCEBEB;color:#A32D2D}
+.sev.o{background:#FBE6D8;color:#993C1D}
+.sev.s{background:#E6F1FB;color:#0C447C}
+.sev.op{background:#EEEDFE;color:#3C3489}
+.sev.y{background:#FBF1CF;color:#7a5b00}
+.reco{display:flex;gap:13px;background:#FFF6E9;border:1px solid var(--yellow);border-radius:12px;padding:15px 17px;margin-top:6px}
+.reco>i{font-size:26px;color:var(--amber)}
+.reco .badge{display:inline-block;background:var(--navy);color:#fff;font-size:12px;font-weight:bold;padding:3px 11px;border-radius:7px;margin-bottom:9px}
+.reco p{font-size:12.5px}
+.reco .rh{font-size:12px;font-weight:bold;margin:9px 0 3px;display:flex;align-items:center;gap:6px}
+.reco .rh.now{color:var(--green)}
+.reco .rh.mid{color:var(--coral)}
+.reco .warn-line{font-size:11.5px;color:#993C1D;background:#FCF1EE;border-radius:8px;padding:8px 10px;margin-top:9px}
+.reco-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin:7px 0 0}
+.reco-list li{display:flex;gap:9px;align-items:flex-start}
+.reco-list li>i{color:var(--amber);font-size:15px;flex:none;margin-top:2px}
+.reco-list .rl-t{font-size:12px;font-weight:bold;line-height:1.4}
+.reco-list .rl-d{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:24px;padding:16px 26px;color:var(--muted);font-size:11px}
+.foot b{color:var(--navy)}
+@media(max-width:640px){.tablero,.metrics,.twocol,.idrow,.use-cols,.purpose-list,.dl-row{grid-template-columns:1fr}}
+@media print{.fp-card{break-inside:auto}.ind,.room,.icard,.col,.risk,.reco,.sens,.map,.usepanel,.use-col,.pend-panel,.pend-item{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fp-card">
+
+  <!-- ENCABEZADO -->
+  <div class="fp-head">
+    <div>
+      <div class="fp-eyebrow">FICHA DE SOFTWARE</div>
+      <div class="fp-name">Zebra</div>
+      <div class="fp-sub">Impresora física de manillas y etiquetas, con software de impresión en PC — Proveedor: Zebra Technologies. Hardware + software local, gestionado por Enfermería.</div>
+      <div class="chips">
+        <span class="chip chip-coral">Identificación de pacientes · Periférico</span>
+      </div>
+    </div>
+    <div class="fp-meta">
+      <div class="fp-tag">F1 · INVENTARIO</div>
+      <div>Ficha FP-02</div>
+      <div>22 jun 2026</div>
+      <div>Laura Salazar — Vena Digital</div>
+      <div>Base: Acta Coord. Administrativa (25 may–1 jun) · Inventario F1</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- TABLERO VISUAL -->
+    <div class="tablero">
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-trending-up"></i> Adopción</div>
+        <div class="meter"><span class="seg g"></span><span class="seg g"></span><span class="seg"></span></div>
+        <div class="ind-val">Media</div>
+        <div class="ind-note">Operativa y en uso por Enfermería, pero sin la integración con SIIS: los datos se digitan a mano.</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-activity-heartbeat"></i> Criticidad operativa</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg"></span><span class="seg"></span></div>
+        <div class="ind-val">Media</div>
+        <div class="ind-note">La manilla es elemento de seguridad del paciente; si se cae, la identificación en hospitalización se ve afectada, pero existen mitigantes manuales.</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-alert-triangle"></i> Nivel de riesgo</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg"></span><span class="seg"></span></div>
+        <div class="ind-val">Medio</div>
+        <div class="ind-note">2 alertas: digitación manual de las manillas y desconfiguración recurrente del equipo (~4/año).</div>
+      </div>
+    </div>
+
+    <!-- DATOS SENSIBLES -->
+    <div class="sens">
+      <i class="ti ti-shield-lock"></i>
+      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Imprime manillas de identificación con datos personales del paciente (nombre, identificación) y etiquetas que pueden referir medicamentos, sustancias químicas y pertenencias. Aplica Ley 1581 de 2012 (habeas data) y los lineamientos de identificación segura del paciente. La manilla impresa es trazabilidad clínica directa.</span></div>
+    </div>
+
+    <!-- A · IDENTIFICACIÓN -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-id"></i><b>Identificación y propósito</b><span>BLOQUE A</span></div>
+      <div class="panel-a">
+        <div class="purpose">
+          <div class="purpose-h">Para qué se usa</div>
+          <ul class="purpose-list">
+            <li><i class="ti ti-chevron-right"></i> Impresión de manillas de identificación de pacientes</li>
+            <li><i class="ti ti-chevron-right"></i> Etiquetas de unidosis</li>
+            <li><i class="ti ti-chevron-right"></i> Etiquetas de sustancias químicas</li>
+            <li><i class="ti ti-chevron-right"></i> Etiquetas de pertenencias del paciente</li>
+          </ul>
+        </div>
+
+        <!-- MAPA DE USO -->
+        <div class="map">
+          <div class="map-h">
+            <span><i class="ti ti-map-2"></i>Mapa de uso — Clínica Pinares</span>
+            <span class="map-leg"><span><span class="lg coral"></span> Usa Zebra</span><span><span class="lg gray"></span> No usa</span></span>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona asistencial</div>
+            <div class="rooms" style="grid-template-columns:repeat(2,1fr)">
+              <div class="room on"><i class="ti ti-check"></i> Enfermería / Hospitalización</div>
+              <div class="room on"><i class="ti ti-check"></i> Farmacia (unidosis)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Laboratorio</div>
+            </div>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona administrativa</div>
+            <div class="rooms" style="grid-template-columns:repeat(2,1fr)">
+              <div class="room off"><i class="ti ti-minus"></i> Recepción (responsable anterior)</div>
+              <div class="room off"><i class="ti ti-minus"></i> Admisiones / Archivo</div>
+              <div class="room off"><i class="ti ti-minus"></i> Facturación</div>
+              <div class="room on"><i class="ti ti-check"></i> Soporte técnico — OCTUS (externo)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="idrow">
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-user-cog"></i> Doliente interno</div>
+            <div class="person">
+              <div class="avatar">EN</div>
+              <div><div class="pn">Enfermería</div><div class="pr">Responsable operativo (la gestión pasó de Recepción a Enfermería)</div></div>
+            </div>
+            <div class="ucap" style="margin-top:11px">Administración técnica / reconfiguración: <b>OCTUS</b> (proveedor TI externo).</div>
+          </div>
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-users"></i> Usuarios activos vigentes</div>
+            <div class="ucount">Personal de Enfermería</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · PROVEEDOR, CONTRATO Y COSTO -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-businessplan"></i><b>Proveedor, contrato y costo</b><span>BLOQUE B</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-k">Costo mensual</div><div class="metric-v">$0 <small>sin costo recurrente</small></div></div>
+        <div class="metric"><div class="metric-k">Costo anual</div><div class="metric-v">$0 <small>sin costo recurrente</small></div></div>
+        <div class="metric"><div class="metric-k">Modalidad</div><div class="metric-v">Hardware + SW local</div></div>
+        <div class="metric"><div class="metric-k">Vigencia desde</div><div class="metric-v"><span class="pill pill-y">Por confirmar</span></div></div>
+      </div>
+      <div class="note"><b>⚠ Sin contrato entregado al proceso de consultoría.</b> El inventario F1 registra Zebra como <b>"sin costo activo"</b> (compra de hardware, sin licencia mensual). No se entregó contrato, factura, garantía ni datos de contacto del proveedor, por lo que no es posible validar costo de adquisición, vigencia de garantía ni condiciones de soporte. Todo lo de este bloque queda como dato a levantar.</div>
+      <div class="dl">
+        <div class="dl-row"><div class="dl-k">Proveedor</div><div class="dl-v">Zebra Technologies (fabricante del equipo). <span class="pill pill-y">Razón social, NIT y canal de compra por confirmar</span></div></div>
+        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v">Impresora física + software de impresión instalado en PC local (on-premise). No es SaaS.</div></div>
+        <div class="dl-row"><div class="dl-k">Tipo de licencia</div><div class="dl-v">Sin costo recurrente; presumiblemente compra única del equipo.</div></div>
+        <div class="dl-row"><div class="dl-k">Vigencia / terminación</div><div class="dl-v"><span class="pill pill-y">Por confirmar</span> — no hay documento contractual.</div></div>
+        <div class="dl-row"><div class="dl-k">Soporte y dependencia</div><div class="dl-v">El soporte y la reconfiguración los ejecuta <b>OCTUS</b> (proveedor TI externo), no el fabricante. El equipo se desconfigura ~4 veces al año y cada evento depende de OCTUS.</div></div>
+      </div>
+    </div>
+
+    <!-- C · CONFIGURACIÓN TÉCNICA Y DATOS -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-settings-cog"></i><b>Configuración técnica y datos</b><span>BLOQUE C</span></div>
+      <div class="dl" style="margin-bottom:6px">
+        <div class="dl-row"><div class="dl-k">Roles y permisos</div><div class="dl-v">Operación a cargo de Enfermería; reconfiguración técnica en manos de OCTUS. No se documentó un esquema formal de roles/permisos sobre el software de impresión. <span class="pill pill-y">Por confirmar</span></div></div>
+      </div>
+
+      <div class="gh"><span class="num">1</span> ¿Permite integraciones?</div>
+      <div class="box" style="padding:11px 14px;font-size:12.5px">
+        <span class="pill pill-g">Sí</span> &nbsp;<span style="color:var(--muted)">SIIS cuenta con un módulo de impresión directa hacia Zebra (precarga de datos del paciente desde la historia clínica). La capacidad existe pero no se ha activado.</span>
+      </div>
+
+      <div class="gh"><span class="num">2</span> Integraciones activas y vigentes</div>
+      <div class="box" style="padding:11px 14px;font-size:12.5px;color:var(--muted)">
+        Actualmente no hay integraciones activas. Los datos de las manillas y etiquetas se digitan manualmente en el software del PC.
+      </div>
+
+      <div class="gh"><span class="num">3</span> Integraciones convenientes (recomendadas)</div>
+      <div class="conv">
+        <div><i class="ti ti-plug-connected"></i> <span><b>SIIS → Zebra (activar impresión directa)</b> — esta integración nunca ha estado activa; se sugiere <b>activarla</b> para que la manilla salga con los datos del paciente precargados desde la HC, eliminando la digitación manual y el riesgo de error de identificación.</span></div>
+      </div>
+
+      <!-- PAGADO VS USADO -->
+      <div class="usepanel">
+        <div class="usepanel-h">
+          <div class="uh-left"><i class="ti ti-coin"></i><div><div class="uh-title">Capacidad disponible vs. realmente usada</div><div class="uh-sub">Función ya disponible que hoy no se aprovecha</div></div></div>
+          <div class="uh-stat"><div class="uh-num">1 / 2</div><div class="uh-num-lbl">capacidades en uso</div></div>
+        </div>
+        <div class="use-bar"><div class="u" style="width:50%"></div><div class="n" style="width:50%"></div></div>
+        <div class="use-leg"><span><span class="lg" style="background:var(--green)"></span> En uso</span><span><span class="lg" style="background:var(--coral)"></span> Disponible sin aprovechar</span></div>
+        <div class="use-cols">
+          <div class="use-col">
+            <div class="uc-h good"><i class="ti ti-circle-check"></i> En uso</div>
+            <ul class="uc-list">
+              <li><i class="ti ti-check"></i> Impresión de manillas y etiquetas (con captura manual de datos)</li>
+            </ul>
+          </div>
+          <div class="use-col lost">
+            <div class="uc-h bad"><i class="ti ti-circle-x"></i> Disponible y sin aprovechar</div>
+            <ul class="uc-list bad">
+              <li><i class="ti ti-x"></i> <b>Impresión directa desde SIIS</b> — el módulo existe pero nunca se ha activado; obliga a digitar a mano lo que podría precargarse desde la HC.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="usenote">El "dinero dormido" aquí no es la licencia (no la hay): es el reproceso diario y el riesgo clínico de transcribir manualmente la identificación del paciente teniendo la integración ya disponible.</div>
+      </div>
+    </div>
+
+    <!-- D · DIAGNÓSTICO DEL CONSULTOR -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-stethoscope"></i><b>Diagnóstico del consultor</b><span>BLOQUE D</span></div>
+      <div class="twocol">
+        <div class="col good">
+          <h4><i class="ti ti-thumb-up"></i> Fortalezas</h4>
+          <ul>
+            <li><i class="ti ti-check"></i> Operativa y cumpliendo su función básica de identificación e impresión de etiquetas.</li>
+            <li><i class="ti ti-check"></i> Sin costo recurrente: es hardware comprado.</li>
+            <li><i class="ti ti-check"></i> Etiquetas personalizables que cubren varios usos (unidosis, sustancias químicas, pertenencias).</li>
+            <li><i class="ti ti-check"></i> Responsabilidad operativa clara y consolidada en Enfermería.</li>
+          </ul>
+        </div>
+        <div class="col bad">
+          <h4><i class="ti ti-thumb-down"></i> Debilidades</h4>
+          <ul>
+            <li><i class="ti ti-x"></i> Se desconfigura ~4 veces al año y cada reconfiguración depende de OCTUS: la clínica no es autónoma y acumula tiempos muertos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RIESGOS -->
+      <div class="lbl" style="margin:16px 0 0">Riesgos y alertas asociadas</div>
+      <div class="risks">
+        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>Manillas digitadas a mano</b> — al no estar activa la impresión directa desde SIIS, los datos de identificación se transcriben manualmente. La manilla es un elemento de seguridad del paciente: un error de transcripción es un error de identificación clínica.</span></div>
+        <div class="risk"><span class="sev op">🟣 Operatividad</span><span><b>Desconfiguración recurrente + dependencia de OCTUS</b> — el equipo se cae ~4 veces al año y cada reconfiguración pasa por un ticket a OCTUS, con tiempo muerto y costo asociado a una tarea técnica menor.</span></div>
+      </div>
+
+      <!-- RECOMENDACIÓN -->
+      <div class="lbl" style="margin:18px 0 8px">Recomendación</div>
+      <div class="reco">
+        <i class="ti ti-bulb"></i>
+        <div>
+          <span class="badge">Mantener · activar la integración con SIIS</span>
+          <div class="rh now"><i class="ti ti-bolt"></i> Ahora</div>
+          <p>El equipo no es el problema; es barato y funciona. La única prioridad real es eliminar la digitación manual.</p>
+          <ul class="reco-list">
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Activar la impresión directa SIIS → Zebra</div><div class="rl-d">Que los datos del paciente se precarguen desde la historia clínica en la manilla, en lugar de digitarse a mano. Reduce el reproceso diario y el riesgo de error de identificación.</div></div></li>
+          </ul>
+          <div class="warn-line"><b>Advertencia del consultor:</b> conviene verificar el estado real del hardware —fecha de compra, condición física y desgaste de la impresora— para tener una imagen objetiva de su vida útil. Con ese dato se puede proyectar cuándo tocará mantenimiento o reemplazo del equipo, en lugar de reaccionar cada vez que se desconfigura.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>Vena Digital</b> · Diagnóstico tecnológico — Clínica Pinares</span>
+    <span>Ficha de software · F1 Inventario · fuentes: Acta Coord. Administrativa · Inventario F1</span>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

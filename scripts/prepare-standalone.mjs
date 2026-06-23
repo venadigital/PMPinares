@@ -11,12 +11,19 @@ if (!existsSync(standaloneDir)) {
 
 const publicDir = join(root, "public");
 const standalonePublicDir = join(standaloneDir, "public");
+const contentDir = join(root, "content");
+const standaloneContentDir = join(standaloneDir, "content");
 const staticDir = join(root, ".next", "static");
 const standaloneStaticDir = join(standaloneDir, ".next", "static");
 
 if (existsSync(publicDir)) {
   rmSync(standalonePublicDir, { recursive: true, force: true });
   cpSync(publicDir, standalonePublicDir, { recursive: true });
+}
+
+if (existsSync(contentDir)) {
+  rmSync(standaloneContentDir, { recursive: true, force: true });
+  cpSync(contentDir, standaloneContentDir, { recursive: true });
 }
 
 if (existsSync(staticDir)) {

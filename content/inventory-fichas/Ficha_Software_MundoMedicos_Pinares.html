@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de software — Mundo Médicos (Mundomedicos S.A.S.)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+:root{--navy:#0A2142;--coral:#FF6B5E;--yellow:#F5C935;--muted:#5B6675;--line:#E4E7EC;--green:#1D9E75;--amber:#EF9F27;--red:#E24B4A;--blue:#185FA5;--purple:#534AB7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy);line-height:1.5;padding:24px}
+.wrap{max-width:880px;margin:0 auto}
+.fp-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.fp-head{background:var(--navy);color:#fff;padding:24px 26px;display:flex;justify-content:space-between;align-items:stretch;gap:22px;flex-wrap:wrap}
+.fp-head-left{flex:1 1 360px;min-width:0;display:flex;flex-direction:column}
+.fp-eyebrow{font-size:11px;letter-spacing:.14em;color:#9FB2CC}
+.fp-name{font-size:34px;font-weight:bold;line-height:1.1;margin-top:4px}
+.fp-sub{font-size:13px;color:#C7D3E4;margin-top:8px;max-width:430px}
+.fp-meta{flex:0 0 248px;align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:12px;padding:13px 15px;font-size:12px;color:#C7D3E4;line-height:1.45}
+.fp-meta-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.09)}
+.fp-meta-row:first-of-type{border-top:none;padding-top:2px}
+.fp-meta-row .k{color:#9FB2CC;flex:none}
+.fp-meta-row .v{color:#fff;font-weight:bold;text-align:right}
+.fp-meta-src{margin-top:9px;padding-top:10px;border-top:1px solid rgba(255,255,255,.09)}
+.fp-meta-src .k{display:block;color:#9FB2CC;margin-bottom:3px;letter-spacing:.04em}
+.fp-meta-src .v{color:#DCE5F0}
+.fp-tag{display:inline-block;background:rgba(245,201,53,.16);color:var(--yellow);border:1px solid rgba(245,201,53,.35);font-size:11px;font-weight:bold;letter-spacing:.06em;padding:4px 11px;border-radius:6px;margin-bottom:11px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:12px;font-weight:bold;padding:5px 11px;border-radius:20px}
+.chip-coral{background:var(--coral);color:#fff}
+.body{padding:22px 26px 8px}
+.tablero{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ind{border:1px solid var(--line);border-radius:12px;padding:14px}
+.ind-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:bold;letter-spacing:.03em}
+.ind-top i{font-size:18px}
+.meter{display:flex;gap:5px;margin:11px 0 8px}
+.seg{height:9px;flex:1;border-radius:5px;background:var(--line)}
+.seg.g{background:var(--green)}.seg.r{background:var(--red)}.seg.a{background:var(--amber)}
+.ind-val{font-size:19px;font-weight:bold}
+.ind-note{font-size:11px;color:var(--muted);margin-top:2px}
+.sens{display:flex;gap:12px;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;margin-top:18px}
+.sens i{font-size:26px;color:var(--yellow)}
+.sens b{display:block;font-size:13px;margin-bottom:3px}
+.sens span{font-size:12px;color:#C7D3E4}
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:9px;border-left:4px solid var(--coral);padding-left:11px;margin-bottom:13px}
+.sec-h .ti{font-size:20px;color:var(--coral)}
+.sec-h b{font-size:16px;letter-spacing:.02em}
+.sec-h span{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-left:2px}
+.panel-a{background:#FCF6F4;border:1px solid #F3D9CF;border-radius:14px;padding:16px}
+.purpose{margin-bottom:14px}
+.purpose-h{font-size:12.5px;font-weight:bold;color:var(--coral);margin-bottom:9px}
+.purpose-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px}
+.purpose-list li{font-size:12.5px;display:flex;gap:8px;align-items:flex-start}
+.purpose-list li i{color:var(--coral);font-size:15px;flex:none;margin-top:1px}
+.purpose-tag{font-size:12px;font-weight:bold;margin-top:11px;color:var(--navy)}
+.map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.map-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#F7F9FB;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:bold;color:var(--navy)}
+.map-h .ti{color:var(--coral);margin-right:5px}
+.map-leg{font-weight:normal;color:var(--muted);display:flex;align-items:center;gap:12px}
+.map-leg span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:11px;height:11px;border-radius:3px;display:inline-block}
+.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}
+.map-band{padding:11px 14px}
+.map-band+.map-band{border-top:1px dashed var(--line)}
+.band-t{font-size:11px;font-weight:bold;letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.room{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:bold;padding:9px 11px;border-radius:9px;border:1px solid}
+.room i{font-size:15px;flex:none}
+.room.on{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.room.off{background:#F4F3EE;border-color:#D3D1C7;color:#7d7c75}
+.idrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.icard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.ic-h{font-size:11.5px;font-weight:bold;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.ic-h i{font-size:16px;color:var(--coral)}
+.person{display:flex;align-items:center;gap:11px}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;flex:none}
+.pn{font-size:13px;font-weight:bold}
+.pr{font-size:11.5px;color:var(--muted)}
+.kp{display:inline-flex;align-items:center;gap:5px;background:#FCEBEB;color:#A32D2D;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:6px;margin-top:11px}
+.ucount{font-size:18px;font-weight:bold;color:var(--navy)}
+.ucap{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+.metric{background:#F7F9FB;border-radius:10px;padding:12px}
+.metric-k{font-size:11px;color:var(--muted);font-weight:bold}
+.metric-v{font-size:17px;font-weight:bold;margin-top:3px}
+.metric-v small{font-size:11px;color:var(--muted);font-weight:normal}
+.note{font-size:11px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.note b{color:var(--navy)}
+.dl{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dl-row{display:grid;grid-template-columns:160px 1fr;border-top:1px solid var(--line)}
+.dl-row:first-child{border-top:none}
+.dl-k{background:#F7F9FB;padding:11px 14px;font-size:12px;font-weight:bold;color:var(--muted)}
+.dl-v{padding:11px 14px;font-size:13px}
+.pill{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;display:inline-block}
+.pill-y{background:#FBF1CF;color:#7a5b00}
+.pill-r{background:#FCEBEB;color:#A32D2D}
+.pill-g{background:#E1F5EE;color:#0F6E56}
+.lbl{font-size:12px;font-weight:bold;color:var(--muted)}
+.gh{font-size:11.5px;font-weight:bold;color:var(--muted);margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.gh .num{width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.box{border:1px solid var(--line);border-radius:12px;padding:4px 14px}
+.intg-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.intg-row:first-child{border-top:none}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.g{background:var(--green)}.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+.intg-row .nm{font-weight:bold;min-width:185px}
+.intg-row .ds{color:var(--muted)}
+.conv{display:flex;flex-direction:column;gap:7px}
+.conv div{font-size:12.5px;display:flex;gap:8px}
+.conv i{color:var(--coral);font-size:16px;flex:none;margin-top:1px}
+.conv b{color:var(--navy)}
+.pend-panel{border:1px solid #F6D98A;background:#FFFAED;border-radius:14px;padding:14px 16px;margin-top:16px}
+.pend-h{font-size:13px;font-weight:bold;color:#7a5b00;display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.pend-h i{font-size:19px;color:var(--amber)}
+.pend-items{display:flex;flex-direction:column;gap:8px}
+.pend-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #F6E3B0;border-radius:10px;padding:10px 12px;font-size:12.5px}
+.pend-item i{font-size:16px;color:var(--amber);flex:none;margin-top:1px}
+.usepanel{border:1px solid #F0997B;background:#FFFAF8;border-radius:14px;padding:16px;margin-top:18px}
+.usepanel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.uh-left{display:flex;align-items:center;gap:11px}
+.uh-left>i{font-size:27px;color:var(--coral)}
+.uh-title{font-size:14px;font-weight:bold}
+.uh-sub{font-size:11.5px;color:var(--muted)}
+.uh-stat{text-align:right}
+.uh-num{font-size:30px;font-weight:bold;color:var(--coral);line-height:1}
+.uh-num-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.use-bar{display:flex;height:24px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.use-bar .u{background:var(--green)}
+.use-bar .n{background:var(--coral)}
+.use-leg{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.use-leg span{display:inline-flex;align-items:center;gap:6px}
+.use-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.use-col{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.use-col.lost{background:#FCF1EE;border-color:#F3D9CF}
+.uc-h{font-size:12px;font-weight:bold;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.uc-h.good{color:var(--green)}.uc-h.bad{color:#993C1D}
+.uc-h i{font-size:16px}
+.uc-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.uc-list li{font-size:12px;display:flex;gap:7px;align-items:flex-start}
+.uc-list li i{font-size:15px;flex:none;margin-top:1px;color:var(--green)}
+.uc-list.bad li i{color:var(--coral)}
+.uc-list.bad b{color:#993C1D}
+.usenote{font-size:11px;color:var(--muted);margin-top:11px;font-style:italic}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.col h4{font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.col.good h4{color:var(--green)}.col.bad h4{color:var(--red)}
+.col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.col li{font-size:12px;display:flex;gap:7px;line-height:1.45}
+.col li i{font-size:15px;flex:none;margin-top:1px}
+.col.good li i{color:var(--green)}.col.bad li i{color:var(--red)}
+.risks{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.risk{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;line-height:1.45}
+.sev{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;flex:none;white-space:nowrap}
+.sev.r{background:#FCEBEB;color:#A32D2D}
+.sev.o{background:#FBE6D8;color:#993C1D}
+.sev.s{background:#E6F1FB;color:#0C447C}
+.sev.op{background:#EEEDFE;color:#3C3489}
+.sev.y{background:#FBF1CF;color:#7a5b00}
+.pend-panel .pend-item span b{color:var(--navy)}
+.reco{display:flex;gap:13px;background:#FFF6E9;border:1px solid var(--yellow);border-radius:12px;padding:15px 17px;margin-top:6px}
+.reco>i{font-size:26px;color:var(--amber)}
+.reco .badge{display:inline-block;background:var(--navy);color:#fff;font-size:12px;font-weight:bold;padding:3px 11px;border-radius:7px;margin-bottom:9px}
+.reco p{font-size:12.5px}
+.reco .rh{font-size:12px;font-weight:bold;margin:9px 0 3px;display:flex;align-items:center;gap:6px}
+.reco .rh.now{color:var(--green)}
+.reco .rh.mid{color:var(--coral)}
+.reco .warn-line{font-size:11.5px;color:#993C1D;background:#FCF1EE;border-radius:8px;padding:8px 10px;margin-top:9px}
+.reco-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin:7px 0 0}
+.reco-list li{display:flex;gap:9px;align-items:flex-start}
+.reco-list li>i{color:var(--amber);font-size:15px;flex:none;margin-top:2px}
+.reco-list .rl-t{font-size:12px;font-weight:bold;line-height:1.4}
+.reco-list .rl-d{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:24px;padding:16px 26px;color:var(--muted);font-size:11px}
+.foot b{color:var(--navy)}
+@media(max-width:640px){.tablero,.metrics,.twocol,.idrow,.use-cols,.purpose-list,.dl-row{grid-template-columns:1fr}.fp-meta{flex:1 1 100%;align-self:stretch}}
+@media print{.fp-card{break-inside:auto}.ind,.room,.icard,.col,.risk,.reco,.sens,.map,.usepanel,.use-col,.pend-panel,.pend-item{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fp-card">
+
+  <!-- ENCABEZADO -->
+  <div class="fp-head">
+    <div class="fp-head-left">
+      <div class="fp-eyebrow">FICHA DE SOFTWARE</div>
+      <div class="fp-name">Mundo Médicos</div>
+      <div class="fp-sub">Plataforma de gestión de mantenimiento de equipos biomédicos ("APP Ingeniería Clínica") — Proveedor: Mundomedicos S.A.S. Servicio tercerizado por contrato anual; en operación desde nov 2023.</div>
+      <div class="chips">
+        <span class="chip chip-coral">Mantenimiento de equipos biomédicos / Gestión documental</span>
+      </div>
+    </div>
+    <div class="fp-meta">
+      <div class="fp-tag">F1 · INVENTARIO</div>
+      <div class="fp-meta-row"><span class="k">Ficha</span><span class="v">SW-MM-01</span></div>
+      <div class="fp-meta-row"><span class="k">Fecha</span><span class="v">22 jun 2026</span></div>
+      <div class="fp-meta-row"><span class="k">Consultor</span><span class="v">Laura Salazar · Vena Digital</span></div>
+      <div class="fp-meta-src"><span class="k">Fuentes</span><span class="v">Acta Servicio Farmacéutico (20 may 2026) · Contrato 185-2023</span></div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- TABLERO VISUAL -->
+    <div class="tablero">
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-trending-up"></i> Adopción</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg"></span></div>
+        <div class="ind-val">Media</div>
+        <div class="ind-note">Es la fuente única del historial, pero Farmacia mantiene un cronograma paralelo en Excel.</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-activity-heartbeat"></i> Criticidad operativa</div>
+        <div class="meter"><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span><span class="seg"></span></div>
+        <div class="ind-val">Alta</div>
+        <div class="ind-note">Custodia el historial técnico exigido para habilitación y acreditación; su pérdida frena auditorías.</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-alert-triangle"></i> Nivel de riesgo</div>
+        <div class="meter"><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span><span class="seg"></span></div>
+        <div class="ind-val">Alto</div>
+        <div class="ind-note">Sin respaldo local + vigencia contractual por confirmar.</div>
+      </div>
+    </div>
+
+    <!-- DATOS SENSIBLES -->
+    <div class="sens">
+      <i class="ti ti-shield-lock"></i>
+      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Historial técnico de equipos biomédicos: hojas de vida, mantenimientos preventivos y correctivos, certificados de calibración y cronogramas. Información soporte de habilitación (Res. 3100 de 2019), acreditación en salud, tecnovigilancia (INVIMA) y póliza SURA. Su disponibilidad y trazabilidad es requisito normativo de auditoría.</span></div>
+    </div>
+
+    <!-- A · IDENTIFICACIÓN -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-id"></i><b>Identificación y propósito</b><span>BLOQUE A</span></div>
+      <div class="panel-a">
+        <div class="purpose">
+          <div class="purpose-h">Para qué se usa</div>
+          <ul class="purpose-list">
+            <li><i class="ti ti-chevron-right"></i> Programar y registrar mantenimientos preventivos de equipos biomédicos</li>
+            <li><i class="ti ti-chevron-right"></i> Gestionar mantenimientos correctivos (atención pactada en 48 h)</li>
+            <li><i class="ti ti-chevron-right"></i> Consultar el historial y la hoja de vida de cada equipo</li>
+            <li><i class="ti ti-chevron-right"></i> Almacenar certificados de calibración (también llegan por correo en PDF)</li>
+            <li><i class="ti ti-chevron-right"></i> Gestión documental técnica (cláusula 8.9 del contrato)</li>
+            <li><i class="ti ti-chevron-right"></i> Soportar evidencia para acreditación, auditoría y tecnovigilancia</li>
+          </ul>
+        </div>
+
+        <!-- MAPA DE USO -->
+        <div class="map">
+          <div class="map-h">
+            <span><i class="ti ti-map-2"></i>Mapa de uso — Clínica Pinares</span>
+            <span class="map-leg"><span><span class="lg coral"></span> Usa la plataforma</span><span><span class="lg gray"></span> No usa</span></span>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona asistencial</div>
+            <div class="rooms">
+              <div class="room on"><i class="ti ti-check"></i> Servicio Farmacéutico</div>
+              <div class="room off"><i class="ti ti-minus"></i> Enfermería</div>
+              <div class="room off"><i class="ti ti-minus"></i> Hospitalización</div>
+            </div>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona administrativa</div>
+            <div class="rooms">
+              <div class="room off"><i class="ti ti-minus"></i> Mantenimiento / Ing. clínica</div>
+              <div class="room off"><i class="ti ti-minus"></i> Calidad / Acreditación</div>
+              <div class="room off"><i class="ti ti-minus"></i> Contabilidad</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="idrow">
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-user-cog"></i> Doliente interno</div>
+            <div class="person">
+              <div class="avatar">DV</div>
+              <div><div class="pn">Daniela Vázquez</div><div class="pr">Líder Servicio Farmacéutico</div></div>
+            </div>
+          </div>
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-users"></i> Usuarios activos vigentes</div>
+            <div class="ucount">1 <small style="font-size:12px;color:var(--muted);font-weight:normal">usuario por Pinares</small></div>
+            <div class="ucap">El usuario activo por parte de Pinares es la Líder del Servicio Farmacéutico (Daniela Vázquez). El proveedor administra los aspectos técnicos de la plataforma.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · PROVEEDOR, CONTRATO Y COSTO -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-businessplan"></i><b>Proveedor, contrato y costo</b><span>BLOQUE B</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-k">Costo mensual (equivalente)</div><div class="metric-v">~$207.834 <small>COP</small></div></div>
+        <div class="metric"><div class="metric-k">Valor contrato (12 meses)</div><div class="metric-v">$2.494.002 <small>COP · IVA incl.</small></div></div>
+        <div class="metric"><div class="metric-k">Modalidad</div><div class="metric-v">Servicio tercerizado</div></div>
+        <div class="metric"><div class="metric-k">Vigencia desde</div><div class="metric-v">01 nov 2023</div></div>
+      </div>
+      <div class="note"><b>Validado contra el Contrato 185-2023 (no contra el inventario):</b> valor total $2.494.002 IVA incluido por 12 meses, pagado en 2 cuotas ($1.938.629 + $555.373) a la entrega de la documentación y expedición de factura. El mensual es un prorrateo referencial; <b>no es una mensualidad recurrente</b>. <b>No incluye</b> repuestos, implementos ni servicios externos (a cargo de Pinares, facturados aparte y de pago inmediato), ni el traslado de equipos a la sede del contratista para correctivos. Equipos cubiertos: los relacionados en la cotización N° 1640-2023 <span class="pill pill-y">no adjunta — por confirmar</span>.</div>
+      <div class="dl">
+        <div class="dl-row"><div class="dl-k">Proveedor</div><div class="dl-v">Mundomedicos S.A.S. — NIT 901.025.855-7, Cámara de Comercio de Medellín. Rep. legal: Isabel Cristina Rendón Bravo (C.C. 43.759.114, Envigado).</div></div>
+        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v">Plataforma web del proveedor ("APP Ingeniería Clínica"). Calibraciones también enviadas por correo en PDF. <b>Sin instancia ni copia local en Pinares.</b></div></div>
+        <div class="dl-row"><div class="dl-k">Tipo de licencia</div><div class="dl-v">Contrato civil de prestación de servicios (mant. preventivo + correctivo + gestión documental). No es licencia de software recurrente.</div></div>
+        <div class="dl-row"><div class="dl-k">Vigencia / terminación</div><div class="dl-v"><span class="pill pill-r">Vencido en el documento</span> El contrato entregado para la consultoría (185-2023) rige del 01 nov 2023 al 31 oct 2024 (12 meses, 1–2 visitas/año). No hay contratos de 2025 ni 2026 en el expediente y el servicio sigue operando; <b>falta validar si el contrato contempla renovación automática</b>, lo que explicaría su ausencia. Terminación bilateral con aviso de 30 días; mora &gt;60 días suspende servicio, &gt;90 días termina.</div></div>
+        <div class="dl-row"><div class="dl-k">Soporte y dependencia</div><div class="dl-v">Correctivos atendidos dentro de 48 h tras solicitud escrita; garantía de reparaciones por 30 días. Multas por mora: 1% del valor por día (tope 10%). Dependencia alta: acceso, custodia documental y continuidad del historial recaen en el proveedor.</div></div>
+      </div>
+    </div>
+
+    <!-- C · CONFIGURACIÓN TÉCNICA Y DATOS -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-settings-cog"></i><b>Configuración técnica y datos</b><span>BLOQUE C</span></div>
+      <div class="dl" style="margin-bottom:6px">
+        <div class="dl-row"><div class="dl-k">Roles y permisos</div><div class="dl-v">El único usuario con acceso a la plataforma por parte de Pinares es <b>Daniela Vázquez</b>, líder del Servicio Farmacéutico. El resto del acceso y la administración técnica los gestiona el contratista; la cláusula 8.9 obliga a Pinares al "adecuado manejo y conservación de la información" en la app, sin que exista protocolo interno de respaldo ni de baja de accesos.</div></div>
+      </div>
+
+      <div class="gh"><span class="num">1</span> ¿Permite integraciones?</div>
+      <div class="box" style="padding:11px 14px;font-size:12.5px">
+        <span class="pill pill-r">No / por confirmar</span> &nbsp;<span style="color:var(--muted)">La plataforma no expone documentación para integraciones vía API. La información se consulta en la plataforma del proveedor y se recibe por correo en PDF; cualquier respaldo o cruce hoy es manual.</span>
+      </div>
+
+      <div class="gh"><span class="num">2</span> Integraciones activas y vigentes</div>
+      <div class="box">
+        <div class="intg-row"><span class="dot r"></span><span class="nm">Ninguna confirmada</span><span class="ds">El flujo es plataforma del tercero + correo PDF; no hay integración técnica con sistemas de Pinares.</span></div>
+      </div>
+
+      <div class="gh"><span class="num">3</span> Integraciones convenientes (recomendadas)</div>
+      <div class="conv">
+        <div><i class="ti ti-plug-connected"></i> <span><b>Respaldo en los sistemas oficiales de Pinares (SharePoint)</b> — descargar periódicamente de la plataforma y almacenar en SharePoint toda la información necesaria de Calidad y Acreditación —hojas de vida de los equipos, certificados de mantenimiento y calibración— en un repositorio bajo control de Pinares y disponible para auditoría.</span></div>
+      </div>
+
+    </div>
+
+    <!-- D · DIAGNÓSTICO DEL CONSULTOR -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-stethoscope"></i><b>Diagnóstico del consultor</b><span>BLOQUE D</span></div>
+      <div class="twocol">
+        <div class="col good">
+          <h4><i class="ti ti-thumb-up"></i> Fortalezas</h4>
+          <ul>
+            <li><i class="ti ti-check"></i> Proveedor formal y especializado (NIT y Cámara de Comercio), con servicio integral: preventivo + correctivo + calibraciones.</li>
+            <li><i class="ti ti-check"></i> Tiempos de respuesta y garantías pactados por contrato (correctivos 48 h, garantía 30 días) con multas — palancas reales de exigibilidad.</li>
+            <li><i class="ti ti-check"></i> Centraliza el historial técnico en una plataforma y respalda calibraciones por correo en PDF.</li>
+            <li><i class="ti ti-check"></i> Costo bajo y acotado frente a la criticidad normativa que cubre.</li>
+          </ul>
+        </div>
+        <div class="col bad">
+          <h4><i class="ti ti-thumb-down"></i> Debilidades</h4>
+          <ul>
+            <li><i class="ti ti-x"></i> Sin respaldo local del historial: dependencia total del tercero.</li>
+            <li><i class="ti ti-x"></i> Cronograma de mantenimiento duplicado a mano en Excel.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RIESGOS -->
+      <div class="lbl" style="margin:16px 0 0">Riesgos y alertas asociadas</div>
+      <div class="risks">
+        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>Sin respaldo local del historial y custodia documental en manos del tercero</b> — todo el historial de mantenimientos, calibraciones y hojas de vida reside en la plataforma del proveedor, sin copia en los sistemas oficiales de Pinares. La cláusula 8.9 obliga a Pinares a conservar la información, pero el acceso y la custodia dependen del contratista. Ante una caída del servicio, cambio o terminación de la relación, Pinares perdería información crítica para acreditación, auditorías y tecnovigilancia. Es el riesgo central señalado en la entrevista.</span></div>
+      </div>
+
+      <div class="pend-panel">
+        <div class="pend-h"><i class="ti ti-clipboard-list"></i> Pendientes por revisar</div>
+        <div class="pend-items">
+          <div class="pend-item"><i class="ti ti-search"></i><span><b>Renovación del contrato:</b> validar si el contrato 185-2023 contempla cláusula de renovación automática (lo que explicaría la ausencia de contratos 2025/2026) o si requiere renovación / adendo formal tras el 31 oct 2024.</span></div>
+        </div>
+      </div>
+
+      <!-- RECOMENDACIÓN -->
+      <div class="lbl" style="margin:18px 0 8px">Recomendación</div>
+      <div class="reco">
+        <i class="ti ti-bulb"></i>
+        <div>
+          <span class="badge">Mantener el servicio · blindar la información ya</span>
+          <div class="rh now"><i class="ti ti-bolt"></i> Ahora</div>
+          <p>El proveedor y el costo no son el problema; el problema es operar sin red de seguridad. Acciones inmediatas, sin arrepentimiento:</p>
+          <ul class="reco-list">
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Regularizar el contrato</div><div class="rl-d">Validar si el contrato contempla renovación automática; si no, renovar o firmar adendo antes de seguir recibiendo servicio sin cobertura formal de correctivos, garantía y multas.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Implementar respaldo local periódico</div><div class="rl-d">Descargar y archivar en SharePoint el historial, calibraciones y hojas de vida de los equipos. El respaldo no es opcional: es el seguro.</div></div></li>
+          </ul>
+          <div class="warn-line"><b>Advertencia del consultor:</b> el riesgo no es el proveedor, es la dependencia sin copia. Sin respaldo en los sistemas oficiales de Pinares, una caída del servicio o una terminación de la relación deja a la clínica sin el historial que exige la acreditación. El respaldo en SharePoint es el seguro.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>Vena Digital</b> · Diagnóstico tecnológico — Clínica Pinares</span>
+    <span>Ficha de software · F1 Inventario · fuentes: Acta Servicio Farmacéutico (20 may 2026) · Contrato 185-2023 Mundomedicos S.A.S.</span>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

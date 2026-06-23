@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de software — Microsoft 365</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+:root{--navy:#0A2142;--coral:#FF6B5E;--yellow:#F5C935;--muted:#5B6675;--line:#E4E7EC;--green:#1D9E75;--amber:#EF9F27;--red:#E24B4A;--blue:#185FA5;--purple:#534AB7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy);line-height:1.5;padding:24px}
+.wrap{max-width:880px;margin:0 auto}
+.fp-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.fp-head{background:var(--navy);color:#fff;padding:22px 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.fp-eyebrow{font-size:11px;letter-spacing:.14em;color:#9FB2CC}
+.fp-name{font-size:34px;font-weight:bold;line-height:1.1;margin-top:4px}
+.fp-sub{font-size:13px;color:#C7D3E4;margin-top:6px;max-width:470px}
+.fp-meta{text-align:right;font-size:12px;color:#C7D3E4;line-height:1.7}
+.fp-tag{display:inline-block;background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:bold;letter-spacing:.06em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:12px;font-weight:bold;padding:5px 11px;border-radius:20px}
+.chip-coral{background:var(--coral);color:#fff}
+.body{padding:22px 26px 8px}
+.tablero{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ind{border:1px solid var(--line);border-radius:12px;padding:14px}
+.ind-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:bold;letter-spacing:.03em}
+.ind-top i{font-size:18px}
+.meter{display:flex;gap:5px;margin:11px 0 8px}
+.seg{height:9px;flex:1;border-radius:5px;background:var(--line)}
+.seg.g{background:var(--green)}.seg.r{background:var(--red)}.seg.a{background:var(--amber)}
+.ind-val{font-size:19px;font-weight:bold}
+.ind-note{font-size:11px;color:var(--muted);margin-top:2px}
+.sens{display:flex;gap:12px;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;margin-top:18px}
+.sens i{font-size:26px;color:var(--yellow)}
+.sens b{display:block;font-size:13px;margin-bottom:3px}
+.sens span{font-size:12px;color:#C7D3E4}
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:9px;border-left:4px solid var(--coral);padding-left:11px;margin-bottom:13px}
+.sec-h .ti{font-size:20px;color:var(--coral)}
+.sec-h b{font-size:16px;letter-spacing:.02em}
+.sec-h span{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-left:2px}
+.panel-a{background:#FCF6F4;border:1px solid #F3D9CF;border-radius:14px;padding:16px}
+.purpose{margin-bottom:14px}
+.purpose-h{font-size:12.5px;font-weight:bold;color:var(--coral);margin-bottom:9px}
+.purpose-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px}
+.purpose-list li{font-size:12.5px;display:flex;gap:8px;align-items:flex-start}
+.purpose-list li i{color:var(--coral);font-size:15px;flex:none;margin-top:1px}
+.purpose-tag{font-size:12px;font-weight:bold;margin-top:11px;color:var(--navy)}
+.map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.map-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#F7F9FB;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:bold;color:var(--navy)}
+.map-h .ti{color:var(--coral);margin-right:5px}
+.map-leg{font-weight:normal;color:var(--muted);display:flex;align-items:center;gap:12px}
+.map-leg span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:11px;height:11px;border-radius:3px;display:inline-block}
+.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}
+.map-band{padding:11px 14px}
+.map-band+.map-band{border-top:1px dashed var(--line)}
+.band-t{font-size:11px;font-weight:bold;letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.room{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:8px;font-size:12px;font-weight:bold;padding:10px 11px;border-radius:9px;border:1px solid;min-height:58px}
+.room .rn{display:flex;gap:7px;align-items:flex-start;line-height:1.3}
+.room i{font-size:15px;flex:none;margin-top:1px}
+.room.on{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.room.off{background:#F4F3EE;border-color:#D3D1C7;color:#7d7c75}
+.room.prem{background:#0A2142;border-color:#0A2142;color:#fff}
+.room.std{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.room.basic{background:#FBF1CF;border-color:#E7CE7A;color:#7a5b00}
+.room.apps{background:#EAF3FB;border-color:#A9CBE8;color:#0C447C}
+.room .tg{font-size:9px;font-weight:bold;padding:2px 6px;border-radius:5px;letter-spacing:.04em;white-space:nowrap}
+.room.prem .tg{background:rgba(255,255,255,.22);color:#fff}
+.room.std .tg{background:#F0997B;color:#fff}
+.room.basic .tg{background:#E7CE7A;color:#5e4600}
+.room.apps .tg{background:#A9CBE8;color:#0C447C}
+.room.off .tg{background:#D3D1C7;color:#5d5c55}
+.idrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.icard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.ic-h{font-size:11.5px;font-weight:bold;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.ic-h i{font-size:16px;color:var(--coral)}
+.person{display:flex;align-items:center;gap:11px}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;flex:none}
+.pn{font-size:13px;font-weight:bold}
+.pr{font-size:11.5px;color:var(--muted)}
+.kp{display:inline-flex;align-items:center;gap:5px;background:#FBF1CF;color:#7a5b00;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:6px;margin-top:11px}
+.ucount{font-size:18px;font-weight:bold;color:var(--navy)}
+.ucap{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+.metric{background:#F7F9FB;border-radius:10px;padding:12px}
+.metric-k{font-size:11px;color:var(--muted);font-weight:bold}
+.metric-v{font-size:17px;font-weight:bold;margin-top:3px}
+.metric-v small{font-size:11px;color:var(--muted);font-weight:normal}
+.note{font-size:11px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.note b{color:var(--navy)}
+.dl{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dl-row{display:grid;grid-template-columns:160px 1fr;border-top:1px solid var(--line)}
+.dl-row:first-child{border-top:none}
+.dl-k{background:#F7F9FB;padding:11px 14px;font-size:12px;font-weight:bold;color:var(--muted)}
+.dl-v{padding:11px 14px;font-size:13px}
+.pill{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;display:inline-block}
+.pill-y{background:#FBF1CF;color:#7a5b00}
+.pill-r{background:#FCEBEB;color:#A32D2D}
+.pill-g{background:#E1F5EE;color:#0F6E56}
+.lbl{font-size:12px;font-weight:bold;color:var(--muted)}
+.gh{font-size:11.5px;font-weight:bold;color:var(--muted);margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.gh .num{width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.box{border:1px solid var(--line);border-radius:12px;padding:4px 14px}
+.intg-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.intg-row:first-child{border-top:none}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.g{background:var(--green)}.dot.a{background:var(--amber)}
+.intg-row .nm{font-weight:bold;min-width:205px}
+.intg-row .ds{color:var(--muted)}
+.conv{display:flex;flex-direction:column;gap:7px}
+.conv div{font-size:12.5px;display:flex;gap:8px}
+.conv i{color:var(--coral);font-size:16px;flex:none;margin-top:1px}
+.conv b{color:var(--navy)}
+.conv .ex{display:block;font-size:11px;color:var(--muted);font-style:italic;line-height:1.45;margin-top:3px}
+.pend-panel{border:1px solid #F6D98A;background:#FFFAED;border-radius:14px;padding:14px 16px;margin-top:16px}
+.pend-h{font-size:13px;font-weight:bold;color:#7a5b00;display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.pend-h i{font-size:19px;color:var(--amber)}
+.pend-items{display:flex;flex-direction:column;gap:8px}
+.pend-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #F6E3B0;border-radius:10px;padding:10px 12px;font-size:12.5px}
+.pend-item i{font-size:16px;color:var(--amber);flex:none;margin-top:1px}
+.usepanel{border:1px solid #F0997B;background:#FFFAF8;border-radius:14px;padding:16px;margin-top:18px}
+.usepanel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.uh-left{display:flex;align-items:center;gap:11px}
+.uh-left>i{font-size:27px;color:var(--coral)}
+.uh-title{font-size:14px;font-weight:bold}
+.uh-sub{font-size:11.5px;color:var(--muted)}
+.uh-stat{text-align:right}
+.uh-num{font-size:30px;font-weight:bold;color:var(--coral);line-height:1}
+.uh-num-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.use-bar{display:flex;height:24px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.use-bar .u{background:var(--green)}
+.use-bar .n{background:var(--coral)}
+.use-leg{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.use-leg span{display:inline-flex;align-items:center;gap:6px}
+.use-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.use-col{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.use-col.lost{background:#FCF1EE;border-color:#F3D9CF}
+.uc-h{font-size:12px;font-weight:bold;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.uc-h.good{color:var(--green)}.uc-h.bad{color:#993C1D}
+.uc-h i{font-size:16px}
+.uc-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.uc-list li{font-size:12px;display:flex;gap:7px;align-items:flex-start}
+.uc-list li i{font-size:15px;flex:none;margin-top:1px;color:var(--green)}
+.uc-list.bad li i{color:var(--coral)}
+.uc-list.bad b{color:#993C1D}
+.usenote{font-size:11px;color:var(--muted);margin-top:11px;font-style:italic}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.col h4{font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.col.good h4{color:var(--green)}.col.bad h4{color:var(--red)}
+.col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.col li{font-size:12px;display:flex;gap:7px;line-height:1.45}
+.col li i{font-size:15px;flex:none;margin-top:1px}
+.col.good li i{color:var(--green)}.col.bad li i{color:var(--red)}
+.risks{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.risk{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;line-height:1.45}
+.sev{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;flex:none;white-space:nowrap}
+.sev.r{background:#FCEBEB;color:#A32D2D}
+.sev.o{background:#FBE6D8;color:#993C1D}
+.sev.s{background:#E6F1FB;color:#0C447C}
+.sev.op{background:#EEEDFE;color:#3C3489}
+.sev.y{background:#FBF1CF;color:#7a5b00}
+.pend-panel .pend-item span b{color:var(--navy)}
+.reco{display:flex;gap:13px;background:#FFF6E9;border:1px solid var(--yellow);border-radius:12px;padding:15px 17px;margin-top:6px}
+.reco>i{font-size:26px;color:var(--amber)}
+.reco .badge{display:inline-block;background:var(--navy);color:#fff;font-size:12px;font-weight:bold;padding:3px 11px;border-radius:7px;margin-bottom:9px}
+.reco p{font-size:12.5px}
+.reco .rh{font-size:12px;font-weight:bold;margin:9px 0 3px;display:flex;align-items:center;gap:6px}
+.reco .rh.now{color:var(--green)}
+.reco .rh.mid{color:var(--coral)}
+.reco .warn-line{font-size:11.5px;color:#993C1D;background:#FCF1EE;border-radius:8px;padding:8px 10px;margin-top:9px}
+.reco-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin:7px 0 0}
+.reco-list li{display:flex;gap:9px;align-items:flex-start}
+.reco-list li>i{color:var(--amber);font-size:15px;flex:none;margin-top:2px}
+.reco-list .rl-t{font-size:12px;font-weight:bold;line-height:1.4}
+.reco-list .rl-d{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.exlist{list-style:none;margin:6px 0 0;display:flex;flex-direction:column;gap:4px}
+.exlist li{display:block;font-size:11.5px;color:var(--muted);line-height:1.4;padding-left:13px;position:relative}
+.exlist li:before{content:"–";position:absolute;left:0;color:var(--coral);font-weight:bold}
+.exlist li b{color:var(--navy)}
+.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:24px;padding:16px 26px;color:var(--muted);font-size:11px}
+.foot b{color:var(--navy)}
+@media(max-width:640px){.tablero,.metrics,.twocol,.idrow,.opp-grid,.use-cols,.purpose-list,.dl-row{grid-template-columns:1fr}}
+@media print{.fp-card{break-inside:auto}.ind,.room,.icard,.col,.risk,.opp-card,.reco,.sens,.map,.usepanel,.use-col,.pend-panel,.pend-item{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fp-card">
+
+  <div class="fp-head">
+    <div>
+      <div class="fp-eyebrow">FICHA DE SOFTWARE</div>
+      <div class="fp-name">Microsoft 365</div>
+      <div class="fp-sub">Suite de productividad, colaboración y seguridad (correo Exchange, Teams, SharePoint, OneDrive, Office, Power Platform). Proveedor: Microsoft vía partner <b>OCTUS SAS</b>. SaaS — la clínica migró desde Google Workspace.</div>
+      <div class="chips">
+        <span class="chip chip-coral">Productividad y colaboración · Suite corporativa</span>
+      </div>
+    </div>
+    <div class="fp-meta">
+      <div class="fp-tag">F1 · INVENTARIO</div>
+      <div>Ficha FP-02</div>
+      <div>10 jun 2026</div>
+      <div>Laura Salazar — Vena Digital</div>
+      <div>Base: 3 actas + informe de licenciamiento Octus</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- TABLERO VISUAL -->
+    <div class="tablero">
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-trending-up"></i> Adopción</div>
+        <div class="meter"><span class="seg a"></span><span class="seg a"></span><span class="seg"></span></div>
+        <div class="ind-val">Media</div>
+        <div class="ind-note">Correo y archivos sí; colaboración y automatización subutilizadas</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-activity-heartbeat"></i> Criticidad operativa</div>
+        <div class="meter"><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span><span class="seg"></span></div>
+        <div class="ind-val">Alta</div>
+        <div class="ind-note">Sostiene correo, archivos, seguridad y backups de todo el dominio</div>
+      </div>
+      <div class="ind">
+        <div class="ind-top"><i class="ti ti-alert-triangle"></i> Nivel de riesgo</div>
+        <div class="meter"><span class="seg r"></span><span class="seg r"></span><span class="seg r"></span><span class="seg"></span></div>
+        <div class="ind-val">Alto</div>
+        <div class="ind-note">Gobierno de datos e IA · identidad compartida por área</div>
+      </div>
+    </div>
+
+    <!-- DATOS SENSIBLES -->
+    <div class="sens">
+      <i class="ti ti-shield-lock"></i>
+      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Correo y documentos corporativos con información clínica y administrativa (dato sensible de salud · Ley 1581/2012) · capa de seguridad gestionada por Octus: Intune y Entra ID P1 en los 8 usuarios Premium, más Bitdefender (correo, antivirus y móvil) y respaldo Veeam facturados aparte. Riesgo activo: líderes han subido información sensible a IA pública (ChatGPT, Gemini) sin política de uso ni anonimización.</span></div>
+    </div>
+
+    <!-- A · IDENTIFICACIÓN -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-id"></i><b>Identificación y propósito</b><span>BLOQUE A</span></div>
+      <div class="panel-a">
+        <div class="purpose">
+          <div class="purpose-h">Para qué se usa</div>
+          <ul class="purpose-list">
+            <li><i class="ti ti-chevron-right"></i> Correo corporativo y calendario (Exchange / Outlook)</li>
+            <li><i class="ti ti-chevron-right"></i> Repositorio documental (SharePoint Gestión Documental y Día a Día)</li>
+            <li><i class="ti ti-chevron-right"></i> Almacenamiento personal en la nube (OneDrive, 1 TB/usuario)</li>
+            <li><i class="ti ti-chevron-right"></i> Reuniones virtuales y chat (Teams)</li>
+            <li><i class="ti ti-chevron-right"></i> Office (Word, Excel, PowerPoint) web y escritorio</li>
+            <li><i class="ti ti-chevron-right"></i> Formularios e inspecciones (Microsoft Forms)</li>
+            <li><i class="ti ti-chevron-right"></i> Seguridad y continuidad: backups, antivirus, MFA, recuperación</li>
+            <li><i class="ti ti-chevron-right"></i> Base de intranet y Universidad Pinares (sobre SharePoint)</li>
+          </ul>
+          <div class="purpose-tag">Es la columna vertebral de productividad, colaboración y seguridad informática de la clínica.</div>
+        </div>
+
+        <div class="map">
+          <div class="map-h">
+            <span><i class="ti ti-map-2"></i>Mapa de uso y licencia por área — Clínica Pinares</span>
+            <span class="map-leg"><span><span class="lg" style="background:#0A2142"></span> Premium</span><span><span class="lg coral"></span> Standard</span><span><span class="lg" style="background:#E7CE7A"></span> Basic</span><span><span class="lg" style="background:#A9CBE8"></span> Apps</span><span><span class="lg gray"></span> Sin cuenta</span></span>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona asistencial (buzón compartido por área — sin identidad individual)</div>
+            <div class="rooms">
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Subgerencia asistencial</span><span class="tg">PREMIUM</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Médicos</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Jefes de enfermería</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Psicólogos</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Servicio / Químico farmacéutico</span><span class="tg">STANDARD</span></div>
+            </div>
+          </div>
+          <div class="map-band">
+            <div class="band-t">Zona administrativa</div>
+            <div class="rooms">
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Subgerencia administrativa</span><span class="tg">PREMIUM</span></div>
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Recepción / atención</span><span class="tg">PREMIUM</span></div>
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Gestión Documental</span><span class="tg">PREMIUM</span></div>
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Talento Humano</span><span class="tg">PREMIUM</span></div>
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Comercial</span><span class="tg">PREMIUM</span></div>
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Coord. del proyecto · Mónica</span><span class="tg">PREMIUM</span></div>
+              <div class="room prem"><span class="rn"><i class="ti ti-check"></i> Sistemas / backup</span><span class="tg">PREMIUM</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Compras</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Comunicaciones</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Alimentación</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Inducciones</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Universidad Pinares</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> SGSST</span><span class="tg">STANDARD</span></div>
+              <div class="room std"><span class="rn"><i class="ti ti-check"></i> Carlos Escobar</span><span class="tg">STANDARD</span></div>
+              <div class="room basic"><span class="rn"><i class="ti ti-check"></i> Gerencia · Oscar Correa</span><span class="tg">BASIC</span></div>
+              <div class="room basic"><span class="rn"><i class="ti ti-check"></i> Contabilidad</span><span class="tg">BASIC</span></div>
+              <div class="room basic"><span class="rn"><i class="ti ti-check"></i> Jurídica</span><span class="tg">BASIC</span></div>
+              <div class="room basic"><span class="rn"><i class="ti ti-check"></i> Mantenimiento</span><span class="tg">BASIC</span></div>
+              <div class="room basic"><span class="rn"><i class="ti ti-check"></i> Archivo · Naudy</span><span class="tg">BASIC</span></div>
+              <div class="room basic"><span class="rn"><i class="ti ti-check"></i> Talleristas</span><span class="tg">BASIC</span></div>
+              <div class="room basic"><span class="rn"><i class="ti ti-check"></i> Vigilancia · Coopevian</span><span class="tg">BASIC</span></div>
+              <div class="room apps"><span class="rn"><i class="ti ti-check"></i> Server</span><span class="tg">APPS</span></div>
+              <div class="room off"><span class="rn"><i class="ti ti-minus"></i> Servicios Generales / Aseo</span><span class="tg">SIN CUENTA</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="idrow">
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-user-cog"></i> Doliente interno</div>
+            <div class="person">
+              <div class="avatar">CL</div>
+              <div><div class="pn">Claudia Lema</div><div class="pr">Subgerente Administrativa · contraparte operativa</div></div>
+            </div>
+            <div class="kp"><i class="ti ti-alert-triangle"></i> Sin dueño interno de adopción/gobernanza</div>
+          </div>
+          <div class="icard">
+            <div class="ic-h"><i class="ti ti-users"></i> Usuarios / licencias vigentes</div>
+            <div class="ucount">29 licencias</div>
+            <div class="ucap">7 Basic + 13 Standard + 8 Premium + 1 Apps. Sin licencias disponibles (0). El modelo de buzones compartidos por área (enfermería, médicos, recepción) impide la trazabilidad individual de quién hizo qué.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · PROVEEDOR / CONTRATO / COSTO -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-businessplan"></i><b>Proveedor, contrato y costo</b><span>BLOQUE B</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-k">Costo mensual</div><div class="metric-v">$2.794.064 <small>COP</small></div></div>
+        <div class="metric"><div class="metric-k">Costo anual</div><div class="metric-v">$33.528.768 <small>COP</small></div></div>
+        <div class="metric"><div class="metric-k">Modalidad</div><div class="metric-v">SaaS <small>nube</small></div></div>
+        <div class="metric"><div class="metric-k">Renovación</div><div class="metric-v">05 jul 2026</div></div>
+      </div>
+      <div class="note"><b>Costo validado contra factura Octus FE12916 (22 may 2026).</b> <span class="pill pill-g">Validado</span> El pago mensual de <b>$2.794.064</b> se descompone en <b>$1.520.046 de licencias M365</b> (Premium 8×$86.009 + Standard 13×$48.887 + Basic 7×$23.457 + Apps 1×$32.244) y <b>$1.274.018 de infraestructura y seguridad facturadas aparte</b> por Octus: Azure Plan ($620.080), Windows Server 2025 RDS CAL (6×$32.207), respaldo Veeam ($94.618) y Bitdefender correo/antivirus/móvil ($366.078). <b>Microsoft Copilot pago: 0 licencias contratadas</b> (el "Copilot básico" del informe es la versión gratuita del navegador, no el add-on de $30 USD/usuario/mes).</div>
+      <div class="dl">
+        <div class="dl-row"><div class="dl-k">Proveedor</div><div class="dl-v"><b>Microsoft</b>, contratado y gestionado a través del partner de TI <b>OCTUS SAS</b>. La clínica no compra licencias directamente a Microsoft.</div></div>
+        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v">SaaS en la nube de Microsoft; acceso web, escritorio y móvil. Servidores locales integrados vía Azure y respaldo Veeam. <span class="pill pill-g">Migrado desde Google Workspace</span></div></div>
+        <div class="dl-row"><div class="dl-k">Tipo de licencia</div><div class="dl-v">29 licencias por usuario, asignadas por perfil: <b>7 Business Basic</b> ($23.457 c/u, solo web/móvil), <b>13 Business Standard</b> ($48.887 c/u, + Office escritorio), <b>8 Business Premium</b> ($86.009 c/u, + Intune/Defender/Entra ID P1), <b>1 Apps</b> ($32.244, Office en servidor). Contrato anual / pago mensual.</div></div>
+        <div class="dl-row"><div class="dl-k">Vigencia / terminación</div><div class="dl-v">Las licencias Basic/Standard/Premium renuevan el 05/07/2026; Apps el 04/08/2026. El contrato con Octus <b>restringe la baja de licencias hasta la renovación anual</b> (no se pueden liberar buzones a mitad de ciclo).</div></div>
+        <div class="dl-row"><div class="dl-k">Soporte y dependencia</div><div class="dl-v">Octus vía tickets (Doctus): <b>Yerson Peña</b> (M365 general) y <b>Andrés</b> (seguridad: Entra/Azure AD). Solo Claudia Lema y Rafael están autorizados para abrir tickets. La administración del tenant es 100% de Octus; la clínica no la gestiona directamente.</div></div>
+      </div>
+    </div>
+
+    <!-- C · CONFIGURACIÓN TÉCNICA Y DATOS -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-settings-cog"></i><b>Configuración técnica y datos</b><span>BLOQUE C</span></div>
+      <div class="dl" style="margin-bottom:6px">
+        <div class="dl-row"><div class="dl-k">Roles y permisos</div><div class="dl-v"><span class="pill pill-r">Buzones compartidos por área</span> <span class="pill pill-g">SharePoint bien gobernado</span> &nbsp;Sin identidad individual para personal operativo (un buzón para enfermería, otro para médicos, otro para recepción). En contraste, SharePoint Gestión Documental está bien controlado: todos ven, nadie descarga, y solo Mariana Chica (Calidad) edita y versiona.</div></div>
+      </div>
+
+      <div class="gh"><span class="num">1</span> ¿Permite integraciones?</div>
+      <div class="box" style="padding:11px 14px;font-size:12.5px">
+        <span class="pill pill-g">Sí</span> &nbsp;<span style="color:var(--muted)"><b>Power Automate y Power Apps "para Microsoft 365" vienen incluidos</b> en los planes Basic, Standard y Premium que paga Pinares, sin costo adicional, mientras se usen <b>conectores estándar</b> (SharePoint, OneDrive, Teams, Outlook, Forms, Excel) — confirmado en la documentación oficial de Microsoft. Solo los conectores premium/externos (HTTP/API) y <b>Power BI</b> exigen licencia aparte.</span>
+      </div>
+
+      <div class="gh"><span class="num">2</span> Integraciones activas y vigentes</div>
+      <div class="box">
+        <div class="intg-row"><span class="dot g"></span><span class="nm">M365 ↔ servidores locales (Azure)</span><span class="ds">Backups por carpeta + pruebas de recuperación gestionados por Octus</span></div>
+        <div class="intg-row"><span class="dot g"></span><span class="nm">Intranet / Universidad ↔ SharePoint</span><span class="ds">Construidas sobre SharePoint y Microsoft Lists — pero sin lanzamiento masivo</span></div>
+        <div class="intg-row"><span class="dot a"></span><span class="nm">Forms → Excel</span><span class="ds">Inspecciones SST se exportan a Excel y se trasladan a Luxflow a mano</span></div>
+      </div>
+
+      <div class="gh"><span class="num">3</span> Integraciones convenientes (recomendadas)</div>
+      <div class="conv">
+        <div><i class="ti ti-plug-connected"></i> <span><b>Power Automate: Forms → Luxflow</b> — automatizar el traslado de hallazgos de inspección sin digitación manual (con la capacidad ya incluida en las licencias). <span class="ex">Ejemplo: cuando Rafael envía el formulario de inspección de extintores, se crea sola la solicitud de mantenimiento en Luxflow para los que fallaron, sin que nadie la digite.</span></span></div>
+        <div><i class="ti ti-plug-connected"></i> <span><b>Microsoft Forms / Lists → SharePoint</b> — centralizar reportes e indicadores dentro del dominio corporativo con conectores estándar. <span class="ex">Ejemplo: cada respuesta de la encuesta de satisfacción cae sola en una tabla central de SharePoint, lista para consultar, sin bajarla a Excel ni armar el PowerPoint a mano.</span></span></div>
+      </div>
+
+      <!-- PAGADO VS USADO -->
+      <div class="usepanel">
+        <div class="usepanel-h">
+          <div class="uh-left"><i class="ti ti-coin"></i><div><div class="uh-title">Pagado vs. realmente usado</div><div class="uh-sub">Capacidad ya incluida en las licencias que la clínica no aprovecha</div></div></div>
+          <div class="uh-stat"><div class="uh-num">6 / 15</div><div class="uh-num-lbl">capacidades core con uso real</div></div>
+        </div>
+        <div class="use-bar"><div class="u" style="width:40%"></div><div class="n" style="width:60%"></div></div>
+        <div class="use-leg"><span><span class="lg" style="background:var(--green)"></span> En uso (6)</span><span><span class="lg" style="background:var(--coral)"></span> Disponible sin aprovechar (9)</span></div>
+        <div class="use-cols">
+          <div class="use-col">
+            <div class="uc-h good"><i class="ti ti-circle-check"></i> En uso</div>
+            <ul class="uc-list">
+              <li><i class="ti ti-check"></i> Correo Exchange / Outlook</li>
+              <li><i class="ti ti-check"></i> SharePoint — Gestión Documental y Día a Día</li>
+              <li><i class="ti ti-check"></i> OneDrive (almacenamiento)</li>
+              <li><i class="ti ti-check"></i> Teams (reuniones + chat Mantenimiento)</li>
+              <li><i class="ti ti-check"></i> Microsoft Forms (inspecciones)</li>
+              <li><i class="ti ti-check"></i> Seguridad: Defender / Intune / Entra (Premium)</li>
+            </ul>
+          </div>
+          <div class="use-col lost">
+            <div class="uc-h bad"><i class="ti ti-circle-x"></i> Disponible, pagado y sin aprovechar</div>
+            <ul class="uc-list bad">
+              <li><i class="ti ti-x"></i> <b>Intranet corporativa</b> (SharePoint) — inactiva</li>
+              <li><i class="ti ti-x"></i> <b>Universidad Pinares (LMS)</b> — sin lanzar</li>
+              <li><i class="ti ti-x"></i> <b>Microsoft Copilot básico</b> — 0 usuarios activos</li>
+              <li><i class="ti ti-x"></i> <b>Power Automate</b> — sin flujos configurados</li>
+              <li><i class="ti ti-x"></i> <b>Power Apps</b> — sin apps construidas</li>
+              <li><i class="ti ti-x"></i> <b>To Do / Planner</b> — sin adoptar</li>
+              <li><i class="ti ti-x"></i> <b>Teams: canales por área y llamadas</b> — sin adoptar</li>
+              <li><i class="ti ti-x"></i> <b>Bookings</b> (Standard) — sin uso</li>
+              <li><i class="ti ti-x"></i> <b>Sincronía móvil de calendario</b> — solo la usa la Subgerente</li>
+            </ul>
+          </div>
+        </div>
+        <div class="usenote">Nota: las dos plataformas SharePoint (intranet y Universidad Pinares) ya se pagaron como desarrollo y llevan más de dos meses listas sin usarse. Power BI es la única de estas capacidades que no viene incluida y requiere licencia aparte.</div>
+      </div>
+    </div>
+
+    <!-- D · DIAGNÓSTICO DEL CONSULTOR -->
+    <div class="sec">
+      <div class="sec-h"><i class="ti ti-stethoscope"></i><b>Diagnóstico del consultor</b><span>BLOQUE D</span></div>
+      <div class="twocol">
+        <div class="col good">
+          <h4><i class="ti ti-thumb-up"></i> Fortalezas</h4>
+          <ul>
+            <li><i class="ti ti-check"></i> Capa de seguridad robusta y bien gestionada por Octus: Defender, Intune, Entra ID P1, Azure Information Protection, backups por carpeta y pruebas periódicas de recuperación</li>
+            <li><i class="ti ti-check"></i> Ecosistema completo ya pagado (correo, Teams, SharePoint, OneDrive, Office, Power Platform) — capacidad ociosa que resolvería reprocesos sin comprar nada</li>
+            <li><i class="ti ti-check"></i> SharePoint Gestión Documental es el repositorio mejor gobernado de toda la clínica</li>
+          </ul>
+        </div>
+        <div class="col bad">
+          <h4><i class="ti ti-thumb-down"></i> Debilidades</h4>
+          <ul>
+            <li><i class="ti ti-x"></i> Gobernanza interna casi inexistente: Octus hace bien lo técnico, pero su alcance termina donde empieza la responsabilidad interna, y no hay dueño del producto</li>
+            <li><i class="ti ti-x"></i> El personal asistencial no ha recibido capacitación: tiene acceso a Teams desde los equipos del área pero sin formación ni adopción activa, por lo que no conoce el potencial de la suite y no la usa correctamente (caso Teams)</li>
+            <li><i class="ti ti-x"></i> Buzones compartidos por área → sin trazabilidad individual de las acciones sobre documentos y sistemas</li>
+            <li><i class="ti ti-x"></i> Sin política de uso de IA con datos sensibles</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lbl" style="margin:16px 0 0">Riesgos y alertas asociadas</div>
+      <div class="risks">
+        <div class="risk"><span class="sev r">🔴 Urgente</span><span><b>Gobierno de datos e IA inexistente</b> — líderes han subido información sensible de la clínica a IA pública (ChatGPT, Gemini) para cumplir metas de eficiencia que pide la gerencia. Sin política, restricción ni protocolo de anonimización, y con datos de salud clasificados como sensibles (Ley 1581/2012), esto es un riesgo legal, reputacional y de cumplimiento que crecerá hasta que ocurra un incidente.</span></div>
+        <div class="risk"><span class="sev s">🔵 Seguridad</span><span><b>Modelo de identidad compartida por área</b> — un solo buzón para enfermería, médicos o recepción imposibilita saber quién hizo qué sobre documentos y sistemas. Se debe evaluar licencias de bajo costo (M365 F1 / Frontline, ~2 USD/usuario/mes) para dar identidad individual al personal operativo.</span></div>
+      </div>
+
+      <div class="lbl" style="margin:18px 0 8px">Recomendación</div>
+      <div class="reco">
+        <i class="ti ti-bulb"></i>
+        <div>
+          <span class="badge">Gobernar y exprimir lo ya pagado</span>
+          <div class="rh now"><i class="ti ti-bolt"></i> Ahora</div>
+          <p>El problema de M365 no es la herramienta — es la gobernanza. Las prioridades inmediatas no requieren inversión nueva:</p>
+          <ul class="reco-list">
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Definir y aprobar la política de gobierno de datos e IA</div><div class="rl-d">Clasificación de datos por sensibilidad, plataformas aprobadas/prohibidas y protocolo de anonimización. Antes de un incidente, no después.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Garantizar la capacitación completa de todo el personal</div><div class="rl-d">Formar a toda la clínica en el uso correcto de la suite —incluyendo al área asistencial, que hoy no está capacitada— para que la inversión ya pagada se traduzca en uso real y no en herramientas dormidas.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Automatizar con Power Automate los procesos que hoy se hacen a mano</div><div class="rl-d">Aprovechar la capacidad ya incluida en las licencias para eliminar reprocesos manuales identificados en el diagnóstico:
+              <ul class="exlist">
+                <li><b>Encuestas de satisfacción:</b> que las respuestas de Forms se consoliden solas y alimenten un tablero, en lugar del armado manual Forms → Excel → PowerPoint (Calidad y Coordinación Administrativa).</li>
+                <li><b>Inspecciones de SST (Rafael):</b> que el envío del formulario de inspección genere automáticamente la tarea o el registro de seguimiento, sin digitarlo.</li>
+                <li><b>Egreso de personal:</b> que al registrar un egreso en Talento Humano se dispare un aviso/checklist automático a quien administra los usuarios, para inactivar accesos el mismo día.</li>
+                <li><b>Tareas y documentos vencidos:</b> notificar solo al responsable y a su jefe cuando algo está por vencer (hoy Calidad reactiva 337 tareas a mano semana a semana).</li>
+                <li><b>Aprobación de documentos:</b> flujos de revisión y aprobación en SharePoint con avisos automáticos, hoy 100% manuales en el ciclo documental de Calidad.</li>
+              </ul></div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Resolver el modelo de identidad individual</div><div class="rl-d">Evaluar con Octus licencias F1/Frontline (~2 USD/usuario/mes) para personal operativo: habilita la trazabilidad de quién hace qué.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Nombrar un dueño interno del producto M365</div><div class="rl-d">Responsable de gobernanza, adopción y puente con Octus; sin owner, la capacidad pagada seguirá dormida.</div></div></li>
+          </ul>
+          <div class="warn-line"><b>Advertencia del consultor:</b> la capa de seguridad ya es sólida; la brecha real es organizacional. La clínica debe garantizar que todo el personal asistencial esté capacitado en las herramientas. Además, se recomienda instaurar Teams como el canal oficial de los chats de la compañía —general y por áreas—, lo que incrementará y facilitará la adopción.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>Vena Digital</b> · Diagnóstico tecnológico — Clínica Pinares</span>
+    <span>Ficha de software · Fase 1 — Inventario · fuentes: 3 actas + informe de licenciamiento Octus</span>
+  </div>
+
+</div>
+</div>
+</body>
+</html>
