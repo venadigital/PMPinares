@@ -52,7 +52,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
 .map-leg{font-weight:normal;color:var(--muted);display:flex;align-items:center;gap:12px}
 .map-leg span{display:inline-flex;align-items:center;gap:6px}
 .lg{width:11px;height:11px;border-radius:3px;display:inline-block}
-.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}
+.lg.coral{background:var(--coral)}.lg.gray{background:#B4B2A9}.lg.amber{background:#EF9F27}
 .map-band{padding:11px 14px}
 .map-band+.map-band{border-top:1px dashed var(--line)}
 .band-t{font-size:11px;font-weight:bold;letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
@@ -61,6 +61,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
 .room i{font-size:15px;flex:none}
 .room.on{background:#FAECE7;border-color:#F0997B;color:#993C1D}
 .room.off{background:#F4F3EE;border-color:#D3D1C7;color:#7d7c75}
+.room.part{background:#FAEEDA;border-color:#EF9F27;color:#854F0B}
 .idrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .icard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
 .ic-h{font-size:11.5px;font-weight:bold;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
@@ -190,7 +191,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
     <div class="fp-meta">
       <div class="fp-tag">F1 · INVENTARIO</div>
       <div>Ficha FP-01</div>
-      <div>4 jun 2026</div>
+      <div>rev. jul 2026</div>
       <div>Laura Salazar — Vena Digital</div>
       <div>Base: 8 actas + contrato</div>
     </div>
@@ -223,7 +224,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
     <!-- DATOS SENSIBLES -->
     <div class="sens">
       <i class="ti ti-shield-lock"></i>
-      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Historia clínica de salud mental (dato sensible reforzado) · habeas data (Ley 1581/2012) · confidencialidad HC (Res. 1995/1999) · interoperabilidad nacional obligatoria (RDA/IHC, ventana 4 h) · medicamentos de control especial.</span></div>
+      <div><b>Datos sensibles que maneja — cumplimiento</b><span>Historia clínica de salud mental (dato sensible reforzado · Res. 1995/1999) · habeas data (Ley 1581/2012) · interoperabilidad nacional obligatoria (RDA/IHC, ventana 4 h) · medicamentos de control especial · ficha epidemiológica (sale vía RIPS al ente normativo).</span></div>
     </div>
 
     <!-- A · IDENTIFICACIÓN -->
@@ -235,9 +236,9 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
           <ul class="purpose-list">
             <li><i class="ti ti-chevron-right"></i> Historia clínica electrónica (hospitalización y consulta externa)</li>
             <li><i class="ti ti-chevron-right"></i> Prescripción y módulo asistencial (farmacia, enfermería, control)</li>
-            <li><i class="ti ti-chevron-right"></i> Admisión y agenda del día</li>
+            <li><i class="ti ti-chevron-right"></i> Admisión y agenda de consulta externa</li>
             <li><i class="ti ti-chevron-right"></i> Facturación con CUPS + DIAN + RIPS</li>
-            <li><i class="ti ti-chevron-right"></i> Inventarios valorizados por bodega</li>
+            <li><i class="ti ti-chevron-right"></i> Inventarios valorizados por bodega y por grupo</li>
             <li><i class="ti ti-chevron-right"></i> Interoperabilidad nacional (RDA / IHC)</li>
           </ul>
           <div class="purpose-tag">Es la columna vertebral clínica y administrativa de la clínica.</div>
@@ -246,7 +247,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
         <div class="map">
           <div class="map-h">
             <span><i class="ti ti-map-2"></i>Mapa de uso — Clínica Pinares</span>
-            <span class="map-leg"><span><span class="lg coral"></span> Usa SIIS</span><span><span class="lg gray"></span> No usa</span></span>
+            <span class="map-leg"><span><span class="lg coral"></span> Usa SIIS</span><span><span class="lg amber"></span> Uso parcial</span><span><span class="lg gray"></span> No usa</span></span>
           </div>
           <div class="map-band">
             <div class="band-t">Zona asistencial</div>
@@ -256,6 +257,8 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
               <div class="room on"><i class="ti ti-check"></i> Enfermería</div>
               <div class="room on"><i class="ti ti-check"></i> Farmacia</div>
               <div class="room on"><i class="ti ti-check"></i> Psicología / Psiquiatría</div>
+              <div class="room on"><i class="ti ti-check"></i> Toxicología</div>
+              <div class="room on"><i class="ti ti-check"></i> Talleristas</div>
             </div>
           </div>
           <div class="map-band">
@@ -267,7 +270,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
               <div class="room on"><i class="ti ti-check"></i> Archivo clínico</div>
               <div class="room on"><i class="ti ti-check"></i> Compras / Inventarios</div>
               <div class="room off"><i class="ti ti-minus"></i> Nutrición / Cocina (FUDO)</div>
-              <div class="room off"><i class="ti ti-minus"></i> Contabilidad (planos)</div>
+              <div class="room part"><i class="ti ti-file-export"></i> Contabilidad (parcial · planos)</div>
               <div class="room off"><i class="ti ti-minus"></i> Talento Humano</div>
               <div class="room off"><i class="ti ti-minus"></i> Comercial</div>
               <div class="room off"><i class="ti ti-minus"></i> Laboratorio (externo)</div>
@@ -288,7 +291,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
           <div class="icard">
             <div class="ic-h"><i class="ti ti-users"></i> Usuarios activos vigentes</div>
             <div class="ucount">No confiable</div>
-            <div class="ucap">El contrato base se firmó por 8 usuarios; no hay conteo vigente documentado y, sin protocolo de baja, hay cuentas de ex-empleados activas (una con permisos a todos los módulos).</div>
+            <div class="ucap">El contrato es por 8 usuarios <b>concurrentes</b> (en línea a la vez), no en total; el total puede rondar ~50. Cuando hay 8 conectados, el siguiente no entra hasta liberar un cupo — por eso el bajo costo. Sin conteo total confiable ni protocolo de baja (hay cuentas de ex-empleados activas).</div>
           </div>
         </div>
       </div>
@@ -303,10 +306,10 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
         <div class="metric"><div class="metric-k">Modalidad</div><div class="metric-v">SaaS <small>nube</small></div></div>
         <div class="metric"><div class="metric-k">Vigencia desde</div><div class="metric-v">Dic 2018</div></div>
       </div>
-      <div class="note"><b>Costo validado contra contrato.</b> Base contractual 2018: $1.120.000/mes por 8 usuarios ($140.000 c/u), exento de IVA, con renovación automática anual + incremento del IPC. El valor actual ($1.674.440) es coherente con esa base más los ajustes de IPC 2019–2026 (mismos 8 usuarios). Implementación inicial: $4.800.000 + IVA (pago único, 2018).</div>
+      <div class="note"><b>Costo validado contra contrato.</b> Base contractual 2018: $1.120.000/mes por 8 usuarios concurrentes ($140.000 c/u), exento de IVA, con renovación automática anual + incremento del IPC. El valor actual ($1.674.440) es coherente con esa base más los ajustes de IPC 2019–2026 (mismos 8 usuarios concurrentes). Implementación inicial: $4.800.000 + IVA (pago único, 2018).</div>
       <div class="dl">
         <div class="dl-row"><div class="dl-k">Proveedor</div><div class="dl-v"><b>SIMDE SAS</b> (NIT 901.300.510-0), por cesión del desarrollador original <b>IPSOFT SAS</b> (oct 2019). En las actas figura como "Sismed".</div></div>
-        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v">SaaS (alquiler como servicio) alojado en el DataCenter de NetGroup (Cali); acceso vía navegador. <span class="pill pill-r">Stack PHP5 / PostgreSQL 9.3</span></div></div>
+        <div class="dl-row"><div class="dl-k">Modalidad / hosting</div><div class="dl-v">SaaS (alquiler como servicio) alojado en el DataCenter de NetGroup (Cali); acceso vía navegador. <span class="pill pill-r">Stack PHP5 / PostgreSQL 9.3 — sin soporte (EOL)</span> &nbsp;Compromete la seguridad y limita la evolución; por confirmar con el proveedor si lo renovaron.</div></div>
         <div class="dl-row"><div class="dl-k">Tipo de licencia</div><div class="dl-v">Por usuario (tarifa escalonada), exento de IVA. Renovación automática cada 12 meses con incremento del IPC.</div></div>
         <div class="dl-row"><div class="dl-k">Vigencia / terminación</div><div class="dl-v">Renovación automática anual. Terminable por la clínica con aviso escrito (superados los 2 años iniciales). A la salida, el proveedor garantiza exportación de datos y acceso de consulta sin costo.</div></div>
         <div class="dl-row"><div class="dl-k">Soporte y dependencia</div><div class="dl-v">Telefónico + acceso remoto, lun–vie 8 a 20 h; cubre solo la aplicación SIIS (no hardware/BD/SO); fuera de horario $80.000/h. <b>Modificaciones y desarrollos nuevos se cobran aparte</b> → poca autonomía de la clínica.</div></div>
@@ -322,14 +325,14 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
 
       <div class="gh"><span class="num">1</span> ¿Permite integraciones?</div>
       <div class="box" style="padding:11px 14px;font-size:12.5px">
-        <span class="pill pill-g">Sí</span> &nbsp;<span style="color:var(--muted)">Tienen costo y dependen del tercero: la interfaz debe construirla el proveedor y está sujeta a la capacidad de integración del otro sistema.</span>
+        <span class="pill pill-g">Sí</span> &nbsp;<span style="color:var(--muted)">Las integraciones para cumplir normatividad no tienen costo. Las no normativas (Siigo, CoCo) sí, y dependen del tercero: hay que poner a alguien de Pinares a coordinar con ambos proveedores. Estimado CoCo: $2–4 M.</span>
       </div>
 
       <div class="gh"><span class="num">2</span> Integraciones activas y vigentes</div>
       <div class="box">
-        <div class="intg-row"><span class="dot g"></span><span class="nm">SIIS → DIAN</span><span class="ds">Factura electrónica de servicios con CUPS</span></div>
-        <div class="intg-row"><span class="dot g"></span><span class="nm">SIIS → Ministerio de Salud</span><span class="ds">Envío de RIPS / RIF</span></div>
-        <div class="intg-row"><span class="dot g"></span><span class="nm">SIIS → Interoperabilidad RDA/IHC</span><span class="ds">Activa, fase inicial — solo consulta externa (ventana 4 h)</span></div>
+        <div class="intg-row"><span class="dot g"></span><span class="nm">SIIS → DIAN</span><span class="ds">Factura electrónica</span></div>
+        <div class="intg-row"><span class="dot g"></span><span class="nm">SIIS → Ministerio de Salud</span><span class="ds">Envío de RIPS y CUPS</span></div>
+        <div class="intg-row"><span class="dot g"></span><span class="nm">SIIS → Interoperabilidad RDA/IHC</span><span class="ds">Activa, fase inicial — solo datos personales del paciente (RDA); faltan las demás fases</span></div>
         <div class="intg-row"><span class="dot a"></span><span class="nm">SIIS → Siigo Contai (ventas)</span><span class="ds">Activa pero manual — carga mensual de archivo plano con ajustes a mano</span></div>
       </div>
 
@@ -354,7 +357,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
             <ul class="uc-list">
               <li><i class="ti ti-check"></i> Admisión / agenda del día</li>
               <li><i class="ti ti-check"></i> Facturación CUPS + DIAN + RIPS</li>
-              <li><i class="ti ti-check"></i> Asistencial (prescripción / farmacia / enfermería)</li>
+              <li><i class="ti ti-check"></i> Asistencial (historia clínica, evolución, prescripción, farmacia, enfermería)</li>
               <li><i class="ti ti-check"></i> Inventarios y compras</li>
               <li><i class="ti ti-check"></i> Interoperabilidad RDA / IHC</li>
               <li><i class="ti ti-check"></i> Laboratorios (órdenes — parcial)</li>
@@ -367,7 +370,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
               <li><i class="ti ti-x"></i> <b>Dietas / carta menú</b> — apagado (se paga FUDO)</li>
               <li><i class="ti ti-x"></i> <b>Perfil farmacoterapéutico</b> — abandonado (Excel)</li>
               <li><i class="ti ti-x"></i> <b>Formularios de psicología</b> — sin costo, sin activar</li>
-              <li><i class="ti ti-x"></i> <b>Agendas y citas médicas</b> — bloqueadas por error "cuenta vencida"</li>
+              <li><i class="ti ti-x"></i> <b>Agendas y citas médicas</b> — con error "cuenta vencida" (por verificar si ya se solucionó)</li>
               <li><i class="ti ti-x"></i> <b>Impresión directa Zebra</b> — desconfigurada</li>
               <li><i class="ti ti-x"></i> <b>Recordatorio de cita</b> — no activo</li>
               <li><i class="ti ti-x"></i> <b>Estado de cuenta nativo</b> — no usado</li>
@@ -394,21 +397,22 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
         <div class="col bad">
           <h4><i class="ti ti-thumb-down"></i> Debilidades</h4>
           <ul>
-            <li><i class="ti ti-x"></i> Software antiguo, con una interfaz sin renovar que no favorece la experiencia de usuario</li>
-            <li><i class="ti ti-x"></i> Historial de errores e inconsistencias que ha minado la confianza del personal; esa desconfianza los lleva a duplicar procesos en Excel y genera reprocesos constantes</li>
-            <li><i class="ti ti-x"></i> El canal con el proveedor existe, pero las solicitudes y reportes no siempre se atienden de forma oportuna ni satisfactoria</li>
-            <li><i class="ti ti-x"></i> Desorden en la gestión de proyectos y nuevas funcionalidades del proveedor (ej. el proyecto de prescripción de control especial)</li>
-            <li><i class="ti ti-x"></i> La parametrización depende fuertemente del proveedor; la clínica tiene poca autonomía para hacer cambios por su cuenta</li>
+            <li><i class="ti ti-x"></i> Software antiguo sobre tecnología obsoleta (PHP5 / PostgreSQL 9.3, sin soporte): compromete la seguridad y limita su evolución e integración con herramientas nuevas</li>
+            <li><i class="ti ti-x"></i> Interfaz sin renovar y usabilidad compleja y tediosa (reportada por los usuarios), que no favorece la experiencia ni la adopción</li>
+            <li><i class="ti ti-x"></i> Los errores e inconsistencias acumulados han minado la confianza del personal, que duplica procesos en Excel y genera reprocesos constantes</li>
+            <li><i class="ti ti-x"></i> El canal con el proveedor (sistema de tickets) no siempre atiende las solicitudes de forma oportuna ni satisfactoria, sobre todo en proyectos</li>
+            <li><i class="ti ti-x"></i> Desorden en la gestión de proyectos y nuevas funcionalidades del proveedor (ej. control especial); sistema hecho a la medida, con poca autonomía de la clínica</li>
+            <li><i class="ti ti-x"></i> Conocimiento del sistema fragmentado, sin owner: la persona que dominaba el maestro se retiró y Naudy quedó con ~50–60%, lo que agrava la dependencia del proveedor</li>
           </ul>
         </div>
       </div>
 
       <div class="lbl" style="margin:16px 0 0">Riesgos y alertas asociadas</div>
       <div class="risks">
-        <div class="risk"><span class="sev r">🔴 Urgente</span><span><b>Proyecto de prescripción de medicamentos de control especial</b> — opera con firmas escaneadas (no certificadas) y sin documento de requisitos (PDR). La Seccional de Antioquia exige firma electrónica certificada en auditoría → riesgo de rechazo regulatorio y pérdida de trazabilidad.</span></div>
+        <div class="risk"><span class="sev r">🔴 Urgente</span><span><b>Proyecto de prescripción de medicamentos de control especial</b> — lleva 2 años sin claridad de avance ni fecha de cierre. Opera con firmas escaneadas (no certificadas) y sin documento de requisitos (PDR). La Seccional de Antioquia exige firma electrónica certificada en auditoría → riesgo de rechazo regulatorio y pérdida de trazabilidad.</span></div>
         <div class="risk"><span class="sev s">🔵 Seguridad</span><span><b>Usuarios no inactivados al egreso</b> — no existe protocolo de baja; hay cuentas de ex-empleados activas, al menos una con permisos a todos los módulos → riesgo de acceso indebido a datos clínicos y administrativos sensibles.</span></div>
         <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>No existe una vista integral de facturación del paciente</b> — el sistema no permite conocer el total facturado a un paciente, porque no integra la facturación de Siigo ni refleja los descuentos o novedades aplicados. Como consecuencia, la coordinación administrativa arma a mano un Excel de estado de cuenta, lo que duplica el trabajo y abre la puerta a errores.</span></div>
-        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>Doble agendamiento CoCo ↔ SIIS</b> — al no estar integrados, recepción registra cada cita en los dos sistemas por separado; esto produce 3–4 discrepancias de agenda al mes que afectan la facturación, los reportes al ente normativo y las comisiones de nómina de los psicólogos.</span></div>
+        <div class="risk"><span class="sev o">🟠 Crítica</span><span><b>Doble agendamiento CoCo ↔ SIIS</b> — al no estar integrados, recepción registra cada cita en los dos sistemas por separado; esto produce 3–4 discrepancias de agenda al mes que afectan la facturación, los reportes al ente normativo y las comisiones de nómina de los psicólogos; además, genera dobles consultas a un mismo especialista en la misma franja horaria.</span></div>
         <div class="risk"><span class="sev op">🟣 Operatividad</span><span><b>Módulo de compras sin parametrizar</b> — como el módulo de compras no está parametrizado, el reporte mensual de inventario exige una triple manipulación humana para generarse y todo el proceso de compras se opera de forma manual, lo que multiplica la probabilidad de error humano.</span></div>
         <div class="risk"><span class="sev op">🟣 Operatividad</span><span><b>Codificación RCA de farmacia pendiente</b> — la fase de medicamentos, dispositivos y reactivos (RCA) de la interoperabilidad exige recodificar todo el catálogo de farmacia en SIIS; mientras no se complete, esa fase no puede habilitarse ante el Ministerio y queda expuesta a errores de cargue masivo.</span></div>
       </div>
@@ -431,19 +435,27 @@ body{font-family:Arial,Helvetica,sans-serif;background:#EEF1F5;color:var(--navy)
           <div class="rh now"><i class="ti ti-bolt"></i> Ahora</div>
           <p>Exprimir la capacidad ya contratada y cerrar las brechas de gobernanza:</p>
           <ul class="reco-list">
-            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Activar Cajas/Compras, Perfil farmacoterapéutico y Estado de cuenta</div><div class="rl-d">Para habilitar la vista integral de facturación por paciente.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Activar Cajas/Compras, Perfil farmacoterapéutico y Estado de cuenta</div></div></li>
             <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Estabilizar el agendamiento y las notificaciones</div><div class="rl-d">Y probar la telemedicina, en caso de estar disponible.</div></div></li>
             <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Reactivar Dietas / carta menú</div><div class="rl-d">Si FUDO no resuelve el control de vencimientos ni la totalización en $ del inventario de cocina.</div></div></li>
             <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Activar la impresión directa con Zebra</div><div class="rl-d">Para que las manillas salgan con los datos precargados.</div></div></li>
-            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Estabilizar la parametrización de los informes en archivo plano</div><div class="rl-d">Los que se cotejan con Siigo: conciliación de compras, inventarios y consumos.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Estabilizar la parametrización de los informes en archivo plano</div><div class="rl-d">Base de la integración con Siigo: compras, inventarios, facturación y consumos.</div></div></li>
             <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Tomar el control del proyecto de prescripción de control especial</div><div class="rl-d">Hoy avanza sin requisitos definidos y con respuesta lenta del proveedor.</div></div></li>
             <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Reactivar la codificación RCA de farmacia</div><div class="rl-d">Requisito para cumplir la interoperabilidad.</div></div></li>
+            <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Consultar a profundidad los módulos disponibles no adquiridos</div><div class="rl-d">Inteligencia de negocios, Suite de pacientes y Dashboard de indicadores: validar si aplican y funcionan para Pinares.</div></div></li>
             <li><i class="ti ti-arrow-right"></i><div><div class="rl-t">Asignar un owner oficial del software</div><div class="rl-d">Puente con el proveedor, supervisión de issues y nuevos proyectos, y control de usuarios, permisos y roles.</div></div></li>
           </ul>
           <div class="rh mid"><i class="ti ti-route"></i> Mediano plazo</div>
-          <p>Contemplar y evaluar formalmente la <b>modernización o el reemplazo del HIS</b> dentro del escenario tecnológico ideal de la clínica. SIIS cumple, pero su interfaz antigua y la fuerte dependencia del proveedor empujan la operación hacia procesos manuales y auditorías evitables. La evaluación debe partir de un mapa funcional de lo que SIIS hace hoy (HC, facturación CUPS, RIPS, interoperabilidad RDA/IHC, farmacia e inventarios) y compararlo —con criterios definidos y costo total de propiedad (TCO)— frente a alternativas igual de robustas pero con interfaz moderna, soporte más confiable y mayor autonomía de parametrización para la clínica. Juega a favor que el contrato es terminable con aviso y que el proveedor garantiza la exportación de los datos, por lo que el amarre para migrar es bajo.</p>
+          <p>Contemplar y evaluar formalmente la <b>modernización o el reemplazo del HIS</b> dentro del escenario tecnológico ideal (horizonte estimado: 2027-2). SIIS cumple, pero su tecnología obsoleta y la dependencia del proveedor empujan la operación hacia procesos manuales y auditorías evitables; llama la atención pagar tan poco por el sistema más crítico de la clínica. La evaluación debe partir de un mapa funcional de lo que SIIS hace hoy (HC, facturación CUPS, RIPS, interoperabilidad RDA/IHC, farmacia e inventarios) y compararlo —con criterios definidos y TCO— frente a alternativas con interfaz moderna, mejor soporte y mayor autonomía de parametrización. <b>El reemplazo debe incluir un CRM / seguimiento unificado del paciente</b>, hoy inexistente (comercial y asistencial están desconectados). Conviene retomar la investigación previa de reemplazo de Carolina/Tatiana (cotizaciones y brochures), abortada por costo (~$100 M+). Juega a favor que el contrato es terminable con aviso y con exportación de datos garantizada, por lo que el amarre para migrar es bajo.</p>
           <div class="warn-line"><b>Advertencia del consultor:</b> reemplazar el HIS sin antes corregir la causa raíz organizacional (falta de doliente, parametrización abandonada, desconfianza) reproduce el mismo patrón de Excel sombra en un sistema nuevo y más caro. La decisión debe tomarse con criterios y TCO en F4/F5, no por impulso.</div>
         </div>
+      </div>
+
+      <div class="lbl" style="margin:18px 0 0">Oportunidades de mejora</div>
+      <div class="opp-grid">
+        <div class="opp-card"><div class="opp-ic"><i class="ti ti-chart-bar"></i></div><div><div class="ot">Módulo de inteligencia de negocios (BI)</div><div class="od">Dashboards de ingresos, egresos, días de estancia, rotación de camas y facturación — hoy armados a mano. Disponible, no adquirido.</div></div></div>
+        <div class="opp-card"><div class="opp-ic"><i class="ti ti-users"></i></div><div><div class="ot">Suite de pacientes</div><div class="od">Módulo disponible no adquirido para la gestión integral del paciente.</div></div></div>
+        <div class="opp-card"><div class="opp-ic"><i class="ti ti-chart-dots"></i></div><div><div class="ot">Dashboard de indicadores</div><div class="od">Automatiza los indicadores hospitalarios que hoy se calculan manualmente.</div></div></div>
       </div>
 
     </div>
