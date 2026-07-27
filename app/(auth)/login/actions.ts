@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
+function getAppUrl() {
+  return (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
+}
+
 export async function loginAction(formData: FormData) {
   if (!isSupabaseConfigured()) {
     redirect("/dashboard?demo=1");
@@ -21,6 +25,63 @@ export async function loginAction(formData: FormData) {
   }
 
   redirect(next.startsWith("/") ? next : "/dashboard");
+}
+
+export async function requestPasswordResetAction(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+
+  if (!isSupabaseConfigured()) {
+    redirect("/login?mode=recuperar&resetError=La recuperacion de contrasena requiere la conexion con Supabase");
+  }
+
+  if (!email || !email.includes("@")) {
+    redirect("/login?mode=recuperar&resetError=Ingresa un correo electronico valido");
+  }
+
+  const supabase = await createClient();
+  const redirectTo = `${getAppUrl()}/auth/callback?next=/restablecer-contrasena`;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+
+  if (error) {
+    redirect("/login?mode=recuperar&resetError=No fue posible enviar el enlace. Espera unos minutos e intentalo nuevamente");
+  }
+
+  // The same response is shown whether or not the account exists to avoid email enumeration.
+  redirect("/login?mode=recuperar&resetSent=1");
+}
+
+export async function updateRecoveredPasswordAction(formData: FormData) {
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (password.length < 8) {
+    redirect("/restablecer-contrasena?error=La contrasena debe tener minimo 8 caracteres");
+  }
+
+  if (password !== confirmPassword) {
+    redirect("/restablecer-contrasena?error=Las contrasenas no coinciden");
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?mode=recuperar&resetError=El enlace de recuperacion vencio o ya fue utilizado");
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    redirect("/restablecer-contrasena?error=No fue posible actualizar la contrasena. Solicita un enlace nuevo");
+  }
+
+  await supabase
+    .from("profiles")
+    .update({ temporary_password_changed: true })
+    .eq("id", user.id);
+
+  await supabase.auth.signOut({ scope: "local" });
+  redirect("/login?passwordUpdated=1");
 }
 
 export async function logoutAction() {

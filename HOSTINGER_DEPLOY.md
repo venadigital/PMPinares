@@ -82,6 +82,16 @@ Verifica en Supabase:
 - El usuario administrador existe.
 - Las URLs del proyecto usan el dominio de producción.
 
+### Recuperacion De Contrasena
+
+En **Supabase > Authentication > URL Configuration** configura:
+
+- `Site URL`: `https://pinarespm.venadigital.com.co`
+- `Redirect URL`: `https://pinarespm.venadigital.com.co/auth/callback`
+- Para pruebas locales, agrega también `http://localhost:3000/auth/callback`.
+
+Supabase Auth genera el enlace seguro y envía el correo de recuperación. Resend no es obligatorio para este flujo. Si se desea personalizar el remitente y la plantilla del correo, configura Resend como proveedor SMTP dentro de Supabase Authentication.
+
 ## Primer Acceso
 
 Si necesitas crear o reparar el administrador inicial:
